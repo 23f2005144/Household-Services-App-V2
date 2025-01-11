@@ -41,6 +41,6 @@ export default{
         body{
         background-color: lightgoldenrodyellow;
         }`
-    document.head.appendChild(style)
+        document.head.appendChild(style)
   },
 }
