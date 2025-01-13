@@ -2,7 +2,7 @@ import ServiceTable from "../components/ServiceTable.js"
 export default{
     template:`
     <div>
-        <ServiceTable :services="services" @Service_Deleted="serv_deleted" @service_details="serv_details_show" @Service_Updated="serv_update"/>
+        <ServiceTable :services="services" @Service_Deleted="serv_deleted" @Service_Details="serv_details_show" @Service_Updated="serv_update" @Service_Created="ServiceDataFetch"/>
         <div v-if="service_detail_record" class="modal fade show" id="ServiceModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -38,7 +38,6 @@ export default{
                 </div>
             </div>
         </div>
-        <p class="text-end"><a href="/admin/service_create" class="link-info link-offset-2 link-underline-opacity-100 link-underline-opacity-100-hover" style="font-size:25px; font-weight: bold;">+ New Service</a></p>
             <!--<div class="row my-3">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">New Professionals</p>
                 <table class="table table-hover table-bordered border-primary">
@@ -91,27 +90,16 @@ export default{
     </div>
     `,
     async mounted(){
-        try{
-            const res = await fetch(location.origin+'/api/service',{
-                headers:{
-                    'Authentication-Token': this.$store.state.auth_token
-                }
-            })
-            this.services= await res.json()
-
-            this.style = document.createElement('style')
-            this.style.innerHTML=`
-                table{
-                    font-size: 18px;
-                }
-                body{
-                    background-color: lightgoldenrodyellow;  
-                }`
-            document.head.appendChild(this.style)
-        }
-        catch(error){
-            console.log("Error",error)
-        }  
+        await this.ServiceDataFetch()
+        this.style = document.createElement('style')
+        this.style.innerHTML=`
+            table{
+                font-size: 18px;
+            }
+            body{
+                background-color: lightgoldenrodyellow;  
+            }`
+        document.head.appendChild(this.style)    
     },
     unmounted() {
         if (this.style) {
@@ -127,6 +115,19 @@ export default{
         }
     },
     methods:{
+        async ServiceDataFetch(){
+            try{
+                const res = await fetch(location.origin+'/api/service',{
+                    headers:{
+                        'Authentication-Token': this.$store.state.auth_token
+                    }
+                })
+                this.services= await res.json()
+            }
+            catch(error){
+                console.log("Error",error)
+            }
+        },
         serv_deleted(service_id){
             this.services = this.services.filter(service => service.service_id !== service_id)
         },
