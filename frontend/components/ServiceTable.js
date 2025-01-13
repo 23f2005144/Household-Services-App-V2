@@ -30,7 +30,7 @@ export default{
                             </tr>
                     </table>
                 </div>
-                <a @click.prevent="ServiceCreateForm" class="link-info link-offset-2 link-underline-opacity-100 link-underline-opacity-100-hover" style="font-size:25px; font-weight: bold;">+ Create a Service</a>
+                <a @click.prevent="ServiceCreateForm"><button class="btn btn-lg btn-success">+ Create Service</button></a>
             </div>
         </div>
         <div v-else-if="service_update_form">
@@ -112,8 +112,12 @@ export default{
                             <label for="service_desc" class="form-label">Service Description</label>
                             <input type="text" class="form-control" v-model="new_service_desc" name="service_desc">
                         </div>
-                    </div><br>
-                    <button type="submit" class="btn btn-success btn-lg p-2 col-md-2" id="btn-create">Create</button>
+                    </div>
+                    <div class="row">
+                        <div class="my-3 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <button type="submit" class="btn btn-success btn-lg p-2 col-md-6" id="btn-create">Create</button>
+                        </div>
+                    </div>                
                 </form>
             </div> 
         </div>
@@ -213,7 +217,7 @@ export default{
                     console.log("Service Created Successfully")
                     this.service_create_form=false;
                     this.service_table=true;
-                    this.$emit("Service_Created")/*Think about sending arg to parent or not since services array will be fetched again??*/
+                    this.$emit("Service_Created")
                 }
             }
             catch(error){
