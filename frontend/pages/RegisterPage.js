@@ -2,10 +2,10 @@ export default{
     template:`
     <div>
         <div v-if="role==='Customer'">
-            <div id="title">
-                <p class="Login-Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</p>
+            <div>
+                <p class="Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</p>
                 <hr style="border:6px dashed lightseagreen;">
-                <p class="Login-subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p>
+                <p class="Subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p>
             </div>
             <div class="container" id="Register-Cust">
                 <form @submit.prevent="RegisterCustomer">
@@ -49,10 +49,10 @@ export default{
             </div>
         </div>
         <div v-else-if="role==='Professional'">
-            <div id="title">
-                <h1 class="Login-Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</h1>
+            <div>
+                <h1 class="Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</h1>
                 <hr style="border:9px dashed lightseagreen;">
-                <p class="Login-subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p>
+                <p class="Subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p>
             </div>
             <div class="container" id="Register-Pro">
                 <form @submit.prevent="RegisterPro">
@@ -115,7 +115,7 @@ export default{
     mounted(){
         const style=document.createElement('style')
         style.innerHTML=`
-            .Login-Title{
+            .Title{
                 background-color:lightgoldenrodyellow;
                 font-style: italic;
                 font-weight: bolder;
@@ -125,7 +125,7 @@ export default{
                 color:#00827f;
             
             }
-            .Login-subtitle{
+            .Subtitle{
                 background-color:lightgoldenrodyellow;
                 font-style: italic;
                 padding: 15px;

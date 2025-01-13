@@ -2,9 +2,9 @@ export default{
     template:`
         <div>
             <div>
-                <h1 class="Login-Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</h1>
+                <h1 class="Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</h1>
                 <hr style="border:9px dashed lightseagreen;">
-                <p class="Login-subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p><br>
+                <p class="Subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p><br>
             </div>
             <div class="container" id="login-form">
                 <form @submit.prevent="LoginSubmit">
@@ -50,7 +50,7 @@ export default{
                 margin: auto;
             }
             
-            .Login-Title{
+            .Title{
                 background-color:lightgoldenrodyellow;
                 font-style: italic;
                 font-weight: bolder;
@@ -60,7 +60,7 @@ export default{
                 color:#00827f;
             }
 
-            .Login-subtitle{
+            .Subtitle{
                 background-color:lightgoldenrodyellow;
                 font-style: italic;
                 padding: 15px;
@@ -96,14 +96,17 @@ export default{
                     localStorage.setItem('user',JSON.stringify(data))
 
                     if(data.role==="Admin"){
-                        this.$router.push('/admin')
+                        this.$store.commit("setUser")
+                        this.$router.push('/admin/home')
                     }
                     
                     else if(data.role==="Customer"){
-                        this.$router.push('/customer')
+                        this.$store.commit("setUser")
+                        this.$router.push('/customer/home')
                     }
                     else{
-                        this.$router.push('/pro')
+                        this.$store.commit("setUser")
+                        this.$router.push('/pro/home')
                     }
 
                 }
