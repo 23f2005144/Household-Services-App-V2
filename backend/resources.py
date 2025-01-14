@@ -42,6 +42,7 @@ pro_fields={
     'p_id' : fields.Integer,
     'user_p_id' : fields.Integer,
     'p_email' : fields.String(attribute='pro_email'),
+    'p_status' : fields.Boolean(attribute='pro_status'),
     'p_name' : fields.String,
     'p_contact_no': fields.Integer,
     'p_service_type': fields.String,

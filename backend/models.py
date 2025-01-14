@@ -54,6 +54,10 @@ class Professional(db.Model):
     def pro_email(self):
         return self.p.email
     
+    @property
+    def pro_status(self):
+        return self.p.status
+    
 
 class ServiceRequest(db.Model):
     serv_req_id=db.Column(db.Integer, primary_key=True)
