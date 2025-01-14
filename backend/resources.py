@@ -41,6 +41,7 @@ customer_fields={
 pro_fields={
     'p_id' : fields.Integer,
     'user_p_id' : fields.Integer,
+    'p_email' : fields.String(attribute='pro_email'),
     'p_name' : fields.String,
     'p_contact_no': fields.Integer,
     'p_service_type': fields.String,
@@ -362,6 +363,16 @@ class CustomerAPI(Resource):
                 except:
                     db.session.rollback()
                     return {"Message":"Error in database"},400
+            
+            if req_method=="UnblockCustomer" and current_user.roles[0]=="Admin":
+                try:
+                    c_user_data.active=True
+                    db.session.commit()
+                    return {"Message":"Customer successfully unblocked"},200
+                
+                except:
+                    db.session.rollback()
+                    return {"Message":"Error in database"},400
         else:
             return {"Message":"Customer/User is not found"},404
     
@@ -413,11 +424,21 @@ class ProfessionalAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
                 
-            if req_method=="BlockProfessional" and current_user.roles[0]=="Admin":
+            if req_method=="BlockPro" and current_user.roles[0]=="Admin":
                 try:
                     p_user_data.active=False
                     db.session.commit()
                     return {"Message":"Professional successfully blocked"},200
+                
+                except:
+                    db.session.rollback()
+                    return {"Message":"Error in database"},400
+            
+            if req_method=="Approve/UnblockPro" and current_user.roles[0]=="Admin":
+                try:
+                    p_user_data.active=True
+                    db.session.commit()
+                    return {"Message":"Professional successfully approved/unblocked"},200
                 
                 except:
                     db.session.rollback()

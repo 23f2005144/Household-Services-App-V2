@@ -49,6 +49,10 @@ class Professional(db.Model):
     p_pincode=db.Column(db.Integer, nullable=False)
     serv_req_pro=db.Relationship('ServiceRequest',backref='srp')
     p_user=db.Relationship('User',backref='p')
+
+    @property
+    def pro_email(self):
+        return self.p.email
     
 
 class ServiceRequest(db.Model):

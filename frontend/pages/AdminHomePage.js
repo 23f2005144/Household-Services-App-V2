@@ -1,4 +1,5 @@
 import ServiceTable from "../components/ServiceTable.js"
+import ProTable from "../components/ProTable.js"
 export default{
     template:`
     <div>
@@ -38,35 +39,8 @@ export default{
                 </div>
             </div>
         </div>
+        <ProTable :new_pro_data="new_pro_data" @Pro_Details="pro_details_show"/>
             <!--<div class="row my-3">
-                <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">New Professionals</p>
-                <table class="table table-hover table-bordered border-primary">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Experience(Yrs)</th>
-                            <th>Service Type</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    {% for y in pro %}
-                        <tr>
-                            <td><a href="/admin/pro_details/{{y.pro_id}}">{{y.pro_id}}</a></td>
-                            <td>{{y.pro_name}}</td>
-                            <td>{{y.pro_exp}}</td>
-                            <td>{{y.pro_service_type}}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="/admin/pro/approve/{{y.pro_id}}"><button type="button" class="btn btn-lg btn-success">Approve</button></a>
-                                    <a href="/admin/pro/reject/{{y.pro_id}}"><button type="button" class="btn btn-lg btn-danger">Reject</button></a>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <div class="row my-3">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service Requests</p>
                 <table class="table table-hover table-bordered border-primary">
                     <thead>
@@ -91,6 +65,7 @@ export default{
     `,
     async mounted(){
         await this.ServiceDataFetch()
+        await this.NewProDataFetch()
         this.style = document.createElement('style')
         this.style.innerHTML=`
             table{
@@ -111,6 +86,8 @@ export default{
             style:null,
             service_detail_record:null,
             services:[],
+            new_pro_data:[],
+            new_pro_detail_record:null,
             
         }
     },
@@ -128,6 +105,20 @@ export default{
                 console.log("Error",error)
             }
         },
+        async NewProDataFetch(){
+            try{
+                const res = await fetch(location.origin+'/api/professional',{
+                    headers:{
+                        'Authentication-Token':this.$store.state.auth_token
+                    }
+                })
+                this.new_pro_data= await res.json()
+            }
+            catch(error){
+                console.log("Error",error)
+            }
+
+        },
         serv_deleted(service_id){
             this.services = this.services.filter(service => service.service_id !== service_id)
         },
@@ -142,7 +133,10 @@ export default{
             if (index !== -1) {
                 this.$set(this.services, index, service_update_obj);
             }
-        }
+        },
+        pro_details_show(p_id){
+            this.new_pro_detail_record=this.new_pro_data.find(pro=> pro.p_id===p_id)
+        },
     },
     components:{
         ServiceTable
