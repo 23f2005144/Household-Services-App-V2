@@ -39,7 +39,7 @@ export default{
                 </div>
             </div>
         </div>
-        <ProTable :new_pro_data="new_pro_data" @Pro_Details="pro_details_show"/>
+        <ProTable :new_pro_data="new_pro_data" @Pro_Approved="pro_approved" @Pro_Details="pro_details_show"/>
             <!--<div class="row my-3">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service Requests</p>
                 <table class="table table-hover table-bordered border-primary">
@@ -112,7 +112,8 @@ export default{
                         'Authentication-Token':this.$store.state.auth_token
                     }
                 })
-                this.new_pro_data= await res.json()
+                const new_pro_data_all= await res.json()
+                this.new_pro_data=new_pro_data_all.filter(pro=> pro.p_status===false)
             }
             catch(error){
                 console.log("Error",error)
@@ -121,6 +122,9 @@ export default{
         },
         serv_deleted(service_id){
             this.services = this.services.filter(service => service.service_id !== service_id)
+        },
+        pro_approved(p_id){
+            this.new_pro_data=this.new_pro_data.filter(pro => pro.p_id !== p_id)
         },
         serv_details_show(service_id){
             this.service_detail_record = this.services.find(service => service.service_id === service_id)
@@ -139,6 +143,7 @@ export default{
         },
     },
     components:{
-        ServiceTable
+        ServiceTable,
+        ProTable
     },
 }

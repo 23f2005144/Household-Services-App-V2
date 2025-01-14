@@ -52,11 +52,11 @@ class Professional(db.Model):
 
     @property
     def pro_email(self):
-        return self.p.email
+        return self.p_user.email
     
     @property
     def pro_status(self):
-        return self.p.status
+        return self.p_user.active
     
 
 class ServiceRequest(db.Model):
