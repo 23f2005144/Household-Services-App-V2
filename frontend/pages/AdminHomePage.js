@@ -40,6 +40,45 @@ export default{
             </div>
         </div>
         <ProTable :new_pro_data="new_pro_data" @Pro_Approved="pro_approved" @Pro_Details="pro_details_show"/>
+        <div v-if="new_pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header" >
+                        <h1 class="modal-title fs-5">New Professional Details</h1>
+                        <button type="button" class="btn-close" @click="pro_details_close" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>UserID</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Contact_No</th>
+                                    <th>Service_Type</th>
+                                    <th>Experience(yrs)</th>
+                                    <th>Serviceable_Pincode</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{{new_pro_detail_record.p_id}}</td>
+                                <td>{{new_pro_detail_record.user_p_id}}</td>
+                                <td>{{new_pro_detail_record.p_email}}</td>
+                                <td>{{new_pro_detail_record.p_name}}</td>
+                                <td>{{new_pro_detail_record.p_contact_no}}</td>
+                                <td>{{new_pro_detail_record.p_service_type}}</td>
+                                <td>{{new_pro_detail_record.p_exp}}</td>
+                                <td>{{new_pro_detail_record.p_pincode}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-lg btn-danger" @click="pro_details_close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
             <!--<div class="row my-3">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service Requests</p>
                 <table class="table table-hover table-bordered border-primary">
@@ -140,6 +179,9 @@ export default{
         },
         pro_details_show(p_id){
             this.new_pro_detail_record=this.new_pro_data.find(pro=> pro.p_id===p_id)
+        },
+        pro_details_close(){
+            this.new_pro_detail_record=null
         },
     },
     components:{
