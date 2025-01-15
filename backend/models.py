@@ -41,7 +41,7 @@ class Customer(db.Model):
 
 class Professional(db.Model):
     p_id=db.Column(db.Integer,primary_key=True,nullable=False)
-    user_p_id=db.Column(db.Integer, db.ForeignKey('user.user_id'),nullable=False)
+    user_p_id=db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE'),nullable=False)
     p_name=db.Column(db.String(), nullable=False)
     p_contact_no=db.Column(db.Integer)
     p_service_type=db.Column(db.String(), nullable=False)

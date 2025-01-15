@@ -456,19 +456,49 @@ class ProfessionalListAPI(Resource):
         pro_data_list=Professional.query.all()
         return pro_data_list
 
-            
+
+class UserAPI(Resource):
+
+    @marshal_with(user_fields)
+    @auth_required('token')
+    def get(self,user_id):
+        user_data=User.query.get(user_id)
+
+        if not user_data:
+            return {"Message":"User does not exist"},404
+        
+        return user_data
+
+    @auth_required('token')
+    def delete(self,user_id):
+        user_data=User.query.get(user_id)
+
+        if not user_data:
+             return {"Message":"User does not exist"},404
+        
+        if current_user.roles[0].name!='Admin':
+            return {"Message":"Forbidden: only Admin can remove users"},403
+        
+        try:
+            db.session.delete(user_data)
+            db.session.commit()
+            return "",204
+        
+        except:
+            db.session.rollback()
+            return {"Message":"Error in database"},400
+
 class UserListAPI(Resource):
     
     @marshal_with(user_fields)
     @auth_required('token')
-    def get(self,user_id):
+    def get(self):
         user_data=User.query.all()
 
         if current_user.roles[0]!='Admin':
             return {"Message":"Forbidden: only Admin can access user details"},403
 
         return user_data
-
 
 
 
@@ -483,4 +513,5 @@ api.add_resource(CustomerAPI,'/customer/<int:c_id>')
 api.add_resource(CustomerListAPI,'/customer')
 api.add_resource(ProfessionalAPI,'/professional/<int:p_id>')
 api.add_resource(ProfessionalListAPI,'/professional')
+api.add_resource(UserAPI,'/user/<int:user_id>')
 api.add_resource(UserListAPI,'/user')
