@@ -182,7 +182,7 @@ class ServiceListAPI(Resource):
         service_data_list=Service.query.all()
 
         if not service_data_list:
-            return {"Message":"Service does not exist"},404
+            return {"Message":"Services do not exist"},404
         
         return service_data_list
     
@@ -289,6 +289,10 @@ class ServiceRequestListAPI(Resource):
     @auth_required('token')
     def get(self):
         serv_req_data_list=ServiceRequest.query.all()
+
+        if not serv_req_data_list:
+            return {"Message":"ServiceRequests do not exist"},404
+        
         return serv_req_data_list
     
     def post(self):
@@ -384,6 +388,10 @@ class CustomerListAPI(Resource):
     @auth_required('token')
     def get(self):
         cust_data_list=Customer.query.all()
+
+        if not cust_data_list:
+            return {"Message":"Customers do not exist"},404
+        
         return cust_data_list
     
 
@@ -454,6 +462,10 @@ class ProfessionalListAPI(Resource):
     @auth_required('token')
     def get(self):
         pro_data_list=Professional.query.all()
+
+        if not pro_data_list:
+            return {"Message":"Professionals do not exist"},404
+        
         return pro_data_list
 
 
