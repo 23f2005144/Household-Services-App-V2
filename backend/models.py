@@ -8,8 +8,10 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String(), nullable=False)
     fs_uniquifier=db.Column(db.String(), unique = True, nullable = False)
     active=db.Column(db.Boolean, default = True)
-    roles=db.Relationship('Role', backref = 'ur', secondary='user_roles')
-
+    roles=db.relationship('Role', backref = 'ur', secondary='user_roles', cascade="delete")
+    p_user=db.relationship('Professional',backref='p',cascade='delete', passive_deletes=True, uselist=False)
+ 
+    
 class Role(db.Model,RoleMixin):
     role_id=db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String(), nullable=False, unique=True)
@@ -17,7 +19,7 @@ class Role(db.Model,RoleMixin):
 
 class UserRoles(db.Model):
     ur_id=db.Column(db.Integer,primary_key=True)
-    u_id=db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    u_id=db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE'))
     r_id=db.Column(db.Integer, db.ForeignKey('role.role_id'))
 
 class Service(db.Model):
@@ -27,7 +29,7 @@ class Service(db.Model):
     service_price=db.Column(db.Integer, nullable=False)
     service_duration=db.Column(db.Integer, nullable=False)
     service_desc=db.Column(db.String())
-    service_req=db.Relationship('ServiceRequest',backref='sr',cascade='delete')
+    service_req=db.relationship('ServiceRequest',backref='sr',cascade='delete')
 
 class Customer(db.Model):
     c_id=db.Column(db.Integer,primary_key=True,nullable=False)
@@ -36,27 +38,18 @@ class Customer(db.Model):
     c_contact_no=db.Column(db.Integer, nullable=False)
     c_address=db.Column(db.String(),nullable=False)
     c_pincode=db.Column(db.Integer,nullable=False)
-    c_req=db.Relationship('ServiceRequest',backref='cr')
-    c_user=db.Relationship('User',backref='c')
+    c_req=db.relationship('ServiceRequest',backref='cr')
+    c_user=db.relationship('User',backref='c')
 
 class Professional(db.Model):
     p_id=db.Column(db.Integer,primary_key=True,nullable=False)
-    user_p_id=db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE'),nullable=False)
+    user_p_id=db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete="CASCADE"), nullable=False)
     p_name=db.Column(db.String(), nullable=False)
     p_contact_no=db.Column(db.Integer)
     p_service_type=db.Column(db.String(), nullable=False)
     p_exp=db.Column(db.Integer, nullable=False)
     p_pincode=db.Column(db.Integer, nullable=False)
-    serv_req_pro=db.Relationship('ServiceRequest',backref='srp')
-    p_user=db.Relationship('User',backref='p')
-
-    @property
-    def pro_email(self):
-        return self.p_user.email
-    
-    @property
-    def pro_status(self):
-        return self.p_user.active
+    serv_req_pro=db.relationship('ServiceRequest',backref='srp')
     
 
 class ServiceRequest(db.Model):

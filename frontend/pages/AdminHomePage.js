@@ -39,7 +39,7 @@ export default{
                 </div>
             </div>
         </div>
-        <ProTable :new_pro_data="new_pro_data" @Pro_Approved="pro_approved" @Pro_Details="pro_details_show"/>
+        <ProTable :new_pro_data="new_pro_data" @Pro_Approved="pro_approved" @Pro_Details="pro_details_show" @Pro_Rejected="pro_rejected"/>
         <div v-if="new_pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -162,9 +162,6 @@ export default{
         serv_deleted(service_id){
             this.services = this.services.filter(service => service.service_id !== service_id)
         },
-        pro_approved(p_id){
-            this.new_pro_data=this.new_pro_data.filter(pro => pro.p_id !== p_id)
-        },
         serv_details_show(service_id){
             this.service_detail_record = this.services.find(service => service.service_id === service_id)
         },
@@ -176,6 +173,12 @@ export default{
             if (index !== -1) {
                 this.$set(this.services, index, service_update_obj);
             }
+        },
+        pro_approved(p_id){
+            this.new_pro_data=this.new_pro_data.filter(pro => pro.p_id !== p_id)
+        },
+        pro_rejected(p_id){
+            this.new_pro_data=this.new_pro_data.filter(pro => pro.p_id !== p_id)
         },
         pro_details_show(p_id){
             this.new_pro_detail_record=this.new_pro_data.find(pro=> pro.p_id===p_id)

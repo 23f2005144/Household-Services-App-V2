@@ -41,8 +41,8 @@ customer_fields={
 pro_fields={
     'p_id' : fields.Integer,
     'user_p_id' : fields.Integer,
-    'p_email' : fields.String(attribute='pro_email'),
-    'p_status' : fields.Boolean(attribute='pro_status'),
+    'p_email' : fields.String(attribute="p.email"),
+    'p_status' : fields.Boolean(attribute="p.active"),
     'p_name' : fields.String,
     'p_contact_no': fields.Integer,
     'p_service_type': fields.String,
@@ -471,7 +471,8 @@ class UserAPI(Resource):
 
     @auth_required('token')
     def delete(self,user_id):
-        user_data=User.query.get(user_id)
+        user_data=User.query.filter(User.user_id==user_id).first()
+        pro_data=Professional.query.filter(Professional.user_p_id==user_id).first()
 
         if not user_data:
              return {"Message":"User does not exist"},404
@@ -481,6 +482,7 @@ class UserAPI(Resource):
         
         try:
             db.session.delete(user_data)
+            db.session.delete(pro_data)
             db.session.commit()
             return "",204
         

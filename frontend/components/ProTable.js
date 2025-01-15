@@ -61,6 +61,7 @@ export default{
                     const data=await res.json()
                     alert(data.Message)
                     console.log("Professional Succesfully Approved")
+                    this.new_pro_obj=null
                 }
 
             }
@@ -68,6 +69,27 @@ export default{
                 console.log("Error",error)
             }
         },
+        async RejectPro(p_id){
+            this.new_pro_obj=this.new_pro_data.find(pro => pro.p_id === p_id)
+            try{
+                const res = await fetch(`${location.origin}/api/user/${this.new_pro_obj.user_p_id}`,{
+                    method:'DELETE',
+                    headers:{
+                        'Authentication-Token':this.$store.state.auth_token
+                    }
+                })
+                if (res.ok){
+                    this.$emit('Pro_Rejected',p_id)
+                    console.log('Professional Rejected Successfully')
+                    alert("Professional Rejected Successfully")
+                    this.new_pro_obj=null
+                }
+            }
+            catch(error){
+                console.log("Error",error)
+            }
+
+        }
 
     }
 }
