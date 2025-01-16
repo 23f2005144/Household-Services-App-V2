@@ -23,8 +23,8 @@ export default{
         </div>
     `,
     mounted() {
-        const style=document.createElement('style')
-        style.innerHTML=`
+        this.style=document.createElement('style')
+        this.style.innerHTML=`
             #emailbox{
                 border: 2px solid ;
                 height: 35px;
@@ -71,10 +71,16 @@ export default{
             body{
                 background-color:lightgoldenrodyellow;
             }`
-        document.head.appendChild(style)
+        document.head.appendChild(this.style)
+    },
+    unmounted() {
+        if (this.style) {
+            document.head.removeChild(this.style);
+        }
     },
     data(){
         return{
+            style:null,
             email:null,
             password:null
         }
