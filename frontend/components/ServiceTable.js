@@ -6,30 +6,28 @@ export default{
     <div>
         <div v-if="service_table">
             <div class="container">
-                <div class="row my-3">
-                    <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Services</p>
-                    <table class="table table-bordered">
-                        <thead>
-                            <th>ID</th>
-                            <th>Type</th>
-                            <th>Name</th>
-                            <th>Price ₹</th>
-                            <th>Action</th>
-                        </thead>
-                            <tr v-for="s in services" :key="s.service_id">
-                                <td><button type="button" class="btn btn-info" @click="service_details_page(s.service_id)">{{s.service_id}}</button></td>
-                                <td>{{s.service_type}}</td>
-                                <td>{{s.service_name}}</td>
-                                <td>{{s.service_price}}</td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-lg btn-warning" @click="Service_Update(s.service_id)">Edit</button>
-                                        <button type="button" class="btn btn-lg btn-danger" @click="ServiceDelete(s.service_id)">Delete</button>
-                                    </div>
-                                </td>
-                            </tr>
-                    </table>
-                </div>
+                <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Services</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Price ₹</th>
+                        <th>Action</th>
+                    </thead>
+                        <tr v-for="s in services" :key="s.service_id">
+                            <td><button type="button" class="btn btn-info" @click="service_details_page(s.service_id)">{{s.service_id}}</button></td>
+                            <td>{{s.service_type}}</td>
+                            <td>{{s.service_name}}</td>
+                            <td>{{s.service_price}}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-lg btn-warning" @click="Service_Update(s.service_id)">Edit</button>
+                                    <button type="button" class="btn btn-lg btn-danger" @click="ServiceDelete(s.service_id)">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                </table>
                 <button class="btn btn-lg btn-success" @click="ServiceCreateForm">+ Create Service</button>
             </div>
         </div>
@@ -73,7 +71,7 @@ export default{
                     </div><br>
                     <div class="row">
                         <div class="my-3 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                            <button type="submit" class="btn btn-success btn-lg p-2 col-md-2" id="btn-create">Update</button>
+                            <button type="submit" class="btn btn-success btn-lg p-2 col-md-6" id="btn-create">Update</button>
                         </div>
                     </div>
                 </form>
