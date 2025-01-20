@@ -6,15 +6,17 @@ export default{
     <div>
         <div class="container">
             <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service Requests</p>
-            <table class="table table-hover table-bordered border-primary">
+            <table class="table table-bordered">
                 <thead>
-                    <th>ID</th>
-                    <th>Service ID </th>
-                    <th>Service Name</th>
-                    <th>Pro ID</th>
-                    <th>Pro Name</th>
-                    <th>Date of Request</th>
-                    <th>Status</th>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service ID </th>
+                        <th>Service Name</th>
+                        <th>Pro ID</th>
+                        <th>Pro Name</th>
+                        <th>Date of Request</th>
+                        <th>Status</th>
+                    </tr>
                 </thead>
                     <tr v-for="sreq in service_reqs_data" :key="sreq.serv_req_id">
                         <td><button class="btn btn-primary" @click="$emit("Serv_Req_Details",sreq.serv_req_id)">{{sreq.serv_req_id}}</button></td>

@@ -9,13 +9,13 @@ export default{
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Experience(Yrs)</th>
-                    <th>Service Type</th>
-                    <th>Action</th>
-                    </tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Experience(Yrs)</th>
+                        <th>Service Type</th>
+                        <th>Action</th>
+                    <tr>
                 </thead>
                 <tr v-for="p in new_pro_data" :key="p.p_id">
                     <td><button class="btn btn-warning" @click="pro_details_page(p.p_id)">{{p.p_id}}</button></td>

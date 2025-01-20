@@ -9,11 +9,13 @@ export default{
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Services</p>
                 <table class="table table-bordered">
                     <thead>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Price ₹</th>
-                        <th>Action</th>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Price ₹</th>
+                            <th>Action</th>
+                        </tr>
                     </thead>
                         <tr v-for="s in services" :key="s.service_id">
                             <td><button type="button" class="btn btn-info" @click="service_details_page(s.service_id)">{{s.service_id}}</button></td>

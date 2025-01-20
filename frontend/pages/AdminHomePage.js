@@ -78,7 +78,7 @@ export default{
                 </div>
             </div>
         </div>
-        <ServiceReqTable :serv_reqs_data="serv_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
+        <ServiceReqTable :service_reqs_data="service_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
         <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -179,9 +179,14 @@ export default{
                     }
                 })
                 const new_pro_data_all= await res.json()
-                this.new_pro_data=new_pro_data_all.filter(pro=> pro.p_status===false)
+                if(new_pro_data_all!==null ){
+                    this.new_pro_data=this.new_pro_data_all.filter(pro=> pro.p_status===false)
+                }
             }
             catch(error){
+                if(error instanceof TypeError){
+                    console.log("No new professionals signed up!")
+                }
                 console.log("Error",error)
             }
 
@@ -236,6 +241,7 @@ export default{
     },
     components:{
         ServiceTable,
-        ProTable
+        ProTable,
+        ServiceReqTable
     },
 }
