@@ -1,5 +1,6 @@
 import ServiceTable from "../components/ServiceTable.js"
 import ProTable from "../components/ProTable.js"
+import ServiceReqTable from "../components/ServiceReqTable.js"
 export default{
     template:`
     <div>
@@ -50,28 +51,26 @@ export default{
                     <div class="modal-body">
                         <table class="table table-striped">
                             <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>UserID</th>
-                                    <th>Email</th>
-                                    <th>Name</th>
-                                    <th>Contact_No</th>
-                                    <th>Service_Type</th>
-                                    <th>Experience(yrs)</th>
-                                    <th>Serviceable_Pincode</th>
-                                </tr>
+                                <th>ID</th>
+                                <th>UserID</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Contact_No</th>
+                                <th>Service_Type</th>
+                                <th>Experience(yrs)</th>
+                                <th>Serviceable_Pincode</th>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td>{{new_pro_detail_record.p_id}}</td>
-                                <td>{{new_pro_detail_record.user_p_id}}</td>
-                                <td>{{new_pro_detail_record.p_email}}</td>
-                                <td>{{new_pro_detail_record.p_name}}</td>
-                                <td>{{new_pro_detail_record.p_contact_no}}</td>
-                                <td>{{new_pro_detail_record.p_service_type}}</td>
-                                <td>{{new_pro_detail_record.p_exp}}</td>
-                                <td>{{new_pro_detail_record.p_pincode}}</td>
-                            </tr>
+                                <tr>
+                                    <td>{{new_pro_detail_record.p_id}}</td>
+                                    <td>{{new_pro_detail_record.user_p_id}}</td>
+                                    <td>{{new_pro_detail_record.p_email}}</td>
+                                    <td>{{new_pro_detail_record.p_name}}</td>
+                                    <td>{{new_pro_detail_record.p_contact_no}}</td>
+                                    <td>{{new_pro_detail_record.p_service_type}}</td>
+                                    <td>{{new_pro_detail_record.p_exp}}</td>
+                                    <td>{{new_pro_detail_record.p_pincode}}</td>
+                                </tr>
                             </tbody>
                         </table>
                         <button type="button" class="btn btn-lg btn-danger" @click="pro_details_close">Close</button>
@@ -79,32 +78,58 @@ export default{
                 </div>
             </div>
         </div>
-            <!--<div class="row my-3">
-                <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service Requests</p>
-                <table class="table table-hover table-bordered border-primary">
-                    <thead>
-                        <th>ID</th>
-                        <th>Service Name</th>
-                        <th>Assigned Professional</th>
-                        <th>Date of Request</th>
-                        <th>Status</th>
-                    </thead>
-                    {% for z in serv_reqs %}
-                        <tr>
-                            <td><a href="/admin/service_req/{{z[0]}}">{{z[0]}}</a></td>
-                            <td>{{z[1]}}</td>
-                            <td>{{z[2]}}</td>
-                            <td>{{z[4]}}</td>
-                            <td>{{z[5]}}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>-->
+        <ServiceReqTable :serv_reqs_data="serv_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
+        <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header" >
+                        <h1 class="modal-title fs-5">Service Request Details</h1>
+                        <button type="button" class="btn-close" @click="service_req_details_close" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <th>ID</th>
+                                <th>Service ID</th>
+                                <th>Customer ID</th>
+                                <th>Customer Name</th>
+                                <th>Customer Pincode</th>
+                                <th>Service Status</th>
+                                <th>Pro ID</th>
+                                <th>Date_of_Request</th>
+                                <th>Date_of_Completion</th>
+                                <th>Service Remarks</th>
+                                <th>Service Rating</th>
+                                <th>Pro Rating</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{service_req_detail_record.serv_req_id}}</td>
+                                    <td>{{service_req_detail_record.serv_id}}</td>
+                                    <td>{{service_req_detail_record.cust_id}}</td>
+                                    <td>{{service_req_detail_record.cust_name}}</td>
+                                    <td>{{service_req_detail_record.cust_pincode}}</td>
+                                    <td>{{service_req_detail_record.service_status}}</td>
+                                    <td>{{service_req_detail_record.pro_id}}</td>
+                                    <td>{{service_req_detail_record.date_of_req}}</td>
+                                    <td>{{service_req_detail_record.date_of_comp}}</td>
+                                    <td>{{service_req_detail_record.service_remarks}}</td>
+                                    <td>{{service_req_detail_record.service_rating}}</td>
+                                    <td>{{service_req_detail_record.pro_rating}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-lg btn-danger" @click="serv_req_details_close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     `,
     async mounted(){
         await this.ServiceDataFetch()
         await this.NewProDataFetch()
+        await this.ServiceReqsDataFetch()
         this.style = document.createElement('style')
         this.style.innerHTML=`
             table{
@@ -127,6 +152,8 @@ export default{
             services:[],
             new_pro_data:[],
             new_pro_detail_record:null,
+            service_reqs_data:[],
+            service_req_detail_record:null
             
         }
     },
@@ -159,6 +186,20 @@ export default{
             }
 
         },
+        async ServiceReqsDataFetch(){
+            try{
+                const res = await fetch(location.origin+'/api/service_request',{
+                    headers:{
+                        'Authentication-Token': this.$store.state.auth_token
+                    }
+                })
+                this.service_reqs_data= await res.json()
+            }
+            catch(error){
+                console.log("Error",error)
+            }
+        },
+
         serv_deleted(service_id){
             this.services = this.services.filter(service => service.service_id !== service_id)
         },
@@ -186,6 +227,12 @@ export default{
         pro_details_close(){
             this.new_pro_detail_record=null
         },
+        serv_req_details_show(serv_req_id){
+            this.service_req_detail_record=this.service_reqs_data.find(sr=> sr.serv_req_id===serv_req_id)
+        },
+        serv_req_details_close(){
+            this.service_req_detail_record=null
+        }
     },
     components:{
         ServiceTable,

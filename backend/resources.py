@@ -16,7 +16,7 @@ service_fields={
 }
 
 service_request_fields={
-    'ser_req_id': fields.Integer,
+    'serv_req_id': fields.Integer,
     'serv_id' : fields.Integer,
     'serv_type': fields.String(attribute="sr.service_type"),
     'serv_name' : fields.String(attribute='sr.service_name'),
