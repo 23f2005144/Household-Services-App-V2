@@ -165,7 +165,10 @@ export default{
                         'Authentication-Token': this.$store.state.auth_token
                     }
                 })
-                this.services= await res.json()
+                const data = await res.json()
+                if(typeof data !=="object"){
+                    this.services=data
+                }
             }
             catch(error){
                 console.log("Error",error)
@@ -179,14 +182,11 @@ export default{
                     }
                 })
                 const new_pro_data_all= await res.json()
-                if(new_pro_data_all!==null ){
+                if( typeof new_pro_data_all!=="object" ){ //since if no record, then api gives object and not list
                     this.new_pro_data=this.new_pro_data_all.filter(pro=> pro.p_status===false)
                 }
             }
             catch(error){
-                if(error instanceof TypeError){
-                    console.log("No new professionals signed up!")
-                }
                 console.log("Error",error)
             }
 
@@ -198,7 +198,11 @@ export default{
                         'Authentication-Token': this.$store.state.auth_token
                     }
                 })
-                this.service_reqs_data= await res.json()
+                
+                const data= await res.json()
+                if( typeof data!=="object"){
+                    this.service_reqs_data=data;
+                }
             }
             catch(error){
                 console.log("Error",error)

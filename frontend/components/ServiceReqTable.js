@@ -18,6 +18,7 @@ export default{
                         <th>Status</th>
                     </tr>
                 </thead>
+                <tbody>
                     <tr v-for="sreq in service_reqs_data" :key="sreq.serv_req_id">
                         <td><button class="btn btn-primary" @click="$emit("Serv_Req_Details",sreq.serv_req_id)">{{sreq.serv_req_id}}</button></td>
                         <td><button class="btn btn-primary" @click="$emit("Serv_Details",sreq.serv_id)">{{sreq.serv_id}}</button></td>
@@ -27,6 +28,7 @@ export default{
                         <td>{{sreq.date_of_req}}</td>
                         <td>{{sreq.service_status}}</td>
                     </tr>
+                </tbody> 
             </table>
         </div>
     </div>

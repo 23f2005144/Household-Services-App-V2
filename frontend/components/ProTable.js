@@ -15,7 +15,7 @@ export default{
                         <th>Experience(Yrs)</th>
                         <th>Service Type</th>
                         <th>Action</th>
-                    <tr>
+                    </tr>
                 </thead>
                 <tr v-for="p in new_pro_data" :key="p.p_id">
                     <td><button class="btn btn-warning" @click="pro_details_page(p.p_id)">{{p.p_id}}</button></td>

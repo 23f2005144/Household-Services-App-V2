@@ -24,7 +24,7 @@ service_request_fields={
     'cust_id' : fields.Integer,
     'cust_name' : fields.String(attribute="cr.c_name"),
     'cust_pincode': fields.Integer(attribute="cr.c_pincode"),
-    'pro_id ' : fields.Integer,
+    'pro_id' : fields.Integer,
     'pro_name' : fields.String(attribute="srp.p_name"),
     'pro_exp' : fields.Integer(attribute="srp.p_exp"),
     'date_of_req' : fields.DateTime,
