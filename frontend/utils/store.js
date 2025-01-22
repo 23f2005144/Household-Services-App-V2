@@ -28,7 +28,7 @@ const store = new Vuex.Store({
             state.auth_token=null;
             state.role=null;
             state.user_id=null;
-            state.loggedin=false;
+            state.LoggedIn=false;
         }
     },
     actions: {
