@@ -166,7 +166,7 @@ export default{
                     }
                 })
                 const data = await res.json()
-                if(typeof data !=="object"){
+                if(typeof data !=="Array"){
                     this.services=data
                 }
             }

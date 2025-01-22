@@ -29,10 +29,13 @@ const store = new Vuex.Store({
             state.role=null;
             state.user_id=null;
             state.loggedin=false;
-            localStorage.removeItem('user')
         }
     },
     actions: {
+        LogOut({commit}){
+            localStorage.removeItem('user')
+            commit('logout')
+        }
 
     }
 })

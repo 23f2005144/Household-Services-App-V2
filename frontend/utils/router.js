@@ -2,12 +2,27 @@ import HomePage from "../pages/HomePage.js";
 import LoginPage from "../pages/LoginPage.js";
 import RegisterPage from "../pages/RegisterPage.js";
 import AdminHomePage from "../pages/AdminHomePage.js";
+import AdminSearchPage from "../pages/AdminSearchPage.js";
+import CustomerHomePage from "../pages/CustomerHomePage.js";
+import CustomerSearchPage from "../pages/CustomerSearchPage.js";
+import ProHomePage from "../pages/ProHomePage.js";
+import ProSearchPage from "../pages/ProSearchPage.js";
+import SummaryPage from "../pages/SummaryPage.js";
+
 import store from'./store.js';
 const routes=[
     {path:'/', component:HomePage },
     {path:'/login', component:LoginPage } ,
     {path:'/register/:role', component:RegisterPage },
     {path:'/admin/home', component:AdminHomePage, meta:{RequiresLogin:true, role:'Admin'}},
+    {path:'/admin/search', component:AdminSearchPage, meta:{RequiresLogin:true, role:'Admin'}},
+    {path:'/admin/summary', component:SummaryPage, meta:{RequiresLogin:true, role:'Admin'}},//using same summary pages across three roles
+    {path:'/customer/home/:user_id', name:'CustomerHome', component:CustomerHomePage, meta:{RequiresLogin:true, role:'Customer'}},
+    {path:'/customer/search/:user_id', name:'CustomerSearch', component:CustomerSearchPage, meta:{RequiresLogin:true, role:'Customer'}},
+    {path:'/customer/summary/:user_id', name:'CustomerSummary', component:SummaryPage, meta:{RequiresLogin:true, role:'Customer'}},
+    {path:'/pro/home/:user_id', name:'ProHome', component:ProHomePage, meta:{RequiresLogin:true, role:'Professional'}},
+    {path:'/pro/search/:user_id', name:'ProSearch', component:ProSearchPage, meta:{RequiresLogin:true, role:'Professional'}},
+    {path:'/pro/summary/:user_id', name:'ProSummary', component:SummaryPage, meta:{RequiresLogin:true, role:'Professional'}},
 ]
 
 const router = new VueRouter({
@@ -18,9 +33,11 @@ router.beforeEach((to, from, next)=>{
     if(to.matched.some((record)=> record.meta.RequiresLogin)){//array of objects of routes check it once later
         if(!store.state.LoggedIn){
             next({path:"/login"})
-        } else if(to.meta.role && to.meta.role!=store.state.role){
-            next({path:'/'})
-        } else{
+        } else if(to.meta.role && to.meta.role!=store.state.role && store.state.role==="Customer"){
+            next({path:'/customer/home'})
+        }else if(to.meta.role && to.meta.role!=store.state.role && store.state.role==="Professional"){
+            next({path:'/pro/home'})
+        }else{
             next();
         }
         
