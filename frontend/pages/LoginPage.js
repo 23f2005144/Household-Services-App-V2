@@ -108,11 +108,11 @@ export default{
                     
                     else if(data.role==="Customer"){
                         this.$store.commit("setUser")
-                        this.$router.push('/customer/home')
+                        this.$router.push('/customer/home/'+this.$store.state.user_id)
                     }
                     else{
                         this.$store.commit("setUser")
-                        this.$router.push('/pro/home')
+                        this.$router.push('/pro/home/'+this.$store.state.user_id)
                     }
 
                 }
