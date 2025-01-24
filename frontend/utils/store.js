@@ -3,6 +3,7 @@ const store = new Vuex.Store({
         auth_token: null,
         role: null,
         user_id: null,
+        role_id: null,
         LoggedIn:false,
 
     },

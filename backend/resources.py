@@ -74,8 +74,13 @@ serv_req_cust_fields={
     'serv_price' : fields.Integer(attribute='sr.serv_price'),
     'pro_name' : fields.String(attribute='srp.p_name'),
     'pro_contact_no' : fields.Integer(attribute='srp.p_contact_no'),
+    'pro_exp' : fields.String(attribute='srp.p_exp'),
     'serv_request_datetime' : fields.DateTime,
-    'serv_status' : fields.String #still have to add more according to modal
+    'serv_close_datetime' : fields.DateTime,
+    'serv_status' : fields.String,
+    'serv_remarks': fields.String,
+    'serv_rating' : fields.Integer,
+    'pro_rating' : fields.Integer,
 }
 class RegisterAPI(Resource): #have not used any @auth only checking if registering user is already registred to the user table or not:)
     def post(self):

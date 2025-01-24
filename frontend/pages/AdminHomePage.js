@@ -51,14 +51,16 @@ export default{
                     <div class="modal-body">
                         <table class="table table-striped">
                             <thead>
-                                <th>ID</th>
-                                <th>UserID</th>
-                                <th>Email</th>
-                                <th>Name</th>
-                                <th>Contact_No</th>
-                                <th>Service_Type</th>
-                                <th>Experience(yrs)</th>
-                                <th>Serviceable_Pincode</th>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>UserID</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Contact_No</th>
+                                    <th>Service_Type</th>
+                                    <th>Experience(yrs)</th>
+                                    <th>Serviceable_Pincode</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 <tr>
@@ -89,18 +91,20 @@ export default{
                     <div class="modal-body">
                         <table class="table table-striped">
                             <thead>
-                                <th>ID</th>
-                                <th>Service ID</th>
-                                <th>Customer ID</th>
-                                <th>Customer Name</th>
-                                <th>Customer Pincode</th>
-                                <th>Service Status</th>
-                                <th>Pro ID</th>
-                                <th>DateTime_of_Request</th>
-                                <th>DateTime_of_Completion</th>
-                                <th>Service Remarks</th>
-                                <th>Service Rating</th>
-                                <th>Pro Rating</th>
+                                <tr>    
+                                    <th>ID</th>
+                                    <th>Service ID</th>
+                                    <th>Customer ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Customer Pincode</th>
+                                    <th>Service Status</th>
+                                    <th>Pro ID</th>
+                                    <th>DateTime_of_Request</th>
+                                    <th>DateTime_of_Completion</th>
+                                    <th>Service Remarks</th>
+                                    <th>Service Rating</th>
+                                    <th>Pro Rating</th>
+                                <tr>
                             </thead>
                             <tbody>
                                 <tr>

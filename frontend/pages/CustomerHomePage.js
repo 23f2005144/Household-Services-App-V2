@@ -14,6 +14,55 @@ export default{
             <div class="row">
                 <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show"/>
             </div>
+            <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header" >
+                            <h1 class="modal-title fs-5">Service History Details</h1>
+                            <button type="button" class="btn-close" @click="service_req_details_cust_close" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Service Type</th>
+                                        <th>Service Name</th>
+                                        <th>Service Price</th>
+                                        <th>Assigned Professional</th>
+                                        <th>Contact Number</th>
+                                        <th>Experience (yrs)</th>
+                                        <th>DateTime_of_Request</th>
+                                        <th>DateTime_of_Completion</th>
+                                        <th>Service Status</th>
+                                        <th>Service Remarks</th>
+                                        <th>Service Rating</th>
+                                        <th>Pro Rating</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{service_req_detail_record.serv_req_id}}</td>
+                                        <td>{{service_req_detail_record.serv_type}}</td>
+                                        <td>{{service_req_detail_record.serv_name}}</td>
+                                        <td>{{service_req_detail_record.serv_price}}</td>
+                                        <td>{{service_req_detail_record.pro_name}}</td>
+                                        <td>{{service_req_detail_record.pro_contact_no}}</td>
+                                        <td>{{service_req_detail_record.pro_exp}}</td>
+                                        <td>{{service_req_detail_record.serv_request_datetime}}</td>
+                                        <td>{{service_req_detail_record.serv_close_datetime}}</td>
+                                        <td>{{service_req_detail_record.serv_status}}</td>
+                                        <td>{{service_req_detail_record.serv_remarks}}</td>
+                                        <td>{{service_req_detail_record.serv_rating}}</td>
+                                        <td>{{service_req_detail_record.pro_rating}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-lg btn-danger" @click="serv_req_details_cust_close">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>  
     </div>
     
@@ -38,7 +87,8 @@ export default{
     data(){
         return{
             style:null,
-            service_reqs_data:null
+            service_reqs_data:null,
+            service_req_detail_record:null
         }
     },
     methods:{
@@ -55,6 +105,12 @@ export default{
             catch(error){
                 console.log("Error",error)
             }
+        },
+        serv_req_details_cust_show(serv_req_id){
+            this.service_req_detail_record=this.service_reqs_data.find(sr=> sr.serv_req_id===serv_req_id)
+        },
+        serv_req_details_cust_close(){
+            this.service_req_detail_record=null
         }
 
     },
