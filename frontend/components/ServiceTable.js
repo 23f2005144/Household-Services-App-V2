@@ -17,15 +17,15 @@ export default{
                             <th>Action</th>
                         </tr>
                     </thead>
-                        <tr v-for="s in services" :key="s.service_id">
-                            <td><button type="button" class="btn btn-info" @click="service_details_page(s.service_id)">{{s.service_id}}</button></td>
-                            <td>{{s.service_type}}</td>
-                            <td>{{s.service_name}}</td>
-                            <td>{{s.service_price}}</td>
+                        <tr v-for="s in services" :key="s.serv_id">
+                            <td><button type="button" class="btn btn-info" @click="service_details_page(s.serv_id)">{{s.serv_id}}</button></td>
+                            <td>{{s.serv_type}}</td>
+                            <td>{{s.serv_name}}</td>
+                            <td>{{s.serv_price}}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-lg btn-warning" @click="Service_Update(s.service_id)">Edit</button>
-                                    <button type="button" class="btn btn-lg btn-danger" @click="ServiceDelete(s.service_id)">Delete</button>
+                                    <button type="button" class="btn btn-lg btn-warning" @click="Service_Update(s.serv_id)">Edit</button>
+                                    <button type="button" class="btn btn-lg btn-danger" @click="ServiceDelete(s.serv_id)">Delete</button>
                                 </div>
                             </td>
                         </tr>
@@ -40,7 +40,7 @@ export default{
                     <div class="row">
                         <div class="my-3 col-md-4" style="text-align:center;padding:0px;margin:auto">
                             <label for="name" class="form-label">Service Type</label>
-                            <select class="form-select" v-model="service_update_obj.service_type" name="service_type" required>
+                            <select class="form-select" v-model="service_update_obj.serv_type" name="service_type" required>
                                 <option v-for="s in services_type_data">
                                     {{s}}
                                 </option>
@@ -50,25 +50,25 @@ export default{
                     <div class="row">
                         <div class="my-3 col-md-4"style="text-align:center;padding:0px;margin:auto">
                             <label for="name" class="form-label">Service Name</label>
-                            <input type="text" class="form-control" v-model="service_update_obj.service_name" name="service_name" required>
+                            <input type="text" class="form-control" v-model="service_update_obj.serv_name" name="service_name" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="my-3 col-md-3" style="text-align: center;padding:0px;margin:auto">
                             <label for="name" class="form-label">Service Price ₹</label>
-                            <input type="text" class="form-control"  v-model="service_update_obj.service_price" name="service_price" required>
+                            <input type="text" class="form-control"  v-model="service_update_obj.serv_price" name="service_price" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="my-3 col-md-3" style="text-align:center;padding:0px;margin:auto">
                             <label for="name" class="form-label">Service Duration (hrs)</label>
-                            <input type="text" class="form-control" v-model="service_update_obj.service_duration" name="service_duration" required>
+                            <input type="text" class="form-control" v-model="service_update_obj.serv_duration" name="service_duration" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="my-3 col-md-3" style="text-align: center;padding:0px;margin:auto">
                             <label for="service_desc" class="form-label">Service Description</label>
-                            <input type="text" class="form-control" v-model="service_update_obj.service_desc" name="service_desc">
+                            <input type="text" class="form-control" v-model="service_update_obj.serv_desc" name="service_desc">
                         </div>
                     </div><br>
                     <div class="row">
@@ -155,7 +155,7 @@ export default{
             this.service_table=false;
             this.service_update_form=true;
             this.service_update_id=service_id
-            this.service_update_obj=this.services.find(service => service.service_id === service_id)
+            this.service_update_obj=this.services.find(service => service.serv_id === service_id)
         },
         ServiceCreateForm(){
             this.service_table=false

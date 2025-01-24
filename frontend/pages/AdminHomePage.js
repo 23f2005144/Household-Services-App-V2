@@ -26,12 +26,12 @@ export default{
                             </thead>
                             <tbody>
                             <tr>
-                                <td>{{service_detail_record.service_id}}</td>
-                                <td>{{service_detail_record.service_type}}</td>
-                                <td>{{service_detail_record.service_name}}</td>
-                                <td>{{service_detail_record.service_price}}</td>
-                                <td>{{service_detail_record.service_duration}}</td>
-                                <td>{{service_detail_record.service_desc}}</td>
+                                <td>{{service_detail_record.serv_id}}</td>
+                                <td>{{service_detail_record.serv_type}}</td>
+                                <td>{{service_detail_record.serv_name}}</td>
+                                <td>{{service_detail_record.serv_price}}</td>
+                                <td>{{service_detail_record.serv_duration}}</td>
+                                <td>{{service_detail_record.serv_desc}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -96,8 +96,8 @@ export default{
                                 <th>Customer Pincode</th>
                                 <th>Service Status</th>
                                 <th>Pro ID</th>
-                                <th>Date_of_Request</th>
-                                <th>Date_of_Completion</th>
+                                <th>DateTime_of_Request</th>
+                                <th>DateTime_of_Completion</th>
                                 <th>Service Remarks</th>
                                 <th>Service Rating</th>
                                 <th>Pro Rating</th>
@@ -109,12 +109,12 @@ export default{
                                     <td>{{service_req_detail_record.cust_id}}</td>
                                     <td>{{service_req_detail_record.cust_name}}</td>
                                     <td>{{service_req_detail_record.cust_pincode}}</td>
-                                    <td>{{service_req_detail_record.service_status}}</td>
+                                    <td>{{service_req_detail_record.serv_status}}</td>
                                     <td>{{service_req_detail_record.pro_id}}</td>
-                                    <td>{{service_req_detail_record.date_of_req}}</td>
-                                    <td>{{service_req_detail_record.date_of_comp}}</td>
-                                    <td>{{service_req_detail_record.service_remarks}}</td>
-                                    <td>{{service_req_detail_record.service_rating}}</td>
+                                    <td>{{service_req_detail_record.serv_request_datetime}}</td>
+                                    <td>{{service_req_detail_record.serv_close_datetime}}</td>
+                                    <td>{{service_req_detail_record.serv_remarks}}</td>
+                                    <td>{{service_req_detail_record.serv_rating}}</td>
                                     <td>{{service_req_detail_record.pro_rating}}</td>
                                 </tr>
                             </tbody>
@@ -210,16 +210,16 @@ export default{
         },
 
         serv_deleted(service_id){
-            this.services = this.services.filter(service => service.service_id !== service_id)
+            this.services = this.services.filter(service => service.serv_id !== service_id)
         },
         serv_details_show(service_id){
-            this.service_detail_record = this.services.find(service => service.service_id === service_id)
+            this.service_detail_record = this.services.find(service => service.serv_id === service_id)
         },
         serv_details_close(){
             this.service_detail_record=null
         },
         serv_update(service_update_obj){
-            const index = this.services.findIndex(service => service.service_id === service_update_obj.service_id);
+            const index = this.services.findIndex(service => service.serv_id === service_update_obj.serv_id);
             if (index !== -1) {
                 this.$set(this.services, index, service_update_obj);
             }

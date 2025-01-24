@@ -23,13 +23,13 @@ class UserRoles(db.Model):
     r_id=db.Column(db.Integer, db.ForeignKey('role.role_id'))
 
 class Service(db.Model):
-    service_id=db.Column(db.Integer, primary_key=True)
-    service_type=db.Column(db.String(), nullable=False)
-    service_name=db.Column(db.String(), nullable=False, unique=True)
-    service_price=db.Column(db.Integer, nullable=False)
-    service_duration=db.Column(db.Integer, nullable=False)
-    service_desc=db.Column(db.String())
-    service_req=db.relationship('ServiceRequest',backref='sr',cascade='delete')
+    serv_id=db.Column(db.Integer, primary_key=True)
+    serv_type=db.Column(db.String(), nullable=False)
+    serv_name=db.Column(db.String(), nullable=False, unique=True)
+    serv_price=db.Column(db.Integer, nullable=False)
+    serv_duration=db.Column(db.Integer, nullable=False)
+    serv_desc=db.Column(db.String())
+    serv_req=db.relationship('ServiceRequest',backref='sr',cascade='delete')
 
 class Customer(db.Model):
     c_id=db.Column(db.Integer,primary_key=True,nullable=False)
@@ -54,12 +54,12 @@ class Professional(db.Model):
 
 class ServiceRequest(db.Model):
     serv_req_id=db.Column(db.Integer, primary_key=True)
-    serv_id=db.Column(db.Integer, db.ForeignKey('service.service_id'))
+    serv_id=db.Column(db.Integer, db.ForeignKey('service.serv_id'))
     cust_id=db.Column(db.Integer, db.ForeignKey('customer.c_id'))
     pro_id=db.Column(db.Integer, db.ForeignKey('professional.p_id'))
-    service_request_datetime=db.Column(db.DateTime, nullable=False)
-    service_close_datetime=db.Column(db.DateTime)
-    service_status=db.Column(db.String(), nullable=False, default="Requested")
-    service_remarks=db.Column(db.String())
-    service_rating=db.Column(db.Integer)
+    serv_request_datetime=db.Column(db.DateTime, nullable=False)
+    serv_close_datetime=db.Column(db.DateTime)
+    serv_status=db.Column(db.String(), nullable=False, default="Requested")
+    serv_remarks=db.Column(db.String())
+    serv_rating=db.Column(db.Integer)
     pro_rating=db.Column(db.Integer)

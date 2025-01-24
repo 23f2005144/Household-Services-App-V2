@@ -12,7 +12,7 @@ export default{
                 <ServiceBookCard/>
             </div>
             <div class="row">
-                <ServiceReqTable :service_reqs_data='service_reqs_data'/>
+                <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show"/>
             </div>
         </div>  
     </div>

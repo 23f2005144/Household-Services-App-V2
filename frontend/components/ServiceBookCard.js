@@ -6,7 +6,7 @@ export default{
                 <div class="card-body">
                     <h5 class="card-title">{{x}} Services</h5>
                     <p class="card-text">All in One {{x}} Packages, Available Now!</p>
-                    <button class="btn btn-success card-link" @click="$router.push('/customer/'+cust_id+'/service_book/'+service_type)">Book Now</button>
+                    <button class="btn btn-success card-link" @click="$router.push('/customer/'+cust_id+'/service_book/'+serv_type)">Book Now</button>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@ export default{
     data(){
         return{
             style:null,
-            service_data:[]
+            service_data:null
         }
     },
     methods:{
@@ -49,7 +49,7 @@ export default{
             try{
                 const res = await fetch(`${location.origin}/api/service_type`)
                 const data = await res.json()
-                this.service_data=data
+                this.service_data=data.Service_Types //since it is a list
             }
             catch(error){
                 console.log("Error",error)

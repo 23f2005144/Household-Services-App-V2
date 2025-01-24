@@ -3,35 +3,35 @@ from flask_restful import Api, Resource,fields,marshal_with
 from backend.models import db,User,Customer,Professional,Service,ServiceRequest,UserRoles,Role
 from flask_security import auth_required,current_user
 
-
+#major changes required here for handling different db operations based on role
 api=Api(prefix='/api')
 
 service_fields={
-    'service_id' : fields.Integer,
-    'service_type' : fields.String,
-    'service_name' : fields.String,
-    'service_price' : fields.Integer,
-    'service_duration' : fields.Integer,
-    'service_desc' : fields.String
+    'serv_id' : fields.Integer,
+    'serv_type' : fields.String,
+    'serv_name' : fields.String,
+    'serv_price' : fields.Integer,
+    'serv_duration' : fields.Integer,
+    'serv_desc' : fields.String
 }
 
 service_request_fields={
     'serv_req_id': fields.Integer,
     'serv_id' : fields.Integer,
-    'serv_type': fields.String(attribute="sr.service_type"),
-    'serv_name' : fields.String(attribute='sr.service_name'),
-    'serv_price' : fields.Integer(attribute="sr.service_price"),
+    'serv_type': fields.String(attribute="sr.serv_type"),
+    'serv_name' : fields.String(attribute='sr.serv_name'),
+    'serv_price' : fields.Integer(attribute="sr.serv_price"),
     'cust_id' : fields.Integer,
     'cust_name' : fields.String(attribute="cr.c_name"),
     'cust_pincode': fields.Integer(attribute="cr.c_pincode"),
     'pro_id' : fields.Integer,
     'pro_name' : fields.String(attribute="srp.p_name"),
     'pro_exp' : fields.Integer(attribute="srp.p_exp"),
-    'date_of_req' : fields.DateTime,
-    'date_of_comp' : fields.DateTime,
-    'service_status' : fields.String,
-    'service_remarks' : fields.String,
-    'service_rating' : fields.Integer,
+    'serv_request_datetime' : fields.DateTime,
+    'serv_request_datetime' : fields.DateTime,
+    'serv_status' : fields.String,
+    'serv_remarks' : fields.String,
+    'serv_rating' : fields.Integer,
     'pro_rating' : fields.Integer
 
 }
@@ -65,6 +65,17 @@ user_fields={
     'user_id' : fields.Integer,
     'email' : fields.String,
     'roles' : fields.List(fields.Nested(role_fields))
+}
+
+serv_req_cust_fields={
+    'serv_req_id' : fields.Integer,
+    'serv_type' : fields.String(attribute='sr.serv_type'),
+    'serv_name' : fields.String(attribute='sr.serv_name'),
+    'serv_price' : fields.Integer(attribute='sr.serv_price'),
+    'pro_name' : fields.String(attribute='srp.p_name'),
+    'pro_contact_no' : fields.Integer(attribute='srp.p_contact_no'),
+    'serv_request_datetime' : fields.DateTime,
+    'serv_status' : fields.String #still have to add more according to modal
 }
 class RegisterAPI(Resource): #have not used any @auth only checking if registering user is already registred to the user table or not:)
     def post(self):
@@ -155,11 +166,11 @@ class ServiceAPI(Resource):
     @auth_required('token')
     def put(self,service_id):
         data=request.get_json()
-        serv_type=data.get('service_type')
-        serv_name=data.get('service_name')
-        serv_price=data.get('service_price')
-        serv_duration=data.get('service_duration')
-        serv_desc=data.get('service_desc')
+        serv_type=data.get('serv_type')
+        serv_name=data.get('serv_name')
+        serv_price=data.get('serv_price')
+        serv_duration=data.get('serv_duration')
+        serv_desc=data.get('serv_desc')
         service_data=Service.query.get(service_id)
 
         if not service_data:
@@ -169,11 +180,11 @@ class ServiceAPI(Resource):
             return {"Message":"Forbidden: only Admin can update services"},403
         
         try:
-            service_data.service_type=serv_type
-            service_data.service_name=serv_name
-            service_data.service_price=serv_price
-            service_data.service_duration=serv_duration
-            service_data.service_desc=serv_desc
+            service_data.serv_type=serv_type
+            service_data.serv_name=serv_name
+            service_data.serv_price=serv_price
+            service_data.serv_duration=serv_duration
+            service_data.serv_desc=serv_desc
             db.session.commit()
             return {"Message":"Service details updated successfully"},200
         
@@ -195,17 +206,17 @@ class ServiceListAPI(Resource):
     
     def post(self):
         data=request.get_json()
-        service_type=data.get('service_type')
-        service_name=data.get('service_name')
-        service_price=data.get('service_price')
-        service_duration=data.get('service_duration')
-        service_desc=data.get('service_desc')
+        serv_type=data.get('service_type')
+        serv_name=data.get('service_name')
+        serv_price=data.get('service_price')
+        serv_duration=data.get('service_duration')
+        serv_desc=data.get('service_desc')
 
         if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can create new service"},403
         
         try:
-            service=Service(service_type=service_type, service_name=service_name, service_price=service_price, service_duration=service_duration, service_desc=service_desc)
+            service=Service(serv_type=serv_type, serv_name=serv_name, serv_price=serv_price, serv_duration=serv_duration, serv_desc=serv_desc)
             db.session.add(service)
             db.session.commit()
             return {"Message":"Service data added successfully"},201
@@ -234,8 +245,8 @@ class ServiceRequestAPI(Resource):
         serv_id=data.get('serv_id')
         cust_id=data.get('cust_id')
         pro_id=data.get('pro_id')
-        serv_req_dt=data.get('serv_req_dt')
-        serv_close_dt=data.get('serv_close_dt')
+        serv_request_datetime=data.get('serv_request_datetime')
+        serv_close_datetime=data.get('serv_close_datetime')
         serv_status=data.get('serv_status')
         serv_remarks=data.get('serv_remarks')
         serv_rating=data.get('serv_rating')
@@ -247,7 +258,7 @@ class ServiceRequestAPI(Resource):
             if serv_status=="Requested" and serv_req_method=="Accepted":
                 try: #after pro has accepted, fetch call to make the
                     serv_req_data.pro_id=pro_id
-                    serv_req_data.service_status='Accepted'
+                    serv_req_data.serv_status='Accepted'
                     db.session.commit()
                     return {"Message":"ServiceRequest successfully accepted"},200
                 except:
@@ -256,11 +267,11 @@ class ServiceRequestAPI(Resource):
             
             if serv_status=="Accepted" and serv_req_method=="Closed": #trying to close the service once completed
                 try:
-                    serv_req_data.service_close_datetime=serv_close_dt
-                    serv_req_data.service_remarks=serv_remarks
-                    serv_req_data.service_rating=serv_rating
+                    serv_req_data.serv_close_datetime=serv_close_datetime
+                    serv_req_data.serv_remarks=serv_remarks
+                    serv_req_data.serv_rating=serv_rating
                     serv_req_data.pro_rating=pro_rating
-                    serv_req_data.service_status='Closed'
+                    serv_req_data.serv_status='Closed'
                     db.session.commit()
                     return {"Message":"ServiceRequest successfully closed"},200
                 except:
@@ -269,8 +280,8 @@ class ServiceRequestAPI(Resource):
                 
             if serv_status=="Requested" and serv_req_method=="Cancelled":
                 try:
-                    serv_req_data.service_close_datetime=serv_close_dt
-                    serv_req_data.service_status="Cancelled"
+                    serv_req_data.serv_close_datetime=serv_close_datetime
+                    serv_req_data.serv_status="Cancelled"
                     db.session.commit()
                     return {"Message":"ServiceRequest successfully cancelled"},200
                 except:
@@ -279,8 +290,8 @@ class ServiceRequestAPI(Resource):
             
             if serv_status=="Accepted" and serv_req_method=="Cancelled":
                 try:
-                    serv_req_data.service_close_datetime=serv_close_dt
-                    serv_req_data.service_status="Cancelled"
+                    serv_req_data.serv_close_datetime=serv_close_datetime
+                    serv_req_data.serv_status="Cancelled"
                     db.session.commit()
                     return {"Message":"ServiceRequest successfully cancelled"},200
                 except:
@@ -311,13 +322,13 @@ class ServiceRequestListAPI(Resource):
         if current_user.roles[0]!='Customer':
             return {"Message":"Forbidden: only Customer can create new ServiceRequest"},403
         
-        serv_req_data=db.session.query(ServiceRequest).filter((ServiceRequest.cust_id==cust_id)&(ServiceRequest.serv_id==serv_id)&(ServiceRequest.service_status=='Requested')).all()
+        serv_req_data=db.session.query(ServiceRequest).filter((ServiceRequest.cust_id==cust_id)&(ServiceRequest.serv_id==serv_id)&(ServiceRequest.serv_status=='Requested')).all()
         
         if serv_req_data:
             return {"Message":"Service already booked "},400
         
         try:
-            new_serv_req=ServiceRequest(serv_id=serv_id, cust_id=cust_id,service_request_datetime=serv_req_dt)
+            new_serv_req=ServiceRequest(serv_id=serv_id, cust_id=cust_id,serv_request_datetime=serv_req_dt)
             db.session.add(new_serv_req)
             db.session.commit()
             return {"Message":"ServiceRequest details added successfully"},201
@@ -366,7 +377,7 @@ class CustomerAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
                 
-            if req_method=="BlockCustomer" and current_user.roles[0]=="Admin":
+            if req_method=="BlockCustomer" and current_user.roles[0]=="Admin": # add method to also cancel all serv_reqs accepted/ requested.
                 try:
                     c_user_data.active=False
                     db.session.commit()
@@ -494,7 +505,7 @@ class UserAPI(Resource):
         pro_data=Professional.query.filter(Professional.user_p_id==user_id).first()
 
         if not user_data:
-             return {"Message":"User does not exist"},404
+            return {"Message":"User does not exist"},404
         
         if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can remove users"},403
@@ -521,9 +532,24 @@ class UserListAPI(Resource):
 
         return user_data
 
+class ServiceBookTypes(Resource):
 
+    def get(self):
+        serv_types = db.session.query(Service.serv_type.distinct()).all() #returns a tuple ()
+        unique_serv_types = [s_type[0] for s_type in serv_types]
+        return {"Service_Types": unique_serv_types}
 
-    
+class ServiceRequestCustRecords(Resource):
+
+        @marshal_with(serv_req_cust_fields)
+        @auth_required('token')
+        def get(self,cust_id):
+            serv_req_data=ServiceRequest.query.filter(ServiceRequest.cust_id==cust_id).all()
+
+            if not serv_req_data:
+                return {"Message":"ServiceRequests do not exist"},404
+            
+            return serv_req_data
     
 api.add_resource(RegisterAPI,'/register')
 api.add_resource(ServiceAPI,'/service/<int:service_id>')
@@ -536,3 +562,5 @@ api.add_resource(ProfessionalAPI,'/professional/<int:p_id>')
 api.add_resource(ProfessionalListAPI,'/professional')
 api.add_resource(UserAPI,'/user/<int:user_id>')
 api.add_resource(UserListAPI,'/user')
+api.add_resource(ServiceBookTypes,'/service_type')
+api.add_resource(ServiceRequestCustRecords,'/service_request_customer/<int:cust_id>')
