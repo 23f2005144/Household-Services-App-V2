@@ -6,7 +6,7 @@ export default{
                 <div class="card-body">
                     <h5 class="card-title">{{x}} Services</h5>
                     <p class="card-text">All in One {{x}} Packages, Available Now!</p>
-                    <button class="btn btn-success card-link" @click="$router.push('/customer/'+cust_id+'/service_book/'+serv_type)">Book Now</button>
+                    <button class="btn btn-success card-link" @click="$router.push('/customer/'+$store.state.c_id+'/service_book/'+x)">Book Now</button>
                 </div>
             </div>
         </div>

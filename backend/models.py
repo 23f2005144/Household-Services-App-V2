@@ -9,8 +9,8 @@ class User(db.Model,UserMixin):
     fs_uniquifier=db.Column(db.String(), unique = True, nullable = False)
     active=db.Column(db.Boolean, default = True)
     roles=db.relationship('Role', backref = 'ur', secondary='user_roles', cascade="delete")
-    p_user=db.relationship('Professional',backref='p',cascade='delete', passive_deletes=True, uselist=False)
- 
+    p_user=db.relationship('Professional',backref='p',cascade='delete', uselist=False)
+    c_user=db.relationship('Customer',backref='c', uselist=False)
     
 class Role(db.Model,RoleMixin):
     role_id=db.Column(db.Integer, primary_key=True)
@@ -39,7 +39,7 @@ class Customer(db.Model):
     c_address=db.Column(db.String(),nullable=False)
     c_pincode=db.Column(db.Integer,nullable=False)
     c_req=db.relationship('ServiceRequest',backref='cr')
-    c_user=db.relationship('User',backref='c')
+    
 
 class Professional(db.Model):
     p_id=db.Column(db.Integer,primary_key=True,nullable=False)

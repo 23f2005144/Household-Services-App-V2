@@ -3,7 +3,8 @@ const store = new Vuex.Store({
         auth_token: null,
         role: null,
         user_id: null,
-        role_id: null,
+        c_id: null,
+        p_id: null,
         LoggedIn:false,
 
     },
@@ -12,10 +13,26 @@ const store = new Vuex.Store({
             try{
                 if(JSON.parse(localStorage.getItem('user'))){
                     const user= JSON.parse(localStorage.getItem('user'));
-                    state.auth_token=user.token;
-                    state.role=user.role;
-                    state.user_id=user.user_id;
-                    state.LoggedIn=true;
+                    if (user.c_id){
+                        state.auth_token=user.token;
+                        state.role=user.role;
+                        state.user_id=user.user_id;
+                        state.c_id=user.c_id;
+                        state.LoggedIn=true;
+                    }
+                    else if(user.p_id){
+                        state.auth_token=user.token;
+                        state.role=user.role;
+                        state.user_id=user.user_id;
+                        state.p_id=user.p_id;
+                        state.LoggedIn=true;
+                    }
+                    else{
+                        state.auth_token=user.token;
+                        state.role=user.role;
+                        state.user_id=user.user_id;
+                        state.LoggedIn=true;
+                    }
                     
                 }
             }
@@ -29,6 +46,8 @@ const store = new Vuex.Store({
             state.auth_token=null;
             state.role=null;
             state.user_id=null;
+            state.c_id=null;
+            state.p_id=null;
             state.LoggedIn=false;
         }
     },

@@ -6,7 +6,7 @@ export default{
         <p class="mb-0" style="color:teal; font-size:30px; font-weight:bold;">Welcome to Customer Dashboard</p>
         <div class="container">
             <div class="row">
-                <p class="text-end link-info link-offset-2 link-underline-opacity-100 link-underline-opacity-100-hover" style="font-size:25px; font-weight: bold;" @click='$router.push("/customer/profile"+cust_id)'>View Profile</p>
+                <p class="text-end link-info link-offset-2 link-underline-opacity-100 link-underline-opacity-100-hover" style="font-size:25px; font-weight: bold;" @click='$router.push("/customer/profile/"+$store.state.c_id)'>View Profile</p>
             </div>
             <div class="row">
                 <ServiceBookCard/>
@@ -94,7 +94,7 @@ export default{
     methods:{
          async ServiceReqsDataFetch(){
             try{
-                const res = await fetch(`${location.origin}/api/service_request_customer/${cust_id}`,{
+                const res = await fetch(`${location.origin}/api/service_request_customer/${this.$store.state.c_id}`,{
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token
                     }

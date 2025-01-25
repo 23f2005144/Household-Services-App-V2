@@ -104,7 +104,7 @@ export default{
                                     <th>Service Remarks</th>
                                     <th>Service Rating</th>
                                     <th>Pro Rating</th>
-                                <tr>
+                                </tr>
                             </thead>
                             <tbody>
                                 <tr>

@@ -24,7 +24,14 @@ def login():
     
     if verify_password(password,user.password):
         if active:
-            return jsonify({"token":user.get_auth_token(),"user_id":user.user_id,"email":user.email,"role":user.roles[0].name}),200
+            if user.c_user:
+                return jsonify({"token":user.get_auth_token(),"user_id":user.user_id,"email":user.email,"role":user.roles[0].name,"c_id":user.c_user.c_id}),200
+            
+            elif user.p_user:
+                return jsonify({"token":user.get_auth_token(),"user_id":user.user_id,"email":user.email,"role":user.roles[0].name,"p_id":user.p_user.p_id}),200
+
+            else:
+                return jsonify({"token":user.get_auth_token(),"user_id":user.user_id,"email":user.email,"role":user.roles[0].name}),200
         else:
             return jsonify({"Message":"User is blocked/not approved"}),403
     else:
