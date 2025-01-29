@@ -15,11 +15,11 @@ export default{
                 <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show"/>
             </div>
             <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
-                <div class="modal-dialog modal-xl">
+                <div class="modal-dialog modal-xl" style="max-width: 90%;">
                     <div class="modal-content">
                         <div class="modal-header" >
                             <h1 class="modal-title fs-5">Service History Details</h1>
-                            <button type="button" class="btn-close" @click="service_req_details_cust_close" aria-label="Close"></button>
+                            <button type="button" class="btn-close" @click="serv_req_details_cust_close" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <table class="table table-striped">
@@ -28,7 +28,7 @@ export default{
                                         <th>ID</th>
                                         <th>Service Type</th>
                                         <th>Service Name</th>
-                                        <th>Service Price</th>
+                                        <th>Service Price ₹</th>
                                         <th>Assigned Professional</th>
                                         <th>Contact Number</th>
                                         <th>Experience (yrs)</th>
@@ -99,8 +99,10 @@ export default{
                         'Authentication-Token':this.$store.state.auth_token
                     }
                 })
-                const data = await res.json()
-                this.service_reqs_data=data
+                if(res.ok){
+                    const data = await res.json()
+                    this.service_reqs_data=data
+                }
             }
             catch(error){
                 console.log("Error",error)

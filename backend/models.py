@@ -8,7 +8,7 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String(), nullable=False)
     fs_uniquifier=db.Column(db.String(), unique = True, nullable = False)
     active=db.Column(db.Boolean, default = True)
-    roles=db.relationship('Role', backref = 'ur', secondary='user_roles', cascade="delete")
+    roles=db.relationship('Role', backref = 'ur', secondary='user_roles', lazy='joined', cascade="delete")
     p_user=db.relationship('Professional',backref='p',cascade='delete', uselist=False)
     c_user=db.relationship('Customer',backref='c', uselist=False)
     

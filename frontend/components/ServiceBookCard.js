@@ -6,7 +6,7 @@ export default{
                 <div class="card-body">
                     <h5 class="card-title">{{x}} Services</h5>
                     <p class="card-text">All in One {{x}} Packages, Available Now!</p>
-                    <button class="btn btn-success card-link" @click="$router.push('/customer/'+$store.state.c_id+'/service_book/'+x)">Book Now</button>
+                    <button class="btn btn-success card-link" @click="$router.push('/customer/'+$store.state.user_id+'/service_book/'+x)">Book Now</button>
                 </div>
             </div>
         </div>
@@ -48,9 +48,12 @@ export default{
         async ServiceDataFetch(){
             try{
                 const res = await fetch(`${location.origin}/api/service_type`)
-                const data = await res.json()
-                this.service_data=data.Service_Types //since it is a list
+                if(res.ok){
+                    const data = await res.json()
+                    this.service_data=data.Service_Types //since it is a list
+                }
             }
+
             catch(error){
                 console.log("Error",error)
             }

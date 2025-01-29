@@ -2,6 +2,7 @@ from flask import current_app as app,request
 from flask_restful import Api, Resource,fields,marshal_with
 from backend.models import db,User,Customer,Professional,Service,ServiceRequest,UserRoles,Role
 from flask_security import auth_required,current_user
+from datetime import datetime
 
 #major changes required here for handling different db operations based on role
 api=Api(prefix='/api')
@@ -318,22 +319,24 @@ class ServiceRequestListAPI(Resource):
         
         return serv_req_data_list
     
+    @auth_required('token')
     def post(self):
         data=request.get_json()
         serv_id=data.get('serv_id')
         cust_id=data.get('cust_id')
-        serv_req_dt=data.get('serv_req_dt')
+        serv_req_dt=data.get('serv_request_datetime')
+        req_datetime= datetime.strptime(serv_req_dt, '%d-%m-%Y %H:%M')
 
-        if current_user.roles[0]!='Customer':
+        if current_user.roles[0].name!='Customer':
             return {"Message":"Forbidden: only Customer can create new ServiceRequest"},403
         
         serv_req_data=db.session.query(ServiceRequest).filter((ServiceRequest.cust_id==cust_id)&(ServiceRequest.serv_id==serv_id)&(ServiceRequest.serv_status=='Requested')).all()
         
         if serv_req_data:
-            return {"Message":"Service already booked "},400
+            return {"Message":"Service already booked"},400
         
         try:
-            new_serv_req=ServiceRequest(serv_id=serv_id, cust_id=cust_id,serv_request_datetime=serv_req_dt)
+            new_serv_req=ServiceRequest(serv_id=serv_id, cust_id=cust_id,serv_request_datetime=req_datetime)
             db.session.add(new_serv_req)
             db.session.commit()
             return {"Message":"ServiceRequest details added successfully"},201
@@ -555,7 +558,19 @@ class ServiceRequestCustRecords(Resource):
                 return {"Message":"ServiceRequests do not exist"},404
             
             return serv_req_data
-    
+        
+class ServiceTypeListAPI(Resource):
+
+    @marshal_with(service_fields)
+    @auth_required('token')
+    def get(self,s_type):
+        serv_data=Service.query.filter(Service.serv_type==s_type).all()
+
+        if not serv_data:
+            return {"Message":"Services do not exist of this type"},404
+        
+        return serv_data
+
 api.add_resource(RegisterAPI,'/register')
 api.add_resource(ServiceAPI,'/service/<int:service_id>')
 api.add_resource(ServiceListAPI,'/service')
@@ -569,3 +584,4 @@ api.add_resource(UserAPI,'/user/<int:user_id>')
 api.add_resource(UserListAPI,'/user')
 api.add_resource(ServiceBookTypes,'/service_type')
 api.add_resource(ServiceRequestCustRecords,'/service_request_customer/<int:cust_id>')
+api.add_resource(ServiceTypeListAPI,'/service/type/<string:s_type>')
