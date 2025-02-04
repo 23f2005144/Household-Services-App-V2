@@ -17,19 +17,21 @@ export default{
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tr v-for="p in new_pro_data" :key="p.p_id">
-                    <td><button type="button" class="btn btn-warning" @click="pro_details_page(p.p_id)">{{p.p_id}}</button></td>
-                    <td>{{p.p_name}}</td>
-                    <td>{{p.p_email}}</td>
-                    <td>{{p.p_exp}}</td>
-                    <td>{{p.p_service_type}}</td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-lg btn-success" @click="ApprovePro(p.p_id)">Approve</button>
-                            <button type="button" class="btn btn-lg btn-danger" @click="RejectPro(p.p_id)">Reject</button>
-                        </div>
-                    </td>
-                </tr>
+                <tbody>
+                    <tr v-for="p in new_pro_data" :key="p.p_id">
+                        <td><button type="button" class="btn btn-warning" @click="pro_details_page(p.p_id)">{{p.p_id}}</button></td>
+                        <td>{{p.p_name}}</td>
+                        <td>{{p.p_email}}</td>
+                        <td>{{p.p_exp}}</td>
+                        <td>{{p.p_service_type}}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-lg btn-success" @click="ApprovePro(p.p_id)">Approve</button>
+                                <button type="button" class="btn btn-lg btn-danger" @click="RejectPro(p.p_id)">Reject</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -62,11 +64,14 @@ export default{
                     alert(data.Message)
                     console.log("Professional Succesfully Approved")
                     this.new_pro_obj=null
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
 
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
         },
         async RejectPro(p_id){
@@ -83,10 +88,13 @@ export default{
                     console.log('Professional Rejected Successfully')
                     alert("Professional Rejected Successfully")
                     this.new_pro_obj=null
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
 
         }

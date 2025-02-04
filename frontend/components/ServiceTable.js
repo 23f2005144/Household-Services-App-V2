@@ -17,6 +17,7 @@ export default{
                             <th>Action</th>
                         </tr>
                     </thead>
+                    <tbody>
                         <tr v-for="s in services" :key="s.serv_id">
                             <td><button type="button" class="btn btn-info" @click="service_details_page(s.serv_id)">{{s.serv_id}}</button></td>
                             <td>{{s.serv_type}}</td>
@@ -29,8 +30,11 @@ export default{
                                 </div>
                             </td>
                         </tr>
+                    </tbody>
                 </table>
-                <button class="btn btn-lg btn-success" @click="ServiceCreateForm">+ Create Service</button>
+                <div class="row-6 text-end">
+                    <button class="btn btn-lg btn-success" @click="ServiceCreateForm">+ Create Service</button>
+                </div>
             </div>
         </div>
         <div v-else-if="service_update_form">
@@ -174,10 +178,13 @@ export default{
                     this.$emit('Service_Deleted',service_id)
                     console.log("Service Deleted Successfully")
                     alert("Service Deleted Successfully")
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
         },
         async ServiceUpdate(){
@@ -197,11 +204,14 @@ export default{
                     this.service_update_form=false;
                     this.service_table=true;
                     this.$emit('Service_Updated',this.service_update_obj)
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
 
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
 
         },
@@ -222,10 +232,13 @@ export default{
                     this.service_create_form=false;
                     this.service_table=true;
                     this.$emit("Service_Created")
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
         }
         

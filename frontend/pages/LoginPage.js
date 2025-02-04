@@ -119,11 +119,14 @@ export default{
                 else if (res.status===403){
                     console.log("Message",res.status,res.statusText)
                     alert("Current user is blocked/Not yet approved")
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
           
             }
             catch (error){
-                console.log("Error",error)
+                console.log(error)
 
             }
         }

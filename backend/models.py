@@ -8,7 +8,7 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String(), nullable=False)
     fs_uniquifier=db.Column(db.String(), unique = True, nullable = False)
     active=db.Column(db.Boolean, default = True)
-    roles=db.relationship('Role', backref = 'ur', secondary='user_roles', lazy='joined', cascade="delete")
+    roles=db.relationship('Role', backref = 'ur', secondary='user_roles', cascade="delete")
     p_user=db.relationship('Professional',backref='p',cascade='delete', uselist=False)
     c_user=db.relationship('Customer',backref='c', uselist=False)
     
@@ -50,6 +50,20 @@ class Professional(db.Model):
     p_exp=db.Column(db.Integer, nullable=False)
     p_pincode=db.Column(db.Integer, nullable=False)
     serv_req_pro=db.relationship('ServiceRequest',backref='srp')
+
+    @property
+    def avg_rating(self):
+        total_rating=0
+        c=0
+        for sr in self.serv_req_pro:
+            if sr.serv_status=='Closed' and sr.pro_rating is not None:
+                total_rating+=sr.pro_rating
+                c+= 1
+
+        if c > 0:
+            return round(total_rating/c, 2)
+        else:
+            return 0.0
     
 
 class ServiceRequest(db.Model):

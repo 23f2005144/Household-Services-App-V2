@@ -51,11 +51,14 @@ export default{
                 if(res.ok){
                     const data = await res.json()
                     this.service_data=data.Service_Types //since it is a list
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
             }
 
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
         }
     }

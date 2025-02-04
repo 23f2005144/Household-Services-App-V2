@@ -62,7 +62,7 @@ export default{
                                 </tbody>
                             </table>
                             <div class="row">
-                                <label for="datetimePicker" class="form-label">Choose your Date and Time for Service</label>
+                                <label for="datetimePicker" class="form-label" style="font-size:18px;font-weight:bold;">Choose your Date and Time for Service</label>
                                 <input id="datetimePicker" class="form-control" v-model="service_slot" placeholder="Choose your slot" required>
                             </div><br>
                             <div class="row">
@@ -78,7 +78,7 @@ export default{
                 </div>
             </div>
             <div class="row">
-                <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show"/>
+                <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show" @Serv_Req_Cancel="serv_req_cancel"/>
             </div>
             <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
                 <div class="modal-dialog modal-xl" style="max-width: 90%;">
@@ -194,26 +194,6 @@ export default{
             }
         },
         ServiceInProgress(serv_id){
-            /*if (this.service_reqs_data.length!==0){
-                let c_data = this.service_reqs_data.filter(s=> s.serv_id==serv_id)
-                const serv_in_progress= c_data.some(s=> s.service_status==="Requested"|| s.service_status==="Accepted")
-                if (serv_in_progress){
-                    alert("Service already in progress, cannot be booked")
-                    this.booking_modal_close()// to close modal automatically, still check once
-                }else{
-                    this.serv_book_record=c_data.find(s=> s.serv_id==serv_id)
-                    this.$nextTick(() => {
-                        this.initializeFlatpickr()
-                    })
-                }
-            }else{
-                this.serv_book_record=this.services_data.find(s=> s.serv_id==serv_id)
-                this.$nextTick(() => {
-                    this.initializeFlatpickr()
-                })
-                
-            }*/
-
             this.serv_book_record=this.services_data.find(s=> s.serv_id==serv_id)
             this.$nextTick(() => {
                 this.initializeFlatpickr()
@@ -227,9 +207,21 @@ export default{
             maxDate.setDate(now.getDate() + 3)
             if (hour >= 20 || hour < 8) {
                 minDate = new Date(now)
-                minDate.setHours(8, 0, 0, 0); 
-                if (hour >= 20) {
+                minDate.setHours(8, 0, 0, 0)
+                if (hour>=20) {
                     minDate.setDate(now.getDate() + 1)
+                }else if(hour>=8){
+                    let nextMin= now.getMinutes() < 30 ? "30" : "00"
+                    let nextHour= now.getMinutes() < 30 ? hour : hour + 1
+                    if(nextHour>= 20){
+                        minDate.setDate(now.getDate() + 1)
+                    } 
+                    if(nextHour>= 20) {
+                        minDate.setDate(now.getDate() + 1)
+                        minTime = "08:00"
+                    }else {
+                        minTime = String(nextHour).padStart(2, '0') + ":" + String(nextMin).padStart(2, '0')
+                    }
                 }
             }
             const dt = document.getElementById("datetimePicker")
@@ -241,10 +233,11 @@ export default{
               minTime: "08:00",               // Start time
               maxTime: "20:00",               // End time
               time_24hr: true,               // 12-hour clock
+              minuteIncrement: 30,
               onChange: (selectedDates) => {
                 this.service_slot = selectedDates[0]; // Update selected date
               },
-            });
+            })
         },
         async ServBookSubmit(){
             if(this.service_slot!==null){
@@ -271,6 +264,7 @@ export default{
                 } 
                 catch(error){
                     alert(error)
+                    this.$router.push(`/customer/home/${this.$store.state.user_id}`)
 
                 }
             }else{
@@ -286,6 +280,33 @@ export default{
         serv_req_details_cust_close(){
             this.service_req_detail_record=null
         },
+        async serv_req_cancel(serv_req_id){
+            const serv_req_obj=this.service_reqs_data.find(s=> s.serv_req_id===serv_req_id)
+            const now = new Date();
+            const current_datetime = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0') + " " +
+            String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0')
+            try{
+                const res = await fetch(`${location.origin}/api/service_request/${serv_req_id}`,{
+                    method: "PUT",
+                    headers: {
+                        'Authentication-Token': this.$store.state.auth_token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({...serv_req_obj,'req_method':'Cancelled','serv_close_datetime':current_datetime})
+                })
+                if(res.ok){
+                    const data = await res.json()
+                    console.log(data.Message)
+                    await this.ServiceReqsDataFetch()
+
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
+                }
+            }catch(error){
+                console.log(error)
+            }
+       }
 
 
     },

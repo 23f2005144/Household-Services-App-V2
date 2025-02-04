@@ -4,7 +4,7 @@ import ServiceReqTable from "../components/ServiceReqTable.js"
 export default{
     template:`
     <div>
-        <ServiceTable :services="services" @Service_Deleted="serv_deleted" @Service_Details="serv_details_show" @Service_Updated="serv_update" @Service_Created="ServiceDataFetch"/>
+        <ServiceTable :services="services" @Service_Deleted="serv_deleted" @Service_Details="serv_details_show" @Service_Updated="serv_update" @Service_Created="ServiceDataFetch"/><br>
         <div v-if="service_detail_record" class="modal fade show" id="ServiceModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -60,6 +60,7 @@ export default{
                                     <th>Service_Type</th>
                                     <th>Experience(yrs)</th>
                                     <th>Serviceable_Pincode</th>
+                                    <th>Average Rating</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,6 +73,7 @@ export default{
                                     <td>{{new_pro_detail_record.p_service_type}}</td>
                                     <td>{{new_pro_detail_record.p_exp}}</td>
                                     <td>{{new_pro_detail_record.p_pincode}}</td>
+                                    <td>{{new_pro_detail_record.p_avg_rating}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -114,12 +116,33 @@ export default{
                                     <td>{{service_req_detail_record.cust_name}}</td>
                                     <td>{{service_req_detail_record.cust_pincode}}</td>
                                     <td>{{service_req_detail_record.serv_status}}</td>
-                                    <td>{{service_req_detail_record.pro_id}}</td>
+                                    <td>
+                                        <div v-if="service_req_detail_record.pro_id">
+                                            {{service_req_detail_record.pro_id}}
+                                        </div>
+                                        <div v-else>
+                                            <p>Null</p>
+                                        </div>
+                                    </td>
                                     <td>{{service_req_detail_record.serv_request_datetime}}</td>
                                     <td>{{service_req_detail_record.serv_close_datetime}}</td>
                                     <td>{{service_req_detail_record.serv_remarks}}</td>
-                                    <td>{{service_req_detail_record.serv_rating}}</td>
-                                    <td>{{service_req_detail_record.pro_rating}}</td>
+                                    <td>
+                                        <div v-if="service_req_detail_record.serv_rating">
+                                            {{service_req_detail_record.serv_rating}}
+                                        </div>
+                                        <div v-else>
+                                            <p>Null</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="service_req_detail_record.pro_rating">
+                                            {{service_req_detail_record.pro_rating}}
+                                        </div>
+                                        <div v-else>
+                                            <p>Null</p>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -171,13 +194,14 @@ export default{
                 })
                 if(res.ok){
                     const data = await res.json()
-                    if(typeof data !=="Array"){
-                        this.services=data
-                    }
+                    this.services=data
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
         },
         async NewProDataFetch(){
@@ -189,13 +213,15 @@ export default{
                 })
                 if(res.ok){
                     const new_pro_data_all= await res.json()
-                    if( typeof new_pro_data_all!=="object" ){ //since if no record, then api gives object and not list
-                        this.new_pro_data=this.new_pro_data_all.filter(pro=> pro.p_status===false)
-                    }
+                    this.new_pro_data=new_pro_data_all.filter(pro=> pro.p_status===false)
+                    
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
 
         },
@@ -209,10 +235,13 @@ export default{
                 if(res.ok){
                     const data= await res.json()
                     this.service_reqs_data=data;
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
                 }
             }
             catch(error){
-                console.log("Error",error)
+                console.log(error)
             }
         },
 

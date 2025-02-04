@@ -1,6 +1,6 @@
 export default{
     props:{
-        service_reqs_data:Array
+        service_reqs_data:Array,
     },
     template:`
     <div>
@@ -27,7 +27,7 @@ export default{
                             <td>
                                 <div v-if="sreq.pro_id">
                                     <button type="button" class="btn btn-info" @click="$emit('Pro_Details',sreq.pro_id)">{{sreq.pro_id}}</button>
-                                </div>         <!-- added func for modal for service and pro -->
+                                </div>
                                 <div v-else>
                                     <p> Not yet assigned</p>
                                 </div>
@@ -70,8 +70,8 @@ export default{
                             <td>{{sreq.serv_price}}</td>
                             <td>
                                 <div v-if="sreq.pro_name">
-                                    {{sreq.pro_name}}
-                                </div>         <!-- added func for modal for service and pro -->
+                                    <button type="button" class="btn btn-info" @click="$emit('Pro_Details',sreq.pro_id)">{{sreq.pro_name}}</button>
+                                </div>
                                 <div v-else>
                                     <p> Not yet assigned</p>
                                 </div>
@@ -105,6 +105,37 @@ export default{
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div v-else><!-- Assuming now that role=Professional-->
+                <div class="row my-3">
+                    <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Closed Services</p>
+                    <table class="table table-hover table-bordered border-primary">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Service Name</th>
+                                <th>Customer Name</th>
+                                <th>Service Location</th>
+                                <th>DateTime_of_Completion</th>
+                                <th>Service Remarks</th>
+                                <th>Service Rating</th>
+                                <th>My Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="sh in service_reqs_data" :key="sh.serv_req_id">
+                                <td><button type="button" class="btn btn-primary" @click="$emit('Serv_Req_Details_Pro',sh.serv_req_id)">{{sh.serv_req_id}}</button></td>
+                                <td>{{sh.serv_name}}</td>
+                                <td>{{sh.cust_name}}</td>
+                                <td>{{sh.cust_address}} {{sh.cust_pincode}}</td>
+                                <td>{{sh.serv_close_datetime}}</td> 
+                                <td>{{sh.serv_remarks}}</td>
+                                <td>{{sh.serv_rating}}</td>
+                                <td>{{sh.pro_rating}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

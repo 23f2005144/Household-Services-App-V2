@@ -28,8 +28,9 @@ service_request_fields={
     'pro_id' : fields.Integer,
     'pro_name' : fields.String(attribute="srp.p_name"),
     'pro_exp' : fields.Integer(attribute="srp.p_exp"),
+    'pro_avg_rating' :  fields.Float(attribute=lambda sr: sr.srp.avg_rating if sr.srp else None),
     'serv_request_datetime' : fields.DateTime,
-    'serv_request_datetime' : fields.DateTime,
+    'serv_close_datetime' : fields.DateTime,
     'serv_status' : fields.String,
     'serv_remarks' : fields.String,
     'serv_rating' : fields.Integer,
@@ -40,6 +41,7 @@ service_request_fields={
 customer_fields={
     'c_id' : fields.Integer,
     'user_c_id' : fields.Integer,
+    'c_email' : fields.String(attribute='c.email'),
     'c_name' : fields.String,
     'c_contact_no': fields.Integer,
     'c_address' : fields.String,
@@ -55,6 +57,7 @@ pro_fields={
     'p_contact_no': fields.Integer,
     'p_service_type': fields.String,
     'p_exp' : fields.Integer,
+    'p_avg_rating' : fields.Float(attribute=lambda p: p.avg_rating if p else None),
     'p_pincode' : fields.Integer
 }
 
@@ -73,9 +76,11 @@ serv_req_cust_fields={
     'serv_type' : fields.String(attribute='sr.serv_type'),
     'serv_name' : fields.String(attribute='sr.serv_name'),
     'serv_price' : fields.Integer(attribute='sr.serv_price'),
+    'pro_id' : fields.Integer,
     'pro_name' : fields.String(attribute='srp.p_name'),
     'pro_contact_no' : fields.Integer(attribute='srp.p_contact_no'),
     'pro_exp' : fields.String(attribute='srp.p_exp'),
+    'pro_avg_rating' :  fields.Float(attribute=lambda sr: sr.srp.avg_rating if sr.srp else None),
     'serv_request_datetime' : fields.DateTime,
     'serv_close_datetime' : fields.DateTime,
     'serv_status' : fields.String,
@@ -83,6 +88,25 @@ serv_req_cust_fields={
     'serv_rating' : fields.Integer,
     'pro_rating' : fields.Integer,
 }
+
+serv_req_pro_fields={
+    'serv_req_id' : fields.Integer,
+    'serv_type' : fields.String(attribute='sr.serv_type'),
+    'serv_name' : fields.String(attribute='sr.serv_name'),
+    'serv_price' : fields.Integer(attribute='sr.serv_price'),
+    'cust_name' : fields.String(attribute='cr.c_name'),
+    'cust_contact_no' : fields.Integer(attribute='cr.c_contact_no'),
+    'cust_address' : fields.String(attribute='cr.c_address'),
+    'cust_pincode' : fields.Integer(attribute='cr.c_pincode'),
+    'serv_request_datetime' : fields.DateTime,
+    'serv_close_datetime' : fields.DateTime,
+    'serv_status' : fields.String,
+    'serv_remarks': fields.String,
+    'serv_rating' : fields.Integer,
+    'pro_rating' : fields.Integer,
+
+}
+
 class RegisterAPI(Resource): #have not used any @auth only checking if registering user is already registred to the user table or not:)
     def post(self):
         data=request.get_json()
@@ -257,11 +281,16 @@ class ServiceRequestAPI(Resource):
         serv_remarks=data.get('serv_remarks')
         serv_rating=data.get('serv_rating')
         pro_rating=data.get('pro_rating')
-        serv_req_method=data.get('serv_req_method')
+        serv_req_method=data.get('req_method')
+        if serv_close_datetime:
+            close_datetime= datetime.strptime(serv_close_datetime, '%Y-%m-%d %H:%M')
         serv_req_data=ServiceRequest.query.get(serv_req_id) #since in servicerequest api there would be status=requested at first, whenever it is created for the first time
 
         if serv_req_data:
             if serv_status=="Requested" and serv_req_method=="Accepted":
+                pro_serv_req_data=ServiceRequest.query.filter((ServiceRequest.pro_id==pro_id)&(ServiceRequest.serv_status=='Accepted')).all()
+                if pro_serv_req_data:
+                    return {"Message":"Professional is not free to accept ServiceRequest"},400
                 try: #after pro has accepted, fetch call to make the
                     serv_req_data.pro_id=pro_id
                     serv_req_data.serv_status='Accepted'
@@ -271,9 +300,9 @@ class ServiceRequestAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
             
-            if serv_status=="Accepted" and serv_req_method=="Closed": #trying to close the service once completed
+            elif serv_status=="Accepted" and serv_req_method=="Closed": #trying to close the service once completed
                 try:
-                    serv_req_data.serv_close_datetime=serv_close_datetime
+                    serv_req_data.serv_close_datetime=close_datetime
                     serv_req_data.serv_remarks=serv_remarks
                     serv_req_data.serv_rating=serv_rating
                     serv_req_data.pro_rating=pro_rating
@@ -284,9 +313,9 @@ class ServiceRequestAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
                 
-            if serv_status=="Requested" and serv_req_method=="Cancelled":
+            elif serv_status=="Requested" and serv_req_method=="Cancelled":
                 try:
-                    serv_req_data.serv_close_datetime=serv_close_datetime
+                    serv_req_data.serv_close_datetime=close_datetime
                     serv_req_data.serv_status="Cancelled"
                     db.session.commit()
                     return {"Message":"ServiceRequest successfully cancelled"},200
@@ -294,15 +323,18 @@ class ServiceRequestAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
             
-            if serv_status=="Accepted" and serv_req_method=="Cancelled":
+            elif serv_status=="Accepted" and serv_req_method=="Cancelled":
                 try:
-                    serv_req_data.serv_close_datetime=serv_close_datetime
+                    serv_req_data.serv_close_datetime=close_datetime
                     serv_req_data.serv_status="Cancelled"
                     db.session.commit()
                     return {"Message":"ServiceRequest successfully cancelled"},200
                 except:
                     db.session.rollback()
                     return {"Message":"Error in database"},400
+            else:
+                return {"Error":"Wrong Request Method"},404
+            
         else:
             return {"Message":"ServiceRequest not found"},404
         
@@ -330,7 +362,7 @@ class ServiceRequestListAPI(Resource):
         if current_user.roles[0].name!='Customer':
             return {"Message":"Forbidden: only Customer can create new ServiceRequest"},403
         
-        serv_req_data=db.session.query(ServiceRequest).filter((ServiceRequest.cust_id==cust_id)&(ServiceRequest.serv_id==serv_id)&(ServiceRequest.serv_status=='Requested')).all()
+        serv_req_data=db.session.query(ServiceRequest).filter((ServiceRequest.cust_id==cust_id)&(ServiceRequest.serv_id==serv_id)&((ServiceRequest.serv_status=='Requested')|(ServiceRequest.serv_status=='Accepted'))).all()
         
         if serv_req_data:
             return {"Message":"Service already booked"},400
@@ -367,7 +399,7 @@ class CustomerAPI(Resource):
         c_data=Customer.query.get(c_id)
         c_user_data=User.query.get(user_c_id)
         if c_data and c_user_data:
-            if req_method=="UpdateProfile" and current_user.roles[0]=="Customer":
+            if req_method=="UpdateProfile" and current_user.roles[0].name=="Customer":
                 c_name=data.get('c_name')
                 c_contact_no=data.get('c_contact_no')
                 c_address=data.get('c_address')
@@ -385,7 +417,7 @@ class CustomerAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
                 
-            if req_method=="BlockCustomer" and current_user.roles[0]=="Admin": # add method to also cancel all serv_reqs accepted/ requested.
+            if req_method=="BlockCustomer" and current_user.roles[0].name=="Admin": # add method to also cancel all serv_reqs accepted/ requested.
                 try:
                     c_user_data.active=False
                     db.session.commit()
@@ -395,7 +427,7 @@ class CustomerAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
             
-            if req_method=="UnblockCustomer" and current_user.roles[0]=="Admin":
+            if req_method=="UnblockCustomer" and current_user.roles[0].name=="Admin":
                 try:
                     c_user_data.active=True
                     db.session.commit()
@@ -441,7 +473,7 @@ class ProfessionalAPI(Resource):
         p_data=Professional.query.get(p_id)
         p_user_data=User.query.get(user_p_id)
         if p_data and p_user_data:
-            if req_method=="UpdateProfile" and current_user.roles[0]=="Professional":
+            if req_method=="UpdateProfile" and current_user.roles[0].name=="Professional":
                 p_name=data.get('p_name')
                 p_contact_no=data.get('p_contact_no')
                 p_service_type=data.get('p_service_type')
@@ -459,7 +491,7 @@ class ProfessionalAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
                 
-            if req_method=="BlockPro" and current_user.roles[0]=="Admin":
+            if req_method=="BlockPro" and current_user.roles[0].name=="Admin":
                 try:
                     p_user_data.active=False
                     db.session.commit()
@@ -469,7 +501,7 @@ class ProfessionalAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
             
-            if req_method=="Approve/UnblockPro" and current_user.roles[0]=="Admin":
+            if req_method=="Approve/UnblockPro" and current_user.roles[0].name=="Admin":
                 try:
                     p_user_data.active=True
                     db.session.commit()
@@ -535,7 +567,7 @@ class UserListAPI(Resource):
     def get(self):
         user_data=User.query.all()
 
-        if current_user.roles[0]!='Admin':
+        if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can access user details"},403
 
         return user_data
@@ -571,6 +603,33 @@ class ServiceTypeListAPI(Resource):
         
         return serv_data
 
+class ServiceRequestProRecords(Resource):
+
+        @marshal_with(serv_req_pro_fields)
+        @auth_required('token')
+        def get(self,pro_id):
+            serv_req_data=ServiceRequest.query.filter(ServiceRequest.pro_id==pro_id).all()
+
+            if not serv_req_data:
+                return {"Message":"ServiceRequests do not exist"},404
+            
+            return serv_req_data
+        
+class NewServiceRequestPro(Resource):
+
+    @marshal_with(serv_req_pro_fields)
+    @auth_required('token')
+    def get(self,pro_id):
+        pro_data=Professional.query.get(pro_id)
+        new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type, ServiceRequest.serv_request_datetime >= datetime.now()).all()#should work '''&(ServiceRequest.cr.c_pincode==pro_data.p_pincode)'''
+
+        if not new_service_req_data:
+            return {"Message":'ServiceRequests do not exist'},404
+        
+        return new_service_req_data
+
+
+
 api.add_resource(RegisterAPI,'/register')
 api.add_resource(ServiceAPI,'/service/<int:service_id>')
 api.add_resource(ServiceListAPI,'/service')
@@ -583,5 +642,7 @@ api.add_resource(ProfessionalListAPI,'/professional')
 api.add_resource(UserAPI,'/user/<int:user_id>')
 api.add_resource(UserListAPI,'/user')
 api.add_resource(ServiceBookTypes,'/service_type')
-api.add_resource(ServiceRequestCustRecords,'/service_request_customer/<int:cust_id>')
+api.add_resource(ServiceRequestCustRecords,'/service_request/customer/<int:cust_id>')
 api.add_resource(ServiceTypeListAPI,'/service/type/<string:s_type>')
+api.add_resource(ServiceRequestProRecords,'/service_request/professional/<int:pro_id>')
+api.add_resource(NewServiceRequestPro,'/new_service_request/professional/<int:pro_id>' )
