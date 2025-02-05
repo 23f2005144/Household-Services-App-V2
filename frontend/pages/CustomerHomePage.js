@@ -1,6 +1,7 @@
 import ProfileForm from "../components/ProfileForm.js"
 import ServiceBookCard from "../components/ServiceBookCard.js"
 import ServiceReqTable from "../components/ServiceReqTable.js"
+import ServiceCloseForm from "../components/ServiceCloseForm.js"
 
 export default{
     template:`
@@ -17,7 +18,7 @@ export default{
                 <ServiceBookCard/>
             </div>
             <div class="row">
-                <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show" @Serv_Req_Cancel="serv_req_cancel" @Pro_Details="pro_details_show"/>
+                <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show" @Serv_Req_Cancel="serv_req_cancel" @Pro_Details="pro_details_show" @Serv_Req_Close="serv_req_close_form_show"/>
             </div>
             <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
                 <div class="modal-dialog modal-xl" style="max-width: 90%;">
@@ -34,6 +35,7 @@ export default{
                                         <th>Service Type</th>
                                         <th>Service Name</th>
                                         <th>Service Price ₹</th>
+                                        <th>Service Duration (hrs)</th>
                                         <th>Assigned Professional</th>
                                         <th>Contact Number</th>
                                         <th>Experience (yrs)</th>
@@ -51,6 +53,7 @@ export default{
                                         <td>{{service_req_detail_record.serv_type}}</td>
                                         <td>{{service_req_detail_record.serv_name}}</td>
                                         <td>{{service_req_detail_record.serv_price}}</td>
+                                        <td>{{service_req_detail_record.serv_duration}}</td>
                                         <td>{{service_req_detail_record.pro_name}}</td>
                                         <td>{{service_req_detail_record.pro_contact_no}}</td>
                                         <td>{{service_req_detail_record.pro_exp}}</td>
@@ -68,7 +71,7 @@ export default{
                     </div>
                 </div>
             </div>
-            <div v-if="new_pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
+            <div v-if="pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -83,31 +86,31 @@ export default{
                                 <tbody>
                                     <tr>
                                         <th><i class="bi bi-hash"></i> Professional ID:</th>
-                                        <td>#{{new_pro_detail_record.p_id}}</td>
+                                        <td>#{{pro_detail_record.p_id}}</td>
                                     </tr>
                                     <tr>
                                         <th><i class="bi bi-person"></i> Name:</th>
-                                        <td>{{new_pro_detail_record.p_name}}</td>
+                                        <td>{{pro_detail_record.p_name}}</td>
                                     </tr>
                                     <tr>
                                         <th><i class="bi bi-telephone"></i> Contact:</th>
-                                        <td>{{new_pro_detail_record.p_contact_no}}</td>
+                                        <td>{{pro_detail_record.p_contact_no}}</td>
                                     </tr>
                                     <tr>
                                         <th><i class="bi bi-geo-alt"></i> Serviceable Pincode:</th>
-                                        <td>{{new_pro_detail_record.p_pincode}}</td>
+                                        <td>{{pro_detail_record.p_pincode}}</td>
                                     </tr>
                                     <tr>
                                         <th><i class="bi bi-tools"></i> Service Type:</th>
-                                        <td>{{new_pro_detail_record.p_service_type}}</td>
+                                        <td>{{pro_detail_record.p_service_type}}</td>
                                     </tr>
                                     <tr>
                                         <th><i class="bi bi-briefcase"></i> Experience:</th>
-                                        <td>{{new_pro_detail_record.p_exp}} Years</td>
+                                        <td>{{pro_detail_record.p_exp}} Years</td>
                                     </tr>
                                     <tr>
                                         <th><i class="bi bi-star"></i> Avg. Rating:</th>
-                                        <td>{{new_pro_detail_record.p_avg_rating}}</td>
+                                        <td>{{pro_detail_record.p_avg_rating}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -116,6 +119,9 @@ export default{
                     </div>
                 </div>
             </div>
+            <div v-if="serv_req_close_data">
+                <ServiceCloseForm :serv_req_close_data='serv_req_close_data' @Serv_Req_Closed='serv_req_close_form_close'/>
+            </div> 
         </div>  
     </div>
     
@@ -144,7 +150,8 @@ export default{
             service_req_detail_record:null,
             show_profile:false,
             profile_data:null,
-            new_pro_detail_record:null,
+            pro_detail_record:null,
+            serv_req_close_data:null,
         }
     },
     methods:{
@@ -232,8 +239,8 @@ export default{
                     }
                 })
                 if(res.ok){
-                    const new_pro_data_all= await res.json()
-                    this.new_pro_detail_record=new_pro_data_all
+                    const pro_data= await res.json()
+                    this.pro_detail_record=pro_data
                     
                 }else{
                     const errormessage = await res.json()
@@ -243,15 +250,22 @@ export default{
             catch(error){
                 console.log(error)
             }
-
         },
         pro_details_close(){
-            this.new_pro_detail_record=null
+            this.pro_detail_record=null
+        },
+        serv_req_close_form_show(serv_req_id){
+            this.serv_req_close_data=this.service_reqs_data.find(s=> s.serv_req_id===serv_req_id)
+        },
+        async serv_req_close_form_close(){
+            this.serv_req_close_data=null
+            await this.ServiceReqsDataFetch()
         },
     },
     components:{
         ServiceBookCard,
         ServiceReqTable,
-        ProfileForm
+        ProfileForm,
+        ServiceCloseForm
     }
 }

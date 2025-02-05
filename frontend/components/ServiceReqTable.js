@@ -52,9 +52,9 @@ export default{
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Service Type</th>
                             <th>Service Name</th>
                             <th>Service Price ₹</th>
+                            <th>Service Duration (hrs)</th>
                             <th>Assigned Professional</th>
                             <th>Contact Number</th>
                             <th>DateTime_of_Request</th>
@@ -65,9 +65,9 @@ export default{
                     <tbody>
                         <tr v-for="sreq in service_reqs_data" :key="sreq.serv_req_id">
                             <td><button type="button" class="btn btn-primary" @click="$emit('Serv_Req_Details_Cust',sreq.serv_req_id)">{{sreq.serv_req_id}}</button></td>
-                            <td>{{sreq.serv_type}}</td>
                             <td>{{sreq.serv_name}}</td>
                             <td>{{sreq.serv_price}}</td>
+                            <td>{{sreq.serv_duration}}</td>
                             <td>
                                 <div v-if="sreq.pro_name">
                                     <button type="button" class="btn btn-info" @click="$emit('Pro_Details',sreq.pro_id)">{{sreq.pro_name}}</button>

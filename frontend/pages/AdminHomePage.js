@@ -82,7 +82,9 @@ export default{
                 </div>
             </div>
         </div>
-        <ServiceReqTable :service_reqs_data="service_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
+        <div class="row">
+            <ServiceReqTable :service_reqs_data="service_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
+        </div>
         <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-xl" style="max-width: 90%;">
                 <div class="modal-content">
@@ -266,8 +268,25 @@ export default{
         pro_rejected(p_id){
             this.new_pro_data=this.new_pro_data.filter(pro => pro.p_id !== p_id)
         },
-        pro_details_show(p_id){
-            this.new_pro_detail_record=this.new_pro_data.find(pro=> pro.p_id===p_id)
+        async pro_details_show(p_id){
+            try{
+                const res = await fetch(`${location.origin}/api/professional/${p_id}`,{
+                    headers:{ 
+                        'Authentication-Token':this.$store.state.auth_token
+                    }
+                })
+                if(res.ok){
+                    const pro_data= await res.json()
+                    this.new_pro_detail_record=pro_data
+                    
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
+                }
+            }
+            catch(error){
+                console.log(error)
+            }
         },
         pro_details_close(){
             this.new_pro_detail_record=null

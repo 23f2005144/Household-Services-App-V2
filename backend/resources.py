@@ -76,6 +76,7 @@ serv_req_cust_fields={
     'serv_type' : fields.String(attribute='sr.serv_type'),
     'serv_name' : fields.String(attribute='sr.serv_name'),
     'serv_price' : fields.Integer(attribute='sr.serv_price'),
+    'serv_duration' :  fields.Integer(attribute='sr.serv_duration'),
     'pro_id' : fields.Integer,
     'pro_name' : fields.String(attribute='srp.p_name'),
     'pro_contact_no' : fields.Integer(attribute='srp.p_contact_no'),
@@ -621,7 +622,7 @@ class NewServiceRequestPro(Resource):
     @auth_required('token')
     def get(self,pro_id):
         pro_data=Professional.query.get(pro_id)
-        new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type, ServiceRequest.serv_request_datetime >= datetime.now()).all()#should work '''&(ServiceRequest.cr.c_pincode==pro_data.p_pincode)'''
+        new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type, ServiceRequest.serv_request_datetime >= datetime.now()).all()
 
         if not new_service_req_data:
             return {"Message":'ServiceRequests do not exist'},404

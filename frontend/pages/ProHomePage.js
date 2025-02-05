@@ -85,6 +85,7 @@ export default{
                                     <th>Service Type</th>
                                     <th>Service Name</th>
                                     <th>Service Price ₹</th>
+                                    <th>Service Duration (hrs)</th>
                                     <th>Customer Name</th>
                                     <th>Customer's Contact Number</th>
                                     <th>DateTime_of_Request</th>
@@ -101,6 +102,7 @@ export default{
                                     <td>{{service_req_detail_record.serv_type}}</td>
                                     <td>{{service_req_detail_record.serv_name}}</td>
                                     <td>{{service_req_detail_record.serv_price}}</td>
+                                    <td>{{service_req_detail_record.serv_duration}}</td>
                                     <td>{{service_req_detail_record.cust_name}}</td>
                                     <td>{{service_req_detail_record.cust_contact_no}}</td>
                                     <td>{{service_req_detail_record.serv_request_datetime}}</td>

@@ -1,4 +1,5 @@
 import ServiceReqTable from "../components/ServiceReqTable.js"
+import ServiceCloseForm from "../components/ServiceCloseForm.js"
 
 export default{
     template:`
@@ -78,7 +79,7 @@ export default{
                 </div>
             </div>
             <div class="row">
-                <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show" @Serv_Req_Cancel="serv_req_cancel"/>
+                <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show" @Serv_Req_Cancel="serv_req_cancel" @Pro_Details="pro_details_show" @Serv_Req_Close="serv_req_close_form_show"/>
             </div>
             <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
                 <div class="modal-dialog modal-xl" style="max-width: 90%;">
@@ -95,6 +96,7 @@ export default{
                                         <th>Service Type</th>
                                         <th>Service Name</th>
                                         <th>Service Price ₹</th>
+                                        <th>Service Duration (hrs)</th>
                                         <th>Assigned Professional</th>
                                         <th>Contact Number</th>
                                         <th>Experience (yrs)</th>
@@ -112,6 +114,7 @@ export default{
                                         <td>{{service_req_detail_record.serv_type}}</td>
                                         <td>{{service_req_detail_record.serv_name}}</td>
                                         <td>{{service_req_detail_record.serv_price}}</td>
+                                        <td>{{service_req_detail_record.serv_duration}}</td>
                                         <td>{{service_req_detail_record.pro_name}}</td>
                                         <td>{{service_req_detail_record.pro_contact_no}}</td>
                                         <td>{{service_req_detail_record.pro_exp}}</td>
@@ -129,6 +132,57 @@ export default{
                     </div>
                 </div>
             </div>
+            <div v-if="pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5">Service Professional Profile</h1>
+                            <button type="button" class="btn-close" @click="pro_details_close" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-person-circle" style="font-size: 120px; color: gray;"></i>
+                            </div>
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th><i class="bi bi-hash"></i> Professional ID:</th>
+                                        <td>#{{pro_detail_record.p_id}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-person"></i> Name:</th>
+                                        <td>{{pro_detail_record.p_name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-telephone"></i> Contact:</th>
+                                        <td>{{pro_detail_record.p_contact_no}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-geo-alt"></i> Serviceable Pincode:</th>
+                                        <td>{{pro_detail_record.p_pincode}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-tools"></i> Service Type:</th>
+                                        <td>{{pro_detail_record.p_service_type}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-briefcase"></i> Experience:</th>
+                                        <td>{{pro_detail_record.p_exp}} Years</td>
+                                    </tr>
+                                    <tr>
+                                        <th><i class="bi bi-star"></i> Avg. Rating:</th>
+                                        <td>{{pro_detail_record.p_avg_rating}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-lg btn-danger" @click="pro_details_close"><i class="bi bi-x-circle"></i> Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="serv_req_close_data">
+                <ServiceCloseForm :serv_req_close_data='serv_req_close_data' @Serv_Req_Closed='serv_req_close_form_close'/>
+            </div> 
         </div>
     </div>
     `,
@@ -157,13 +211,15 @@ export default{
             service_reqs_data:[],
             serv_book_record:null,
             service_slot:null,
-            service_req_detail_record:null
+            service_req_detail_record:null,
+            pro_detail_record:null,
+            serv_req_close_data:null
         }
     },
     methods:{
         async ServiceReqsDataFetch(){
             try{
-                const res = await fetch(`${location.origin}/api/service_request_customer/${this.$store.state.c_id}`,{
+                const res = await fetch(`${location.origin}/api/service_request/customer/${this.$store.state.c_id}`,{
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token
                     }
@@ -306,12 +362,43 @@ export default{
             }catch(error){
                 console.log(error)
             }
-       }
+        },
+        async pro_details_show(p_id){
+            try{
+                const res = await fetch(`${location.origin}/api/professional/${p_id}`,{
+                    headers:{ 
+                        'Authentication-Token':this.$store.state.auth_token
+                    }
+                })
+                if(res.ok){
+                    const pro_data= await res.json()
+                    this.pro_detail_record=pro_data
+                    
+                }else{
+                    const errormessage = await res.json()
+                    throw new Error(errormessage.Message)
+                }
+            }
+            catch(error){
+                console.log(error)
+            }
+        },
+        pro_details_close(){
+            this.pro_detail_record=null
+        },
+        serv_req_close_form_show(serv_req_id){
+            this.serv_req_close_data=this.service_reqs_data.find(s=> s.serv_req_id===serv_req_id)
+        },
+        async serv_req_close_form_close(){
+            this.serv_req_close_data=null
+            await this.ServiceReqsDataFetch()
+        },
 
 
     },
     components:{
-        ServiceReqTable
+        ServiceReqTable,
+        ServiceCloseForm
     }
     
 }
