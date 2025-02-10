@@ -1,12 +1,14 @@
 from flask import current_app as app,request
-from flask_restful import Api, Resource,fields,marshal_with
+from flask_restful import Api, Resource,fields,marshal_with,marshal
 from backend.models import db,User,Customer,Professional,Service,ServiceRequest,UserRoles,Role
 from flask_security import auth_required,current_user
 from datetime import datetime
+from sqlalchemy import func #to make sure that pro only accepts today's service requests.
 
-#major changes required here for handling different db operations based on role
+
 api=Api(prefix='/api')
 
+   
 service_fields={
     'serv_id' : fields.Integer,
     'serv_type' : fields.String,
@@ -19,18 +21,18 @@ service_fields={
 service_request_fields={
     'serv_req_id': fields.Integer,
     'serv_id' : fields.Integer,
-    'serv_type': fields.String(attribute="sr.serv_type"),
-    'serv_name' : fields.String(attribute='sr.serv_name'),
-    'serv_price' : fields.Integer(attribute="sr.serv_price"),
+    'serv_type': fields.String(attribute="service.serv_type"),
+    'serv_name' : fields.String(attribute='service.serv_name'),
+    'serv_price' : fields.Integer(attribute="service.serv_price"),
     'cust_id' : fields.Integer,
-    'cust_name' : fields.String(attribute="cr.c_name"),
-    'cust_pincode': fields.Integer(attribute="cr.c_pincode"),
+    'cust_name' : fields.String(attribute="customer.c_name"),
+    'cust_pincode': fields.Integer(attribute="customer.c_pincode"),
     'pro_id' : fields.Integer,
-    'pro_name' : fields.String(attribute="srp.p_name"),
-    'pro_exp' : fields.Integer(attribute="srp.p_exp"),
-    'pro_avg_rating' :  fields.Float(attribute=lambda sr: sr.srp.avg_rating if sr.srp else None),
-    'serv_request_datetime' : fields.DateTime,
-    'serv_close_datetime' : fields.DateTime,
+    'pro_name' : fields.String(attribute="professional.p_name"),
+    'pro_exp' : fields.Integer(attribute="professional.p_exp"),
+    'pro_avg_rating' :  fields.Float(attribute="pro_avg_rating"),
+    'serv_request_datetime' : fields.String(attribute='format_serv_request_datetime'),
+    'serv_close_datetime' : fields.String(attribute='format_serv_close_datetime'),
     'serv_status' : fields.String,
     'serv_remarks' : fields.String,
     'serv_rating' : fields.Integer,
@@ -45,7 +47,8 @@ customer_fields={
     'c_name' : fields.String,
     'c_contact_no': fields.Integer,
     'c_address' : fields.String,
-    'c_pincode' : fields.Integer
+    'c_pincode' : fields.Integer,
+    'c_status' : fields.Boolean(attribute='c.active')
 }
 
 pro_fields={
@@ -73,17 +76,17 @@ user_fields={
 
 serv_req_cust_fields={
     'serv_req_id' : fields.Integer,
-    'serv_type' : fields.String(attribute='sr.serv_type'),
-    'serv_name' : fields.String(attribute='sr.serv_name'),
-    'serv_price' : fields.Integer(attribute='sr.serv_price'),
-    'serv_duration' :  fields.Integer(attribute='sr.serv_duration'),
+    'serv_type' : fields.String(attribute='service.serv_type'),
+    'serv_name' : fields.String(attribute='service.serv_name'),
+    'serv_price' : fields.Integer(attribute='service.serv_price'),
+    'serv_duration' :  fields.Integer(attribute='service.serv_duration'),
     'pro_id' : fields.Integer,
-    'pro_name' : fields.String(attribute='srp.p_name'),
-    'pro_contact_no' : fields.Integer(attribute='srp.p_contact_no'),
-    'pro_exp' : fields.String(attribute='srp.p_exp'),
-    'pro_avg_rating' :  fields.Float(attribute=lambda sr: sr.srp.avg_rating if sr.srp else None),
-    'serv_request_datetime' : fields.DateTime,
-    'serv_close_datetime' : fields.DateTime,
+    'pro_name' : fields.String(attribute='professional.p_name'),
+    'pro_contact_no' : fields.Integer(attribute='professional.p_contact_no'),
+    'pro_exp' : fields.String(attribute='professional.p_exp'),
+    'pro_avg_rating' :  fields.Float(attribute="pro_avg_rating"),
+    'serv_request_datetime' : fields.String(attribute='format_serv_request_datetime'),
+    'serv_close_datetime' : fields.String(attribute='format_serv_close_datetime'),
     'serv_status' : fields.String,
     'serv_remarks': fields.String,
     'serv_rating' : fields.Integer,
@@ -92,15 +95,16 @@ serv_req_cust_fields={
 
 serv_req_pro_fields={
     'serv_req_id' : fields.Integer,
-    'serv_type' : fields.String(attribute='sr.serv_type'),
-    'serv_name' : fields.String(attribute='sr.serv_name'),
-    'serv_price' : fields.Integer(attribute='sr.serv_price'),
-    'cust_name' : fields.String(attribute='cr.c_name'),
-    'cust_contact_no' : fields.Integer(attribute='cr.c_contact_no'),
-    'cust_address' : fields.String(attribute='cr.c_address'),
-    'cust_pincode' : fields.Integer(attribute='cr.c_pincode'),
-    'serv_request_datetime' : fields.DateTime,
-    'serv_close_datetime' : fields.DateTime,
+    'serv_type' : fields.String(attribute='service.serv_type'),
+    'serv_name' : fields.String(attribute='service.serv_name'),
+    'serv_price' : fields.Integer(attribute='service.serv_price'),
+    'serv_duration' :  fields.Integer(attribute='service.serv_duration'),
+    'cust_name' : fields.String(attribute='customer.c_name'),
+    'cust_contact_no' : fields.Integer(attribute='customer.c_contact_no'),
+    'cust_address' : fields.String(attribute='customer.c_address'),
+    'cust_pincode' : fields.Integer(attribute='customer.c_pincode'),
+    'serv_request_datetime' : fields.String(attribute='format_serv_request_datetime'),
+    'serv_close_datetime' : fields.String(attribute='format_serv_close_datetime'),
     'serv_status' : fields.String,
     'serv_remarks': fields.String,
     'serv_rating' : fields.Integer,
@@ -225,16 +229,41 @@ class ServiceAPI(Resource):
         
 class ServiceListAPI(Resource):
 
-    @marshal_with(service_fields)
     @auth_required('token')
     def get(self):
+        query=request.args.get("q", "").strip()
+        s_type=request.args.get("s_type","").strip()
+
+        if query and query!='service_types':
+            serv_data_query=Service.query.filter((Service.serv_type==query)|(Service.serv_price==query)|(Service.serv_duration==query)).all()
+
+            if not serv_data_query:
+                return {"Message":"Service not found"},404
+            
+            return marshal(serv_data_query,service_fields),200
+        
+        if query=='service_types' and s_type:
+            serv_data=Service.query.filter(Service.serv_type==s_type).all()
+
+            if not serv_data:
+                return {"Message":"Services do not exist of this type"},404
+            
+            return marshal(serv_data,service_fields),200
+            
+        if query=='service_types':
+            serv_types=db.session.query(Service.serv_type.distinct()).all() #returns a tuple ()
+            unique_serv_types=[s_type[0] for s_type in serv_types]
+
+            return {"Service_Types": unique_serv_types},200
+         
         service_data_list=Service.query.all()
 
         if not service_data_list:
             return {"Message":"Services do not exist"},404
         
-        return service_data_list
-    
+        return marshal(service_data_list,service_fields),200
+
+     
     def post(self):
         data=request.get_json()
         serv_type=data.get('service_type')
@@ -342,15 +371,89 @@ class ServiceRequestAPI(Resource):
 
 class ServiceRequestListAPI(Resource):
 
-    @marshal_with(service_request_fields)
     @auth_required('token')
     def get(self):
-        serv_req_data_list=ServiceRequest.query.all()
+        query=request.args.get("q", "").strip()
+        cust_id=request.args.get("c_id", "").strip()
+        pro_id=request.args.get("p_id", "").strip()
+        pro_id_req=request.args.get("pro_new_req","").strip()
+        if cust_id:
+            if query:
+                if len(query)==10 and query.count("-")==2:
+                    query=ServiceRequest.query.filter((ServiceRequest.cust_id==cust_id)&((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%")))).all()
+            
+                    if not query:
+                        return {"Message":"ServiceRequest not found"},404
+            
+                    return marshal(query,serv_req_cust_fields),200
+                
+                else:
+                    serv_req_data_query=ServiceRequest.query.join(Service).filter((ServiceRequest.cust_id==cust_id)&((Service.serv_type==query)|(Service.serv_price==int(query))|(ServiceRequest.serv_status==query))).all()
 
-        if not serv_req_data_list:
-            return {"Message":"ServiceRequests do not exist"},404
+                    if not serv_req_data_query:
+                        return {"Message":"ServiceRequest not found"},404
+                    
+                    return marshal(serv_req_data_query,serv_req_cust_fields),200
+                
+            else:
+                serv_req_data=ServiceRequest.query.filter(ServiceRequest.cust_id==cust_id).all()
+
+                if not serv_req_data:
+                    return {"Message":"ServiceRequest Data not found"},404
+                
+                return marshal(serv_req_data,serv_req_cust_fields),200 #not sending cust_search_fields, almost same bruv
         
-        return serv_req_data_list
+        if pro_id:
+            if query:
+                if len(query)==10 and query.count("-")==2:
+                    query=ServiceRequest.query.filter((ServiceRequest.pro_id==pro_id)&((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%")))).all()
+                    
+                    if not query:
+                        return {"Message":"ServiceRequest not found"},404
+                    
+                    return marshal(query,serv_req_pro_fields),200
+                
+                else:
+                    query=ServiceRequest.query.join(Service).filter((ServiceRequest.pro_id==pro_id)&((ServiceRequest.serv_status==query)|(ServiceRequest.pro_rating==query)|(Service.serv_price==query))).all()
+                    
+                    if not query:
+                        return {"Message":"ServiceRequest not found"},404
+                    
+                    return marshal(query,serv_req_pro_fields),200
+                
+            else:
+                serv_req_data=ServiceRequest.query.filter(ServiceRequest.pro_id==pro_id).all()
+
+                if not serv_req_data:
+                    return {"Message":"ServiceRequest Data not found"},404
+                
+                return marshal(serv_req_data,serv_req_pro_fields),200
+            
+        if pro_id_req:
+            pro_data=Professional.query.get(pro_id_req)
+
+            if not pro_data:
+                return {"Message":"Professional does not exist"}, 404
+            
+            today=datetime.today()
+            new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type,func.date(ServiceRequest.serv_request_datetime)==today).all()
+
+            if not new_service_req_data:
+                return {"Message":'ServiceRequests do not exist'},404
+                        
+            return marshal(new_service_req_data,serv_req_pro_fields),200
+
+        else:
+            if query: #for admin searching in service table
+                pass
+
+            else:
+                serv_req_data_list=ServiceRequest.query.all()
+
+                if not serv_req_data_list:
+                    return {"Message":"ServiceRequests do not exist"},404
+                
+                return marshal(serv_req_data_list,service_request_fields),200
     
     @auth_required('token')
     def post(self):
@@ -573,64 +676,6 @@ class UserListAPI(Resource):
 
         return user_data
 
-class ServiceBookTypes(Resource):
-
-    def get(self):
-        serv_types = db.session.query(Service.serv_type.distinct()).all() #returns a tuple ()
-        unique_serv_types = [s_type[0] for s_type in serv_types]
-        return {"Service_Types": unique_serv_types}
-
-class ServiceRequestCustRecords(Resource):
-
-        @marshal_with(serv_req_cust_fields)
-        @auth_required('token')
-        def get(self,cust_id):
-            serv_req_data=ServiceRequest.query.filter(ServiceRequest.cust_id==cust_id).all()
-
-            if not serv_req_data:
-                return {"Message":"ServiceRequests do not exist"},404
-            
-            return serv_req_data
-        
-class ServiceTypeListAPI(Resource):
-
-    @marshal_with(service_fields)
-    @auth_required('token')
-    def get(self,s_type):
-        serv_data=Service.query.filter(Service.serv_type==s_type).all()
-
-        if not serv_data:
-            return {"Message":"Services do not exist of this type"},404
-        
-        return serv_data
-
-class ServiceRequestProRecords(Resource):
-
-        @marshal_with(serv_req_pro_fields)
-        @auth_required('token')
-        def get(self,pro_id):
-            serv_req_data=ServiceRequest.query.filter(ServiceRequest.pro_id==pro_id).all()
-
-            if not serv_req_data:
-                return {"Message":"ServiceRequests do not exist"},404
-            
-            return serv_req_data
-        
-class NewServiceRequestPro(Resource):
-
-    @marshal_with(serv_req_pro_fields)
-    @auth_required('token')
-    def get(self,pro_id):
-        pro_data=Professional.query.get(pro_id)
-        new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type, ServiceRequest.serv_request_datetime >= datetime.now()).all()
-
-        if not new_service_req_data:
-            return {"Message":'ServiceRequests do not exist'},404
-        
-        return new_service_req_data
-
-
-
 api.add_resource(RegisterAPI,'/register')
 api.add_resource(ServiceAPI,'/service/<int:service_id>')
 api.add_resource(ServiceListAPI,'/service')
@@ -642,8 +687,5 @@ api.add_resource(ProfessionalAPI,'/professional/<int:p_id>')
 api.add_resource(ProfessionalListAPI,'/professional')
 api.add_resource(UserAPI,'/user/<int:user_id>')
 api.add_resource(UserListAPI,'/user')
-api.add_resource(ServiceBookTypes,'/service_type')
-api.add_resource(ServiceRequestCustRecords,'/service_request/customer/<int:cust_id>')
-api.add_resource(ServiceTypeListAPI,'/service/type/<string:s_type>')
-api.add_resource(ServiceRequestProRecords,'/service_request/professional/<int:pro_id>')
-api.add_resource(NewServiceRequestPro,'/new_service_request/professional/<int:pro_id>' )
+
+

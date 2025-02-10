@@ -108,7 +108,7 @@ export default{
             </div>
             <div v-else><!-- Assuming now that role=Professional-->
                 <div class="row my-3">
-                    <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Closed Services</p>
+                    <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service History</p>
                     <table class="table table-hover table-bordered border-primary">
                         <thead>
                             <tr>

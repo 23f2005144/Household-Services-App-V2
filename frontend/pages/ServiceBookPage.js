@@ -219,7 +219,8 @@ export default{
     methods:{
         async ServiceReqsDataFetch(){
             try{
-                const res = await fetch(`${location.origin}/api/service_request/customer/${this.$store.state.c_id}`,{
+                const QueryParams = new URLSearchParams({c_id:this.$store.state.c_id}).toString()
+                const res = await fetch(`${location.origin}/api/service_request?${QueryParams}`,{
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token
                     }
@@ -235,7 +236,8 @@ export default{
         },
         async ServiceDataTypeFetch(){
             try{
-                const res = await fetch(`${location.origin}/api/service/type/${this.$route.params.type}`,{
+                const QueryParams = new URLSearchParams({q:"service_types",s_type:this.$route.params.type}).toString();
+                const res = await fetch(`${location.origin}/api/service?${QueryParams}`,{
                     headers:{
                         'Authentication-Token': this.$store.state.auth_token
                     }

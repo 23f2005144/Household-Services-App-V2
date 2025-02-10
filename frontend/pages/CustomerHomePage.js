@@ -6,7 +6,7 @@ import ServiceCloseForm from "../components/ServiceCloseForm.js"
 export default{
     template:`
     <div>
-        <p class="mb-0" style="color:teal; font-size:30px; font-weight:bold;">Welcome to Customer Dashboard</p>
+        <p class="mb-0 text-center fs-1" style="color:teal;font-weight:bold;">Welcome to Customer Dashboard</p>
         <div class="container">
             <div class="row">
                 <p class="text-end link-info link-offset-2 link-underline-opacity-100 link-underline-opacity-100-hover" style="font-size:25px; font-weight: bold;" @click="ShowProfile">View Profile</p>
@@ -157,7 +157,8 @@ export default{
     methods:{
          async ServiceReqsDataFetch(){
             try{
-                const res = await fetch(`${location.origin}/api/service_request/customer/${this.$store.state.c_id}`,{
+                const QueryParams = new URLSearchParams({c_id:this.$store.state.c_id}).toString()
+                const res = await fetch(`${location.origin}/api/service_request?${QueryParams}`,{
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token
                     }

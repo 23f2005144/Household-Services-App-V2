@@ -47,7 +47,12 @@ export default{
     methods:{
         async ServiceDataFetch(){
             try{
-                const res = await fetch(`${location.origin}/api/service_type`)
+                const QueryParams = new URLSearchParams({q:"service_types"}).toString()
+                const res = await fetch(`${location.origin}/api/service?${QueryParams}`,{
+                    headers:{
+                        'Authentication-Token':this.$store.state.auth_token
+                    }
+                })
                 if(res.ok){
                     const data = await res.json()
                     this.service_data=data.Service_Types //since it is a list

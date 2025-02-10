@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
+import datetime
 db=SQLAlchemy()
 
 class User(db.Model,UserMixin):
@@ -29,7 +30,7 @@ class Service(db.Model):
     serv_price=db.Column(db.Integer, nullable=False)
     serv_duration=db.Column(db.Integer, nullable=False)
     serv_desc=db.Column(db.String())
-    serv_req=db.relationship('ServiceRequest',backref='sr',cascade='delete')
+    serv_req=db.relationship('ServiceRequest',backref='service',cascade='delete')
 
 class Customer(db.Model):
     c_id=db.Column(db.Integer,primary_key=True,nullable=False)
@@ -38,7 +39,7 @@ class Customer(db.Model):
     c_contact_no=db.Column(db.Integer, nullable=False)
     c_address=db.Column(db.String(),nullable=False)
     c_pincode=db.Column(db.Integer,nullable=False)
-    c_req=db.relationship('ServiceRequest',backref='cr')
+    c_req=db.relationship('ServiceRequest',backref='customer')
     
 
 class Professional(db.Model):
@@ -49,7 +50,7 @@ class Professional(db.Model):
     p_service_type=db.Column(db.String(), nullable=False)
     p_exp=db.Column(db.Integer, nullable=False)
     p_pincode=db.Column(db.Integer, nullable=False)
-    serv_req_pro=db.relationship('ServiceRequest',backref='srp')
+    serv_req_pro=db.relationship('ServiceRequest',backref='professional')
 
     @property
     def avg_rating(self):
@@ -77,3 +78,19 @@ class ServiceRequest(db.Model):
     serv_remarks=db.Column(db.String())
     serv_rating=db.Column(db.Integer)
     pro_rating=db.Column(db.Integer)
+
+    @property
+    def pro_avg_rating(self):
+        return self.professional.avg_rating if self.professional else None
+    
+    @property
+    def format_serv_request_datetime(self):
+        if self.serv_request_datetime:
+            return self.serv_request_datetime.strftime("%d-%m-%Y %H:%M")
+        return None
+
+    @property
+    def format_serv_close_datetime(self):
+        if self.serv_close_datetime:
+            return self.serv_close_datetime.strftime("%d-%m-%Y %H:%M")
+        return None
