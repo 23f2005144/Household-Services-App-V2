@@ -141,9 +141,17 @@ export default{
         async CustomerSearchData(){
             try{
                 this.table_data=null
-                const QueryParams = new URLSearchParams({c_id:this.$store.state.c_id,t:this.search_table,q:this.search_query}).toString()
-                const endp=this.search_table==="ServiceRequest"?"service_request":"service"
-                const res = await fetch(`${location.origin}/api/${endp}?${QueryParams}`,{
+                let QueryParams=""
+                let endp = this.search_table==='ServiceRequest' ? "service_request" : "service"
+                if(this.search_query){
+                    if (this.search_table==='ServiceRequest'){
+                        QueryParams=new URLSearchParams({c_id:this.$store.state.c_id,q:this.search_query}).toString()
+
+                    }else if(this.search_table==='Service'){
+                        QueryParams=new URLSearchParams({q:this.search_query}).toString()
+                    }
+                }
+                const res = await fetch(`${location.origin}/api/${endp}${QueryParams ? "?"+QueryParams : ""}`,{
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token
                     }

@@ -71,7 +71,8 @@ role_fields={
 user_fields={
     'user_id' : fields.Integer,
     'email' : fields.String,
-    'roles' : fields.List(fields.Nested(role_fields))
+    'roles' : fields.List(fields.Nested(role_fields)),
+    'active' : fields.Boolean
 }
 
 serv_req_cust_fields={
@@ -380,15 +381,16 @@ class ServiceRequestListAPI(Resource):
         if cust_id:
             if query:
                 if len(query)==10 and query.count("-")==2:
-                    query=ServiceRequest.query.filter((ServiceRequest.cust_id==cust_id)&((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%")))).all()
+                    query=datetime.strptime(query, "%d-%m-%Y").strftime("%Y-%m-%d")
+                    serv_req_data=ServiceRequest.query.filter((ServiceRequest.cust_id==cust_id)&((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%")))).all()
             
-                    if not query:
+                    if not serv_req_data:
                         return {"Message":"ServiceRequest not found"},404
             
-                    return marshal(query,serv_req_cust_fields),200
+                    return marshal(serv_req_data,serv_req_cust_fields),200
                 
                 else:
-                    serv_req_data_query=ServiceRequest.query.join(Service).filter((ServiceRequest.cust_id==cust_id)&((Service.serv_type==query)|(Service.serv_price==int(query))|(ServiceRequest.serv_status==query))).all()
+                    serv_req_data_query=ServiceRequest.query.join(Service).filter((ServiceRequest.cust_id==cust_id)&((Service.serv_type==query)|(Service.serv_price==query)|(ServiceRequest.serv_status==query))).all()
 
                     if not serv_req_data_query:
                         return {"Message":"ServiceRequest not found"},404
@@ -406,20 +408,21 @@ class ServiceRequestListAPI(Resource):
         if pro_id:
             if query:
                 if len(query)==10 and query.count("-")==2:
-                    query=ServiceRequest.query.filter((ServiceRequest.pro_id==pro_id)&((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%")))).all()
+                    query=datetime.strptime(query, "%d-%m-%Y").strftime("%Y-%m-%d")
+                    serv_req_data=ServiceRequest.query.filter((ServiceRequest.pro_id==pro_id)&((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%")))).all()
                     
-                    if not query:
+                    if not serv_req_data:
                         return {"Message":"ServiceRequest not found"},404
                     
-                    return marshal(query,serv_req_pro_fields),200
+                    return marshal(serv_req_data,serv_req_pro_fields),200
                 
                 else:
-                    query=ServiceRequest.query.join(Service).filter((ServiceRequest.pro_id==pro_id)&((ServiceRequest.serv_status==query)|(ServiceRequest.pro_rating==query)|(Service.serv_price==query))).all()
+                    serv_req_data=ServiceRequest.query.join(Service).filter((ServiceRequest.pro_id==pro_id)&((ServiceRequest.serv_status==query)|(ServiceRequest.pro_rating==query)|(Service.serv_price==query))).all()
                     
-                    if not query:
+                    if not serv_req_data:
                         return {"Message":"ServiceRequest not found"},404
                     
-                    return marshal(query,serv_req_pro_fields),200
+                    return marshal(serv_req_data,serv_req_pro_fields),200
                 
             else:
                 serv_req_data=ServiceRequest.query.filter(ServiceRequest.pro_id==pro_id).all()
@@ -444,8 +447,23 @@ class ServiceRequestListAPI(Resource):
             return marshal(new_service_req_data,serv_req_pro_fields),200
 
         else:
-            if query: #for admin searching in service table
-                pass
+            if query: #for admin searching in service request table
+                if len(query)==10 and query.count("-")==2:
+                    query=datetime.strptime(query, "%d-%m-%Y").strftime("%Y-%m-%d")
+                    serv_req_data=ServiceRequest.query.filter((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%"))).all()
+                    
+                    if not serv_req_data:
+                        return {"Message":"ServiceRequest not found"},404
+                    
+                    return marshal(serv_req_data,service_request_fields),200
+                
+                else:
+                    serv_req_data=ServiceRequest.query.join(Customer).filter((Customer.c_pincode==query)|(ServiceRequest.serv_status==query)).all()
+                    
+                    if not serv_req_data:
+                        return {"Message":"ServiceRequest not found"},404
+                    
+                    return marshal(serv_req_data,service_request_fields),200
 
             else:
                 serv_req_data_list=ServiceRequest.query.all()
@@ -521,40 +539,28 @@ class CustomerAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
                 
-            if req_method=="BlockCustomer" and current_user.roles[0].name=="Admin": # add method to also cancel all serv_reqs accepted/ requested.
-                try:
-                    c_user_data.active=False
-                    db.session.commit()
-                    return {"Message":"Customer successfully blocked"},200
-                
-                except:
-                    db.session.rollback()
-                    return {"Message":"Error in database"},400
-            
-            if req_method=="UnblockCustomer" and current_user.roles[0].name=="Admin":
-                try:
-                    c_user_data.active=True
-                    db.session.commit()
-                    return {"Message":"Customer successfully unblocked"},200
-                
-                except:
-                    db.session.rollback()
-                    return {"Message":"Error in database"},400
-        else:
-            return {"Message":"Customer/User is not found"},404
-    
+#still need to clean this up and implement a way to stop it from updating profile if already some services are requested/accepted, same for pro 
 
 class CustomerListAPI(Resource):
 
-    @marshal_with(customer_fields)
     @auth_required('token')
     def get(self):
+        query=request.args.get("q","").strip()
+
+        if query: #Admin is searching in customer table
+            cust_data=Customer.query.join(User).filter((Customer.c_pincode==query)|(Customer.c_name==query)|(User.active==query)).all()
+
+            if not cust_data:
+                return {"Message" : "Customer data not found"},404
+            
+            return marshal(cust_data,customer_fields),200
+
         cust_data_list=Customer.query.all()
 
         if not cust_data_list:
             return {"Message":"Customers do not exist"},404
         
-        return cust_data_list
+        return marshal(cust_data_list,customer_fields),200
     
 
 class ProfessionalAPI(Resource):
@@ -595,40 +601,27 @@ class ProfessionalAPI(Resource):
                     db.session.rollback()
                     return {"Message":"Error in database"},400
                 
-            if req_method=="BlockPro" and current_user.roles[0].name=="Admin":
-                try:
-                    p_user_data.active=False
-                    db.session.commit()
-                    return {"Message":"Professional successfully blocked"},200
-                
-                except:
-                    db.session.rollback()
-                    return {"Message":"Error in database"},400
-            
-            if req_method=="Approve/UnblockPro" and current_user.roles[0].name=="Admin":
-                try:
-                    p_user_data.active=True
-                    db.session.commit()
-                    return {"Message":"Professional successfully approved/unblocked"},200
-                
-                except:
-                    db.session.rollback()
-                    return {"Message":"Error in database"},400
-        else:
-            return {"Message":"Professional/User is not found"},404
-    
 
 class ProfessionalListAPI(Resource):
 
-    @marshal_with(pro_fields)
     @auth_required('token')
     def get(self):
+        query=request.args.get("q","").strip()
+
+        if query: #Admin is searching in Pro table
+            pro_data=Professional.query.join(User).filter((Professional.p_name==query)|(Professional.p_service_type==query)|(Professional.p_exp==query)|(Professional.p_pincode==query)|(User.active==query)).all()
+
+            if not pro_data:
+                return {"Message" : "Professional data not found"},404
+            
+            return marshal(pro_data,pro_fields),200
+
         pro_data_list=Professional.query.all()
 
         if not pro_data_list:
             return {"Message":"Professionals do not exist"},404
         
-        return pro_data_list
+        return marshal(pro_data_list,pro_fields),200
 
 
 class UserAPI(Resource):
@@ -663,18 +656,55 @@ class UserAPI(Resource):
         except:
             db.session.rollback()
             return {"Message":"Error in database"},400
+    
+    @auth_required('token')
+    def patch(self,user_id):
+        data=request.get_json()
+        status = data["user_status"]
 
+        if "user_status" not in data:
+            return {"Message" : "Status missing"},400
+        
+        if status not in [True, False]:
+            return {"Message": "Invalid status"},400
+
+        user_data=User.query.get(user_id)
+
+        if not user_data:
+            return {"Message" : "User not found"},404
+
+        try:
+            user_data.active= not(status)
+            db.session.commit()
+            return "",204
+        
+        except:
+            db.session.rollback()
+            return {"Message":"Error in database"},400
+        
 class UserListAPI(Resource):
     
-    @marshal_with(user_fields)
     @auth_required('token')
     def get(self):
-        user_data=User.query.all()
+        query=request.args.get("q","").strip()
 
         if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can access user details"},403
 
-        return user_data
+        if query: #Admin is searching in customer table
+            user_data=User.query.filter((User.email==query)|(User.roles[0].name==query)|(User.active==query)).all()
+
+            if not user_data:
+                return {"Message" : "User data not found"},404
+            
+            return marshal(user_data,user_fields),200
+
+        user_data=User.query.all()
+
+        if not user_data:
+            return {"Message" : "User data not found"},404
+
+        return marshal(user_data,user_fields),200
 
 api.add_resource(RegisterAPI,'/register')
 api.add_resource(ServiceAPI,'/service/<int:service_id>')

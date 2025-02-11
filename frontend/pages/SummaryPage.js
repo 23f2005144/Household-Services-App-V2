@@ -1,7 +1,12 @@
 export default{
     template:`
     <div>
-        <h3> This is Summary Page for everyone!</h3>
+        <div v-if="this.$store.state.role==='Admin'">
+        </div>
+        <div v-if="this.$store.state.role==='Customer'">
+        </div>
+        <div v-else>
+        </div>
     </div>
     
     `

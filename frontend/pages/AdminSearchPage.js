@@ -64,9 +64,9 @@ export default{
                                     <th>Service Type</th>
                                     <th>Service Name</th>
                                     <th>Service Price (₹)</th>
-                                    <th>Customer's Name and Location</th>
-                                    <th>Professional's Name and Contact Number</th>
-                                    <th>Professional's Experience (yrs) and Average Rating</th>
+                                    <th>Customer Name (Location)</th>
+                                    <th>Professional Name (Contact Number)</th>
+                                    <th>Professional Experience (yrs) (Average Rating)</th>
                                     <th>DateTime_of_Request</th>
                                     <th>DateTime_of_Completion</th>
                                     <th>Service Status</th>
@@ -81,9 +81,9 @@ export default{
                                     <td>{{sr.serv_type}}</td>
                                     <td>{{sr.serv_name}}</td>
                                     <td>{{sr.serv_price}}</td>
-                                    <td>{{sr.cust_name}} | {{sr.cust_pincode}}</td>
-                                    <td>{{sr.pro_name}} | {{sr.pro_contact_no}}</td>
-                                    <td>{{sr.pro_exp}} | {{sr.pro_avg_rating}}</td>
+                                    <td>{{sr.cust_name}}  ({{sr.cust_pincode}})</td>
+                                    <td>{{sr.pro_name}}  ({{sr.pro_contact_no}})</td>
+                                    <td>{{sr.pro_exp}}  ({{sr.pro_avg_rating}})</td>
                                     <td>{{sr.serv_request_datetime}}</td> 
                                     <td>{{sr.serv_close_datetime}}</td> 
                                     <td>{{sr.serv_status}}</td>
@@ -103,11 +103,11 @@ export default{
                                 <tr>
                                     <th>ID</th>
                                     <th>User ID</th>
-                                    <th>Customer's Name</th>
-                                    <th>Customer's Contact Number</th>
-                                    <th>Customer's Address</th>
-                                    <th>Customer's Pincode</th>
-                                    <th>Customer's Status</th>
+                                    <th>Customer Name</th>
+                                    <th>Customer Contact Number</th>
+                                    <th>Customer Address</th>
+                                    <th>Customer Pincode</th>
+                                    <th>Customer Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -119,14 +119,14 @@ export default{
                                     <td>{{c.c_contact_no}}</td>
                                     <td>{{c.c_address}}</td>
                                     <td>{{c.c_pincode}}</td>
-                                    <div v-if="c.c_status=='true'">
-                                        <td><p>Active</p></td>
-                                        <td>Button for block</td>
-                                    </div>
-                                    <div v-else>
-                                        <td><p>Blocked</p></td>
-                                        <td>Button for unblock</td>
-                                    </div>
+                                    <td>
+                                        <p v-if="c.c_status===true">Active</p>
+                                        <p v-else>Blocked</p>
+                                    </td>
+                                    <td>
+                                        <button v-if="c.c_status===true" class="btn btn-lg btn-danger" @click="BlockUser(c.user_c_id,'customer')">Block</button>
+                                        <button v-else class="btn btn-lg btn-warning" @click="UnblockUser(c.user_c_id,'customer')">Unblock</button>   
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -140,12 +140,12 @@ export default{
                                 <tr>
                                     <th>ID</th>
                                     <th>User ID</th>
-                                    <th>Professional's Name</th>
-                                    <th>Professional's Contact Number</th>
-                                    <th>Professional's Serviceable Pincode</th>
-                                    <th>Professional's Expertise</th>
-                                    <th>Professional's Experience (yrs)</th>
-                                    <th>Professional's Average Rating</th>
+                                    <th>Professional Name</th>
+                                    <th>Professional Contact Number</th>
+                                    <th>Professional Serviceable Pincode</th>
+                                    <th>Professional Expertise</th>
+                                    <th>Professional Experience (yrs)</th>
+                                    <th>Professional Average Rating</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -158,14 +158,14 @@ export default{
                                     <td>{{p.p_pincode}}</td>
                                     <td>{{p.p_exp}}</td>
                                     <td>{{p.p_avg_rating}}</td>
-                                    <div v-if="p.p_status=='true'">
-                                        <td><p>Active</p></td>
-                                        <td>Button for block</td>
-                                    </div>
-                                    <div v-else>
-                                        <td><p>Blocked</p></td>
-                                        <td>Button for unblock</td>
-                                    </div>
+                                    <td>
+                                        <p v-if="p.p_status===true">Active</p>
+                                        <p v-else>Blocked</p>
+                                    </td>
+                                    <td>
+                                        <button v-if="p.p_status===true" class="btn btn-lg btn-danger" @click="BlockUser(p.user_p_id,'professional')">Block</button>
+                                        <button v-else class="btn btn-lg btn-warning" @click="UnblockUser(p.user_p_id,'professional')">Unblock</button>   
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -178,7 +178,6 @@ export default{
                             <thead>
                                 <tr>
                                     <th>User ID</th>
-                                    <th>User Name</th>
                                     <th>User Email</th>
                                     <th>User Status</th>
                                     <th>User Role</th>
@@ -188,16 +187,15 @@ export default{
                             <tbody>
                                 <tr v-for="u in table_data" :key="u.user_id">
                                     <td>{{u.user_id}}</td>
-                                    <td>{{u.name}}</td>
                                     <td>{{u.email}}</td>
-                                    <div v-if="u.active=='true'">
+                                    <div v-if="u.active==true">
                                         <td><p>Active</p></td>
                                     </div>
                                     <div v-else>
                                         <td><p>Blocked</p></td>
                                     </div>
-                                    <td>{{u.role.name}}</td>
-                                    <td>{{u.role.desc}}</td>
+                                    <td>{{u.roles[0].name}}</td>
+                                    <td>{{u.roles[0].desc}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -244,9 +242,49 @@ export default{
         async AdminSearchData(){
             try{
                 this.table_data=null
-                const QueryParams = new URLSearchParams({c_id:this.$store.state.c_id,t:this.search_table,q:this.search_query}).toString()
-                const endp=this.search_table==="ServiceRequest"?"service_request":"service"
-                const res = await fetch(`${location.origin}/api/${endp}?${QueryParams}`,{
+                let QueryParams=""
+                let endp=""
+                if (this.search_table==="ServiceRequest") {
+                    endp="service_request"
+                    if (this.search_query){
+                        QueryParams=new URLSearchParams({q:this.search_query}).toString()
+                    }
+                } else if (this.search_table==="Service") {
+                    endp="service"
+                    if (this.search_query){
+                        QueryParams=new URLSearchParams({q:this.search_query}).toString()
+                    }
+                } else if (this.search_table==="Customer") {
+                    endp="customer"
+                    if (this.search_query){
+                        if(this.search_query==='Active'){
+                            QueryParams=new URLSearchParams({q:1}).toString()
+                        }
+                        else if(this.search_query==='Blocked'){
+                            QueryParams=new URLSearchParams({q:0}).toString()
+                        }else{
+                            QueryParams=new URLSearchParams({q:this.search_query}).toString()
+                        }
+                    }
+                } else if (this.search_table==="Professional") {
+                    endp="professional"
+                    if (this.search_query){
+                        if(this.search_query==='Active'){
+                            QueryParams=new URLSearchParams({q:1}).toString()
+                        }
+                        else if(this.search_query==='Blocked'){
+                            QueryParams=new URLSearchParams({q:0}).toString()
+                        }else{
+                            QueryParams=new URLSearchParams({q:this.search_query}).toString()
+                        }
+                    }
+                } else if (this.search_table==="User") {
+                    endp="user"
+                    if (this.search_query){
+                        QueryParams=new URLSearchParams({q:this.search_query}).toString()
+                    }
+                }
+                const res = await fetch(`${location.origin}/api/${endp}${QueryParams ? "?"+QueryParams : ""}`,{
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token
                     }
@@ -269,7 +307,81 @@ export default{
                 this.table_data=null
             }
 
+        },
+        async BlockUser(user_id,role){
+            try{
+                let user_data
+                let user_status
+                if (role==='customer'){
+                    user_data=this.table_data.find(user => user.user_c_id===user_id)
+                    user_status=user_data.c_status
+
+                }else if (role==='professional'){
+                    user_data=this.table_data.find(user => user.user_p_id===user_id)
+                    user_status=user_data.p_status
+                }
+                const res = await fetch(`${location.origin}/api/user/${user_id}`,{
+                    method:"PATCH",
+                    headers:{
+                        'Authentication-Token' : this.$store.state.auth_token,
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify({'user_status':user_status})
+                })
+                if(res.status===204){
+                    console.log("User Blocked Successfully")
+                    alert("User Blocked Successfully!")
+                    window.location.reload()
+                    this.table_data=null
+
+                }else{
+                    const {Message} = await res.json();
+                    throw new Error(Message);
+
+                }
+            } catch(error){
+                console.log(error.message)
+                this.table_data=null
+            }
+        },
+        async UnblockUser(user_id,role){
+            try{
+                let user_data
+                let user_status
+                if (role==='customer'){
+                    user_data=this.table_data.find(user => user.user_c_id===user_id)
+                    user_status=user_data.c_status
+
+                }else if (role==='professional'){
+                    user_data=this.table_data.find(user => user.user_p_id===user_id)
+                    user_status=user_data.p_status
+                }
+                const res = await fetch(`${location.origin}/api/user/${user_id}`,{
+                    method:"PATCH",
+                    headers:{
+                        'Authentication-Token' : this.$store.state.auth_token,
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify({'user_status':user_status})
+                })
+                if(res.status===204){
+                    console.log("User Unblocked Successfully")
+                    alert("User Unblocked Successfully!")
+                    window.location.reload()
+                    this.table_data=null
+
+                }else{
+                    const {Message} = await res.json();
+                    throw new Error(Message);
+
+                }
+            } catch(error){
+                console.log(error.message)
+                this.table_data=null
+            }
         }
+
+
     }
 
     
