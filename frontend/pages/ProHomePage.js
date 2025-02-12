@@ -87,7 +87,8 @@ export default{
                                     <th>Service Price ₹</th>
                                     <th>Service Duration (hrs)</th>
                                     <th>Customer Name</th>
-                                    <th>Customer's Contact Number</th>
+                                    <th>Customer Contact Number</th>
+                                    <th>Service Location</th>
                                     <th>DateTime_of_Request</th>
                                     <th>DateTime_of_Completion</th>
                                     <th>Service Status</th>
@@ -105,6 +106,7 @@ export default{
                                     <td>{{service_req_detail_record.serv_duration}}</td>
                                     <td>{{service_req_detail_record.cust_name}}</td>
                                     <td>{{service_req_detail_record.cust_contact_no}}</td>
+                                    <td>{{service_req_detail_record.cust_address}} {{service_req_detail_record.cust_pincode}}</td>
                                     <td>{{service_req_detail_record.serv_request_datetime}}</td>
                                     <td>{{service_req_detail_record.serv_close_datetime}}</td>
                                     <td>{{service_req_detail_record.serv_status}}</td>
@@ -166,12 +168,11 @@ export default{
                     this.service_reqs_data=data
                     this.service_req_acc_data=this.service_reqs_data.find(sr=> sr.serv_status==='Accepted')
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         async ServiceReqsProDataFetch(){
@@ -186,12 +187,11 @@ export default{
                     const data = await res.json()
                     this.new_service_reqs_pro_data=data
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         serv_req_details_pro_show(serv_req_id){
@@ -214,11 +214,11 @@ export default{
                         this.show_profile=true
 
                     }else{
-                        const errormessage= await res.json()
-                        throw new Error(errormessage.Message)
-                    }
+                        const {Message} = await res.json()
+                    throw new Error(Message)
+                }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
             }
         },
         HideProfile(){
@@ -241,11 +241,11 @@ export default{
                     await this.ServiceReqsDataFetch()
                     await this.ServiceReqsProDataFetch()
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
             }
         }
     },

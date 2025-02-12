@@ -120,14 +120,11 @@ export default{
                     console.log("Message",res.status,res.statusText)
                     alert("Current user is blocked/Not yet approved")
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-          
-            }
-            catch (error){
-                console.log(error)
-
+            }catch(error){
+                console.log(error.message)
             }
         }
     }

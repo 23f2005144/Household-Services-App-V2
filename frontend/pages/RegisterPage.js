@@ -222,11 +222,11 @@ export default{
                     this.$router.push('/login')
                     alert("Registered Successfully, Login now!")
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            } catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         async RegisterPro()
@@ -256,11 +256,11 @@ export default{
                     this.$router.push('/login')
                     alert("Registered Successfully, Login once approved by Admin")
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            } catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         }
     }

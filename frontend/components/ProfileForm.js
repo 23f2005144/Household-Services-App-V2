@@ -7,8 +7,8 @@ export default{
     <div>
         <div class="container">
             <p class="mb-0 text-center" style="color:teal; font-size:40px; font-weight:bold;">Edit Your Profile</p><br>
-            <div v-if="$store.state.role==='Customer'" class="row" id='Profile-Form'>
-                <form @submit.prevent="EditCustProfile" class="text-center">
+            <div v-if="$store.state.role==='Customer'" class="row">
+                <form @submit.prevent="EditCustProfile" class="text-center" id='Profile-Form'>
                     <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
                         <label for="name" class="form-label">Full Name</label>
                         <input type="text" class="form-control" id="name" name="fullname" v-model="cust_profile_data.c_name" required>
@@ -28,7 +28,7 @@ export default{
                     <div class="mb-2 col-md-2" style="text-align: center;padding:0px;margin:auto">
                         <label for="inputZip" class="form-label">Pincode</label>
                         <input type="text" class="form-control" id="inputZip" name="pincode"  v-model="cust_profile_data.c_pincode" required>
-                    </div>
+                    </div><br>
                     <div class="col-md-12" style="text-align: center;padding:0px;margin:auto">
                         <button type="submit" class="btn btn-primary btn-lg p-2 col-md-2">Update</button>
                         <button type="button" @click="$emit('HideCustProfile')" class="btn btn-lg p-2 col-md-2 btn-danger">Close</button>
@@ -103,11 +103,9 @@ export default{
     data(){
         return{
             style:null,
-            services_type_data:[
-                'Cleaning','Electrical','Plumbing',
+            services_type_data:['Cleaning','Electrical','Plumbing',
                 'Carpentry','Painting','Appliance Installation',
-                'Appliance Service','Pest Control'
-            ],
+                'Appliance Service','Pest Control'],
         }
     },
     methods:{
@@ -119,7 +117,7 @@ export default{
                             'Authentication-Token' : this.$store.state.auth_token,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({...this.cust_profile_data,"req_method":"UpdateProfile"})
+                        body: JSON.stringify({...this.cust_profile_data})
 
                 })
                 if (res.ok){
@@ -128,12 +126,14 @@ export default{
                     console.log("Profile Updated successfully")
                     this.$emit('HideCustProfile')
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
+                this.$emit('HideCustProfile')
             }
+            
         },
         async EditProProfile(){
             try{
@@ -143,7 +143,7 @@ export default{
                             'Authentication-Token' : this.$store.state.auth_token,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({...this.pro_profile_data,"req_method":"UpdateProfile"})
+                        body: JSON.stringify({...this.pro_profile_data})
 
                 })
                 if (res.ok){
@@ -152,11 +152,12 @@ export default{
                     console.log("Profile Updated successfully")
                     this.$emit('HideProProfile')
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
+                this.$emit('HideProProfile')
             }
         }
     }

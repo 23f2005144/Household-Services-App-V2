@@ -95,19 +95,18 @@ export default{
                         'Authentication-Token' : this.$store.state.auth_token
                     }
                 })
+                this.$router.push({ query:{ q:this.search_query || undefined }}).catch(err => {
+                    if (err.name !== 'NavigationDuplicated') {
+                        throw err;
+                    }
+                })
                 if (res.ok){
                     const data = await res.json()
                     this.service_reqs_data=data
-                    this.$router.push({ query:{ q:this.search_query || undefined }}).catch(err => {
-                        if (err.name !== 'NavigationDuplicated') {
-                            throw err;
-                        }
-                    })
                     
-
                 }else{
-                    const {Message} = await res.json();
-                    throw new Error(Message);
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
                 console.log(error.message)

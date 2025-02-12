@@ -198,12 +198,11 @@ export default{
                     const data = await res.json()
                     this.services=data
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         async NewProDataFetch(){
@@ -218,12 +217,11 @@ export default{
                     this.new_pro_data=new_pro_data_all.filter(pro=> pro.p_status===false)
                     
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
 
         },
@@ -238,12 +236,11 @@ export default{
                     const data= await res.json()
                     this.service_reqs_data=data;
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
 
@@ -280,12 +277,11 @@ export default{
                     this.new_pro_detail_record=pro_data
                     
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         pro_details_close(){

@@ -228,15 +228,17 @@ export default{
                 if(res.ok){
                     const data = await res.json()
                     this.service_reqs_data=data
+                }else{
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log("Error",error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         async ServiceDataTypeFetch(){
             try{
-                const QueryParams = new URLSearchParams({q:"service_types",s_type:this.$route.params.type}).toString();
+                const QueryParams = new URLSearchParams({q:"service_types",s_type:this.$route.params.type}).toString()
                 const res = await fetch(`${location.origin}/api/service?${QueryParams}`,{
                     headers:{
                         'Authentication-Token': this.$store.state.auth_token
@@ -245,11 +247,14 @@ export default{
                 if(res.ok){
                     const d = await res.json()
                     this.services_data=JSON.parse(JSON.stringify(d))
+                }else{
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
+            }catch(error){
+                console.log(error.message)
             }
-            catch(error){
-                console.log("Error",error)
-            }
+            
         },
         ServiceInProgress(serv_id){
             this.serv_book_record=this.services_data.find(s=> s.serv_id==serv_id)
@@ -293,7 +298,7 @@ export default{
               time_24hr: true,               // 12-hour clock
               minuteIncrement: 30,
               onChange: (selectedDates) => {
-                this.service_slot = selectedDates[0]; // Update selected date
+                this.service_slot = selectedDates[0] // Update selected date
               },
             })
         },
@@ -316,14 +321,12 @@ export default{
                         this.$router.push(`/customer/home/${this.$store.state.user_id}`)
 
                     }else{
-                        const errormess = await res.json()
-                        throw new Error(errormess.Message)
+                        const {Message} = await res.json()
+                        throw new Error(Message)
                     }
-                } 
-                catch(error){
-                    alert(error)
+                }catch(error){
+                    console.log(error.message)
                     this.$router.push(`/customer/home/${this.$store.state.user_id}`)
-
                 }
             }else{
                 alert("Please choose a slot")
@@ -358,11 +361,11 @@ export default{
                     await this.ServiceReqsDataFetch()
 
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
             }
         },
         async pro_details_show(p_id){
@@ -377,12 +380,11 @@ export default{
                     this.pro_detail_record=pro_data
                     
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         pro_details_close(){

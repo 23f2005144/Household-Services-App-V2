@@ -167,12 +167,11 @@ export default{
                     const data = await res.json()
                     this.service_reqs_data=data
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         serv_req_details_cust_show(serv_req_id){
@@ -195,11 +194,11 @@ export default{
                         this.show_profile=true
 
                     }else{
-                        const errormessage= await res.json()
-                        throw new Error(errormessage.message)
+                        const {Message} = await res.json()
+                        throw new Error(Message)
                     }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
             }
         },
         HideProfile(){
@@ -225,11 +224,11 @@ export default{
                     await this.ServiceReqsDataFetch()
 
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
             }
         },
         async pro_details_show(p_id){
@@ -244,12 +243,11 @@ export default{
                     this.pro_detail_record=pro_data
                     
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         pro_details_close(){

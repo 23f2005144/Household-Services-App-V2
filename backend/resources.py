@@ -403,8 +403,8 @@ class ServiceRequestListAPI(Resource):
                 if not serv_req_data:
                     return {"Message":"ServiceRequest Data not found"},404
                 
-                return marshal(serv_req_data,serv_req_cust_fields),200 #not sending cust_search_fields, almost same bruv
-        
+                return marshal(serv_req_data,serv_req_cust_fields),200
+            
         if pro_id:
             if query:
                 if len(query)==10 and query.count("-")==2:
@@ -517,15 +517,17 @@ class CustomerAPI(Resource):
     def put(self,c_id):
         data=request.get_json()
         user_c_id=data.get('user_c_id')
-        req_method=data.get('req_method')
         c_data=Customer.query.get(c_id)
         c_user_data=User.query.get(user_c_id)
         if c_data and c_user_data:
-            if req_method=="UpdateProfile" and current_user.roles[0].name=="Customer":
+            if current_user.roles[0].name=="Customer":
                 c_name=data.get('c_name')
                 c_contact_no=data.get('c_contact_no')
                 c_address=data.get('c_address')
                 c_pincode=data.get('c_pincode')
+                serv_reqs=ServiceRequest.query.filter((ServiceRequest.cust_id==c_id)&(ServiceRequest.serv_status=='Accepted')).all()
+                if serv_reqs:
+                    return {"Message" : "ServiceRequests in progress, cannot update profile right now"},409
 
                 try:
                     c_data.c_name=c_name
@@ -538,6 +540,8 @@ class CustomerAPI(Resource):
                 except:
                     db.session.rollback()
                     return {"Message":"Error in database"},400
+        else:
+            return {"Message" : "Customer not found"},404
                 
 #still need to clean this up and implement a way to stop it from updating profile if already some services are requested/accepted, same for pro 
 
@@ -579,15 +583,18 @@ class ProfessionalAPI(Resource):
     def put(self,p_id):
         data=request.get_json()
         user_p_id=data.get('user_p_id')
-        req_method=data.get('req_method')
         p_data=Professional.query.get(p_id)
         p_user_data=User.query.get(user_p_id)
         if p_data and p_user_data:
-            if req_method=="UpdateProfile" and current_user.roles[0].name=="Professional":
+            if current_user.roles[0].name=="Professional":
                 p_name=data.get('p_name')
                 p_contact_no=data.get('p_contact_no')
                 p_service_type=data.get('p_service_type')
                 p_pincode=data.get('p_pincode')
+
+                serv_reqs=ServiceRequest.query.filter((ServiceRequest.pro_id==p_id)&(ServiceRequest.serv_status=='Accepted')).all()
+                if serv_reqs:
+                    return {"Message" : "ServiceRequests in progress, cannot update profile right now"},409
 
                 try:
                     p_data.p_name=p_name
@@ -600,6 +607,8 @@ class ProfessionalAPI(Resource):
                 except:
                     db.session.rollback()
                     return {"Message":"Error in database"},400
+        else:
+            return {"Message":"Professional not found"},404
                 
 
 class ProfessionalListAPI(Resource):
@@ -672,16 +681,59 @@ class UserAPI(Resource):
 
         if not user_data:
             return {"Message" : "User not found"},404
+        if status==False:
+            try:
+                user_data.active = True
+                db.session.commit()
+                return "",204
+            
+            except:
+                db.session.rollback()
+                return {"Message":"Error in database"},400
+            
+        else:
+            if user_data.c_user:
+                c_id=user_data.c_user.c_id
+                serv_req_data=ServiceRequest.query.filter((ServiceRequest.cust_id==c_id)&(ServiceRequest.serv_status=='Requested')|(ServiceRequest.serv_status=='Accepted')).all()
+                for x in serv_req_data:
+                    try:
+                        x.serv_status='Cancelled'
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        return {"Message" : "Error in database"},400
+                try:
+                    user_data.active = False
+                    db.session.commit()
+                    return "",204
+            
+                except:
+                    db.session.rollback()
+                    return {"Message":"Error in database"},400
 
-        try:
-            user_data.active= not(status)
-            db.session.commit()
-            return "",204
-        
-        except:
-            db.session.rollback()
-            return {"Message":"Error in database"},400
-        
+            elif user_data.p_user:
+                p_id=user_data.p_user.p_id
+                serv_req_data=ServiceRequest.query.filter((ServiceRequest.pro_id==p_id)&(ServiceRequest.serv_status=='Accepted')).all()
+                for x in serv_req_data:
+                    try:
+                        x.serv_status='Cancelled'
+                        db.session.commit()
+                    except:
+                        db.session.rollback()
+                        return {"Message" : "Error in database"},400
+                
+                try:
+                    user_data.active = False
+                    db.session.commit()
+                    return "",204
+            
+                except:
+                    db.session.rollback()
+                    return {"Message":"Error in database"},400
+            else:
+                return {"User not found"},404
+
+
 class UserListAPI(Resource):
     
     @auth_required('token')

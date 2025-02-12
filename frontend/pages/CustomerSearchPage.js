@@ -150,24 +150,27 @@ export default{
                     }else if(this.search_table==='Service'){
                         QueryParams=new URLSearchParams({q:this.search_query}).toString()
                     }
+                }else{
+                    if(this.search_table==='ServiceRequest'){
+                        QueryParams=new URLSearchParams({c_id:this.$store.state.c_id}).toString() //needed to retrieve only customer service req data
+                    }
                 }
                 const res = await fetch(`${location.origin}/api/${endp}${QueryParams ? "?"+QueryParams : ""}`,{
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token
                     }
                 })
+                this.$router.push({ query:{ t:this.search_table, q:this.search_query || undefined }}).catch(err => {
+                    if (err.name !== 'NavigationDuplicated') {
+                        throw err;
+                    }
+                })
                 if (res.ok){
                     const data = await res.json()
-                    this.table_data=data
-                    this.$router.push({ query:{ t:this.search_table, q:this.search_query || undefined }}).catch(err => {
-                        if (err.name !== 'NavigationDuplicated') {
-                            throw err;
-                        }
-                    })
-                    
+                    this.table_data=data 
                 }else{
-                    const {Message} = await res.json();
-                    throw new Error(Message);
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
                 console.log(error.message)
