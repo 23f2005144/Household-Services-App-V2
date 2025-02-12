@@ -5,7 +5,7 @@ export default{
     template:`
     <div>
         <div class="container">
-            <p class="mb-0 text-center" style="color:teal; font-size:44px; font-weight:bold;">Service Remarks</p>
+            <p class="mb-0 text-center" style="color:teal; font-size:40px; font-weight:bold;">Service Remarks</p>
             <form @submit.prevent="serv_req_close" id="remark-form">
                 <div class="row fs-5">
                     <div class="my-3 col-md-3">
@@ -30,10 +30,6 @@ export default{
                         <label for="name" class="form-label">DateTime_of_Request</label>
                         <input type="text" class="form-control" id="service_dor" name="service_dor" v-model="serv_req_close_data.serv_request_datetime" disabled>
                     </div>
-                    <!--<div class="my-3 col-md-3">
-                        <label for="name" class="form-label">Date of Completion</label>
-                        <input type="text" class="form-control" id="service_doc" name="service_doc" value="{{x[6]}}" disabled>
-                    </div>-->
                     <div class="my-3 col-md-3">
                         <label for="name" class="form-label">Professional Name</label>
                         <input type="text" class="form-control" name="service_pro_name" v-model="serv_req_close_data.pro_name"  disabled>
@@ -100,15 +96,15 @@ export default{
         async serv_req_close(){
             const now = new Date();
             const current_datetime = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0') + " " +
-            String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0')
+            String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') +":00"
             try{
                 const res = await fetch(`${location.origin}/api/service_request/${this.serv_req_close_data.serv_req_id}`,{
-                    method: "PUT",
+                    method: "PATCH",
                     headers: {
                         'Authentication-Token': this.$store.state.auth_token,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({...this.serv_req_close_data,'req_method':'Closed','serv_close_datetime':current_datetime})
+                    body: JSON.stringify({'serv_close_datetime':current_datetime,'serv_rating':this.serv_req_close_data.serv_rating,'pro_rating':this.serv_req_close_data.pro_rating,'serv_remarks':this.serv_req_close_data.serv_remarks})
                 })
                 if(res.ok){
                     const data = await res.json()
@@ -116,11 +112,11 @@ export default{
                     $emit('Serv_Req_Closed')
 
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
             }catch(error){
-                console.log(error)
+                console.log(error.message)
             }
         },
     }

@@ -48,22 +48,16 @@ export default{
         async ServiceDataFetch(){
             try{
                 const QueryParams = new URLSearchParams({q:"service_types"}).toString()
-                const res = await fetch(`${location.origin}/api/service?${QueryParams}`,{
-                    headers:{
-                        'Authentication-Token':this.$store.state.auth_token
-                    }
-                })
+                const res = await fetch(`${location.origin}/api/service?${QueryParams}`)
                 if(res.ok){
                     const data = await res.json()
                     this.service_data=data.Service_Types //since it is a list
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         }
     }

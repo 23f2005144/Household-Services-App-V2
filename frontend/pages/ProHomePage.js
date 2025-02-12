@@ -225,15 +225,14 @@ export default{
             this.show_profile=false
         },
         async ServiceAccept(serv_req_id){
-            const service_req_data = this.new_service_reqs_pro_data.find(sr=> sr.serv_req_id===serv_req_id)
             try{
                 const res = await fetch(`${location.origin}/api/service_request/${serv_req_id}`,{
-                    method:'PUT',
+                    method:'PATCH',
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({...service_req_data,"pro_id":this.$store.state.p_id,"req_method":"Accepted"})
+                    body: JSON.stringify({"pro_id":this.$store.state.p_id})
                 })
                 if(res.ok){
                     const data = await res.json()

@@ -15,6 +15,7 @@ service_fields={
     'serv_name' : fields.String,
     'serv_price' : fields.Integer,
     'serv_duration' : fields.Integer,
+    'serv_avg_rating' : fields.Float(attribute=lambda s: s.serv_avg_rating if s else None),
     'serv_desc' : fields.String
 }
 
@@ -230,7 +231,6 @@ class ServiceAPI(Resource):
         
 class ServiceListAPI(Resource):
 
-    @auth_required('token')
     def get(self):
         query=request.args.get("q", "").strip()
         s_type=request.args.get("s_type","").strip()
@@ -264,7 +264,7 @@ class ServiceListAPI(Resource):
         
         return marshal(service_data_list,service_fields),200
 
-     
+    @auth_required('token')
     def post(self):
         data=request.get_json()
         serv_type=data.get('service_type')
@@ -299,76 +299,60 @@ class ServiceRequestAPI(Resource):
         
         return serv_req_data
     
-
     @auth_required('token')
-    def put(self,serv_req_id):
+    def patch(self,serv_req_id):
         data=request.get_json()
-        serv_id=data.get('serv_id')
-        cust_id=data.get('cust_id')
-        pro_id=data.get('pro_id')
-        serv_request_datetime=data.get('serv_request_datetime')
-        serv_close_datetime=data.get('serv_close_datetime')
-        serv_status=data.get('serv_status')
-        serv_remarks=data.get('serv_remarks')
+        serv_close_dt=data.get('serv_close_datetime')
         serv_rating=data.get('serv_rating')
         pro_rating=data.get('pro_rating')
-        serv_req_method=data.get('req_method')
-        if serv_close_datetime:
-            close_datetime= datetime.strptime(serv_close_datetime, '%Y-%m-%d %H:%M')
-        serv_req_data=ServiceRequest.query.get(serv_req_id) #since in servicerequest api there would be status=requested at first, whenever it is created for the first time
+        serv_remarks=data.get('serv_remarks')
+        pro_id=data.get('pro_id')
 
-        if serv_req_data:
-            if serv_status=="Requested" and serv_req_method=="Accepted":
-                pro_serv_req_data=ServiceRequest.query.filter((ServiceRequest.pro_id==pro_id)&(ServiceRequest.serv_status=='Accepted')).all()
-                if pro_serv_req_data:
-                    return {"Message":"Professional is not free to accept ServiceRequest"},400
-                try: #after pro has accepted, fetch call to make the
-                    serv_req_data.pro_id=pro_id
-                    serv_req_data.serv_status='Accepted'
-                    db.session.commit()
-                    return {"Message":"ServiceRequest successfully accepted"},200
-                except:
-                    db.session.rollback()
-                    return {"Message":"Error in database"},400
-            
-            elif serv_status=="Accepted" and serv_req_method=="Closed": #trying to close the service once completed
+    
+        serv_req_data=ServiceRequest.query.get(serv_req_id)
+
+        if not(serv_req_data):
+            return {"Message" : "ServiceRequest not Found"},404
+
+        if serv_close_dt:
+            if serv_rating and pro_rating: #customer is closing the service with rating and review if any.
                 try:
-                    serv_req_data.serv_close_datetime=close_datetime
-                    serv_req_data.serv_remarks=serv_remarks
                     serv_req_data.serv_rating=serv_rating
                     serv_req_data.pro_rating=pro_rating
+                    serv_req_data.serv_remarks=serv_remarks
                     serv_req_data.serv_status='Closed'
                     db.session.commit()
-                    return {"Message":"ServiceRequest successfully closed"},200
+                    return "",204
                 except:
                     db.session.rollback()
-                    return {"Message":"Error in database"},400
-                
-            elif serv_status=="Requested" and serv_req_method=="Cancelled":
-                try:
-                    serv_req_data.serv_close_datetime=close_datetime
-                    serv_req_data.serv_status="Cancelled"
-                    db.session.commit()
-                    return {"Message":"ServiceRequest successfully cancelled"},200
-                except:
-                    db.session.rollback()
-                    return {"Message":"Error in database"},400
-            
-            elif serv_status=="Accepted" and serv_req_method=="Cancelled":
-                try:
-                    serv_req_data.serv_close_datetime=close_datetime
-                    serv_req_data.serv_status="Cancelled"
-                    db.session.commit()
-                    return {"Message":"ServiceRequest successfully cancelled"},200
-                except:
-                    db.session.rollback()
-                    return {"Message":"Error in database"},400
+                    return{"Message" : "Error in database"},400
             else:
-                return {"Error":"Wrong Request Method"},404
+                try:
+                    serv_req_data.serv_status='Cancelled'
+                    serv_req_data.serv_close_datetime=serv_close_dt
+                    db.session.commit()
+                    return "",204
+                
+                except:
+                    db.session.rollback()
+                    return{"Message" : "Error in database"},400
+                
+        if pro_id:
+            pro_serv_req_data=ServiceRequest.query.filter((ServiceRequest.pro_id==pro_id)&(ServiceRequest.serv_status=='Accepted')).all()
+           
+            if pro_serv_req_data:
+                return {"Message":"Professional is not free to accept ServiceRequest"},400
             
-        else:
-            return {"Message":"ServiceRequest not found"},404
-        
+            try:
+                serv_req_data.pro_id=pro_id
+                serv_req_data.serv_status='Accepted'
+                db.session.commit()
+                return "",204
+            except:
+                    db.session.rollback()
+                    return{"Message" : "Error in database"},400
+            
+        return {"Message" : "Request body missing"},400
 
 class ServiceRequestListAPI(Resource):
 
@@ -543,7 +527,7 @@ class CustomerAPI(Resource):
         else:
             return {"Message" : "Customer not found"},404
                 
-#still need to clean this up and implement a way to stop it from updating profile if already some services are requested/accepted, same for pro 
+
 
 class CustomerListAPI(Resource):
 

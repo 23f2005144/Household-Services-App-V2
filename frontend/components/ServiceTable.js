@@ -4,8 +4,8 @@ export default{
     },
     template:`
     <div>
-        <div v-if="service_table">
-            <div class="container">
+        <div class="container">
+            <div v-if="service_table">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Services</p>
                 <table class="table table-bordered">
                     <thead>
@@ -14,15 +14,17 @@ export default{
                             <th>Type</th>
                             <th>Name</th>
                             <th>Price ₹</th>
+                            <th>Average Rating</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="s in services" :key="s.serv_id">
-                            <td><button type="button" class="btn btn-info" @click="service_details_page(s.serv_id)">{{s.serv_id}}</button></td>
+                            <td><button type="button" class="btn btn-warning" @click="service_details_page(s.serv_id)">{{s.serv_id}}</button></td>
                             <td>{{s.serv_type}}</td>
                             <td>{{s.serv_name}}</td>
                             <td>{{s.serv_price}}</td>
+                            <td>{{s.serv_avg_rating}}</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <button type="button" class="btn btn-lg btn-warning" @click="Service_Update(s.serv_id)">Edit</button>
@@ -36,11 +38,9 @@ export default{
                     <button class="btn btn-lg btn-success" @click="ServiceCreateForm">+ Create Service</button>
                 </div>
             </div>
-        </div>
-        <div v-else-if="service_update_form">
-            <p class="mb-0 text-center" style="color:lightseagreen; font-size:35px; font-weight:bold;">Update Service</p><br>
-            <div class="container">
-                <form @submit.prevent="ServiceUpdate">
+            <div v-else-if="service_update_form">
+                <p class="mb-0 text-center" style="color:lightseagreen; font-size:35px; font-weight:bold;">Update Service</p><br>
+                <form @submit.prevent="ServiceUpdate" id="ServiceUpdateForm">
                     <div class="row">
                         <div class="my-3 col-md-4" style="text-align:center;padding:0px;margin:auto">
                             <label for="name" class="form-label">Service Type</label>
@@ -76,17 +76,18 @@ export default{
                         </div>
                     </div><br>
                     <div class="row">
-                        <div class="my-3 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                            <button type="submit" class="btn btn-success btn-lg p-2 col-md-6" id="btn-create">Update</button>
+                        <div class="col-6" style="text-align:end;padding:0px;margin:auto">
+                            <button type="submit" class="btn btn-success btn-lg p-2 col-4" id="btn-create">Update</button>
+                        </div>
+                        <div class="col-6" style="text-align:start;padding:0px;margin:auto">
+                            <button type="button" @click="ServiceUpdateClose" class="btn btn-lg p-2 col-4 btn-danger">Close</button>
                         </div>
                     </div>
-                </form>
-            </div> 
-        </div>
-        <div v-else-if="service_create_form">
-            <p class="mb-0 text-center" style="color:lightseagreen; font-size:35px; font-weight:bold;">Create Service</p><br>
-            <div class="container">
-                <form @submit.prevent="ServiceCreate">
+                </form>    
+            </div>
+            <div v-else-if="service_create_form">
+                <p class="mb-0 text-center" style="color:lightseagreen; font-size:35px; font-weight:bold;">Create Service</p><br>
+                <form @submit.prevent="ServiceCreate" id="ServiceCreateForm">
                     <div class="row">
                         <div class="my-3 col-md-4" style="text-align:center;padding:0px;margin:auto">
                             <label for="name" class="form-label">Service Type</label>
@@ -120,17 +121,51 @@ export default{
                             <label for="service_desc" class="form-label">Service Description</label>
                             <input type="text" class="form-control" v-model="new_service_desc" name="service_desc">
                         </div>
-                    </div>
+                    </div><br>
                     <div class="row">
-                        <div class="my-3 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                            <button type="submit" class="btn btn-success btn-lg p-2 col-md-6" id="btn-create">Create</button>
+                        <div class="col-6" style="text-align:end;padding:0px;margin:auto">
+                            <button type="submit" class="btn btn-success btn-lg p-2 col-4" id="btn-create">Create</button>
+                        </div>
+                        <div class="col-6" style="text-align:start;padding:0px;margin:auto">
+                            <button type="button" @click="ServiceCreateClose" class="btn btn-lg p-2 col-4 btn-danger">Close</button>
                         </div>
                     </div>                
                 </form>
-            </div> 
+            </div>
         </div>
     </div>
     `,
+    mounted(){
+        this.style = document.createElement('style')
+        this.style.innerHTML=`
+            #ServiceCreateForm {
+                text-align: center;
+                background-color: lightgoldenrodyellow;
+                padding: 10px;
+                font-size: 22px;
+                margin: auto;
+                border: 10px solid teal;
+                height: 700px;
+                width: 1000px;
+            }
+            #ServiceUpdateForm {
+                text-align: center;
+                background-color: lightgoldenrodyellow;
+                padding: 10px;
+                font-size: 22px;
+                margin: auto;
+                border: 10px solid teal;
+                height: 700px;
+                width: 1000px;
+            }
+        `
+        document.head.appendChild(this.style)    
+    },
+    unmounted() {
+        if (this.style) {
+            document.head.removeChild(this.style);
+        }
+    },
     data(){
         return{
             service_table:true,
@@ -156,16 +191,30 @@ export default{
         },
 
         Service_Update(service_id){
-            this.service_table=false;
-            this.service_update_form=true;
+            this.service_table=false
+            this.service_update_form=true
             this.service_update_id=service_id
             this.service_update_obj=this.services.find(service => service.serv_id === service_id)
+            this.$emit('ServiceForm')
         },
         ServiceCreateForm(){
             this.service_table=false
             this.service_create_form=true
+            this.$emit('ServiceForm')
         },
+        ServiceUpdateClose(){
+            this.service_table=true
+            this.service_update_form=false
+            this.service_update_id=null
+            this.service_update_obj=null
+            this.$emit('ServiceForm')
+        },
+        ServiceCreateClose(){
+            this.service_table=true
+            this.service_create_form=false
+            this.$emit('ServiceForm')
 
+        },
         async ServiceDelete(service_id){
             try{
                 const res = await fetch(`${location.origin}/api/service/${service_id}`,{
@@ -179,12 +228,11 @@ export default{
                     console.log("Service Deleted Successfully")
                     alert("Service Deleted Successfully")
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         async ServiceUpdate(){
@@ -201,17 +249,17 @@ export default{
                     const data=await res.json()
                     alert(data.Message)
                     console.log("Service updated successfully")
-                    this.service_update_form=false;
-                    this.service_table=true;
+                    this.service_update_form=false
+                    this.service_table=true
                     this.$emit('Service_Updated',this.service_update_obj)
+                    this.$emit('ServiceForm')
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
+                this.$emit('ServiceForm')
             }
 
         },
@@ -232,13 +280,14 @@ export default{
                     this.service_create_form=false;
                     this.service_table=true;
                     this.$emit("Service_Created")
+                    this.$emit('ServiceForm')
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
+                this.$emit('ServiceForm')
             }
         }
         

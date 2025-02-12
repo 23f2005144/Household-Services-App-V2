@@ -17,11 +17,11 @@ def login():
         return jsonify({"Message":'invalid input'}),404
     
     user=datastore.find_user(email=email)
+    if not user:
+        return jsonify({"Message":"Email not found"}),404
+    
     active=user.active
 
-    if not user:
-        return jsonify({"Message":"invalid email"}),404
-    
     if verify_password(password,user.password):
         if active:
             if user.c_user:
@@ -35,7 +35,7 @@ def login():
         else:
             return jsonify({"Message":"User is blocked/not approved"}),403
     else:
-        return jsonify({"Message":"wrong password"}),400
+        return jsonify({"Message":"Wrong password"}),400
     
 @app.route('/register',methods=["POST"])
 def register_user():

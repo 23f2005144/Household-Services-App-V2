@@ -38,6 +38,7 @@ export default{
                                     <th>Service Name</th>
                                     <th>Service Price (₹)</th>
                                     <th>Service Duration (hrs)</th>
+                                    <th>Average Rating</th>
                                     <th>Service Description</th>
                                     <th>Action</th>
                                 </tr>
@@ -49,6 +50,7 @@ export default{
                                     <td>{{s.serv_name}}</td>
                                     <td>{{s.serv_price}}</td>
                                     <td>{{s.serv_duration}}</td>
+                                    <td>{{s.serv_avg_rating}}</td>
                                     <td>{{s.serv_desc}}</td>
                                     <td><button class="btn btn-primary btn-lg" @click="$router.push('/customer/'+$store.state.c_id+'/service_book/'+s.serv_type)">Book Service</button></td> 
                                 </tr>

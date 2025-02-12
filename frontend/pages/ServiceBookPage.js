@@ -5,7 +5,7 @@ export default{
     template:`
     <div>
         <div class="container">
-            <div class="row my-5">
+            <div class="row my-5" v-show="!serv_req_close_data">
                 <p class="mb-0" style="color:teal; font-size:40px; font-weight:bold;">Available {{this.$route.params.type}} Services</p>
                 <table class="table table-hover table-bordered border-primary">
                     <thead>
@@ -14,6 +14,7 @@ export default{
                             <th>Service Name</th>
                             <th>Service Price ₹</th>
                             <th>Service Duration</th>
+                            <th>Average Rating</th>
                             <th>Service Description</th>
                             <th>Action</th>
                         </tr>
@@ -24,6 +25,7 @@ export default{
                             <td>{{s.serv_name}}</td>
                             <td>{{s.serv_price}}</td>
                             <td>{{s.serv_duration}}</td>
+                            <td>{{s.serv_avg_rating}}</td>
                             <td>{{s.serv_desc}}</td>
                             <td>
                                 <div>
@@ -49,6 +51,7 @@ export default{
                                         <th>Name</th>
                                         <th>Price ₹</th>
                                         <th>Duration</th>
+                                        <th>Average Rating</th>
                                         <th>Description</th>
                                     </tr>
                                 </thead>
@@ -58,6 +61,7 @@ export default{
                                         <td>{{serv_book_record.serv_name}}</td>
                                         <td>{{serv_book_record.serv_price}}</td>
                                         <td>{{serv_book_record.serv_duration}}</td>
+                                        <td>{{serv_book_record.serv_avg_rating}}</td>
                                         <td>{{serv_book_record.serv_desc}}</td>
                                     </tr>
                                 </tbody>
@@ -78,7 +82,7 @@ export default{
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" v-show="!serv_req_close_data">
                 <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show" @Serv_Req_Cancel="serv_req_cancel" @Pro_Details="pro_details_show" @Serv_Req_Close="serv_req_close_form_show"/>
             </div>
             <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
@@ -239,11 +243,7 @@ export default{
         async ServiceDataTypeFetch(){
             try{
                 const QueryParams = new URLSearchParams({q:"service_types",s_type:this.$route.params.type}).toString()
-                const res = await fetch(`${location.origin}/api/service?${QueryParams}`,{
-                    headers:{
-                        'Authentication-Token': this.$store.state.auth_token
-                    }
-                })
+                const res = await fetch(`${location.origin}/api/service?${QueryParams}`)
                 if(res.ok){
                     const d = await res.json()
                     this.services_data=JSON.parse(JSON.stringify(d))
@@ -342,18 +342,17 @@ export default{
             this.service_req_detail_record=null
         },
         async serv_req_cancel(serv_req_id){
-            const serv_req_obj=this.service_reqs_data.find(s=> s.serv_req_id===serv_req_id)
             const now = new Date();
             const current_datetime = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0') + " " +
-            String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0')
+            String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') +":00"
             try{
                 const res = await fetch(`${location.origin}/api/service_request/${serv_req_id}`,{
-                    method: "PUT",
+                    method: "PATCH",
                     headers: {
                         'Authentication-Token': this.$store.state.auth_token,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({...serv_req_obj,'req_method':'Cancelled','serv_close_datetime':current_datetime})
+                    body: JSON.stringify({'serv_close_datetime':current_datetime})
                 })
                 if(res.ok){
                     const data = await res.json()

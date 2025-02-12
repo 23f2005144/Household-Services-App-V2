@@ -19,7 +19,7 @@ export default{
                 </thead>
                 <tbody>
                     <tr v-for="p in new_pro_data" :key="p.p_id">
-                        <td><button type="button" class="btn btn-warning" @click="pro_details_page(p.p_id)">{{p.p_id}}</button></td>
+                        <td><button type="button" class="btn btn-primary" @click="pro_details_page(p.p_id)">{{p.p_id}}</button></td>
                         <td>{{p.p_name}}</td>
                         <td>{{p.p_email}}</td>
                         <td>{{p.p_exp}}</td>
@@ -39,8 +39,6 @@ export default{
     data(){
         return{
             new_pro_obj:null
-            
-
         }
     },
     methods:{
@@ -50,13 +48,13 @@ export default{
         async ApprovePro(p_id){
             this.new_pro_obj=this.new_pro_data.find(pro => pro.p_id === p_id)
             try{
-                const res= await fetch(`${location.origin}/api/professional/${p_id}`,{
-                    method:"PUT",
+                const res= await fetch(`${location.origin}/api/user/${this.new_pro_obj.user_p_id}`,{
+                    method:"PATCH",
                     headers:{
                         'Authentication-Token':this.$store.state.auth_token,
                         'Content-Type':'application/json'
                     },
-                    body:JSON.stringify({"user_p_id":this.new_pro_obj.user_p_id,"req_method":"Approve/UnblockPro"})
+                    body:JSON.stringify({"user_status":this.new_pro_obj.p_status})
                 })
                 if(res.ok){
                     this.$emit('Pro_Approved',p_id)
@@ -65,13 +63,11 @@ export default{
                     console.log("Professional Succesfully Approved")
                     this.new_pro_obj=null
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
         },
         async RejectPro(p_id){
@@ -89,12 +85,11 @@ export default{
                     alert("Professional Rejected Successfully")
                     this.new_pro_obj=null
                 }else{
-                    const errormessage = await res.json()
-                    throw new Error(errormessage.Message)
+                    const {Message} = await res.json()
+                    throw new Error(Message)
                 }
-            }
-            catch(error){
-                console.log(error)
+            }catch(error){
+                console.log(error.message)
             }
 
         }

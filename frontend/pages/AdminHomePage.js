@@ -4,7 +4,10 @@ import ServiceReqTable from "../components/ServiceReqTable.js"
 export default{
     template:`
     <div>
-        <ServiceTable :services="services" @Service_Deleted="serv_deleted" @Service_Details="serv_details_show" @Service_Updated="serv_update" @Service_Created="ServiceDataFetch"/><br>
+        <p class="mb-0 text-center fs-1" style="color:teal;font-weight:bold;">Welcome to Admin Dashboard</p>
+        <div class="row">
+            <ServiceTable :services="services" @Service_Deleted="serv_deleted" @Service_Details="serv_details_show" @Service_Updated="serv_update" @Service_Created="ServiceDataFetch" @ServiceForm="ServiceFormVisible"/><br>
+        </div>
         <div v-if="service_detail_record" class="modal fade show" id="ServiceModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -21,6 +24,7 @@ export default{
                                     <th>Name</th>
                                     <th>Price ₹</th>
                                     <th>Duration</th>
+                                    <th>Average Rating</th>
                                     <th>Description</th>
                                 </tr>
                             </thead>
@@ -31,6 +35,7 @@ export default{
                                 <td>{{service_detail_record.serv_name}}</td>
                                 <td>{{service_detail_record.serv_price}}</td>
                                 <td>{{service_detail_record.serv_duration}}</td>
+                                <td>{{service_detail_record.serv_avg_rating}}</td>
                                 <td>{{service_detail_record.serv_desc}}</td>
                             </tr>
                             </tbody>
@@ -40,7 +45,9 @@ export default{
                 </div>
             </div>
         </div>
-        <ProTable :new_pro_data="new_pro_data" @Pro_Approved="pro_approved" @Pro_Details="pro_details_show" @Pro_Rejected="pro_rejected"/>
+        <div class="row" v-show="!serv_form">
+            <ProTable :new_pro_data="new_pro_data" @Pro_Approved="pro_approved" @Pro_Details="pro_details_show" @Pro_Rejected="pro_rejected"/>
+        </div>
         <div v-if="new_pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
@@ -82,7 +89,7 @@ export default{
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row" v-show="!serv_form">
             <ServiceReqTable :service_reqs_data="service_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
         </div>
         <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
@@ -182,18 +189,15 @@ export default{
             new_pro_data:[],
             new_pro_detail_record:null,
             service_reqs_data:[],
-            service_req_detail_record:null
+            service_req_detail_record:null,
+            serv_form:false
             
         }
     },
     methods:{
         async ServiceDataFetch(){
             try{
-                const res = await fetch(location.origin+'/api/service',{
-                    headers:{
-                        'Authentication-Token': this.$store.state.auth_token
-                    }
-                })
+                const res = await fetch(location.origin+'/api/service')
                 if(res.ok){
                     const data = await res.json()
                     this.services=data
@@ -292,6 +296,13 @@ export default{
         },
         serv_req_details_close(){
             this.service_req_detail_record=null
+        },
+        ServiceFormVisible(){
+            if(this.serv_form){
+                this.serv_form=false
+            }else{
+                this.serv_form=true
+            }
         }
     },
     components:{

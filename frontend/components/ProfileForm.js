@@ -21,7 +21,7 @@ export default{
                         <label for="inputEmail4" class="form-label">Email</label>
                         <input type="email" class="form-control" id="inputEmail4" name="email" v-model="cust_profile_data.c_email" disabled>
                     </div>
-                    <div class="mb-2 col-md-4" style="text-align: center;padding:0px;margin:auto">
+                    <div class="mb-2 col-md-6" style="text-align: center;padding:0px;margin:auto">
                         <label for="inputAddress" class="form-label">Address</label>
                         <input type="text" class="form-control" id="inputAddress" name="address"  v-model="cust_profile_data.c_address" required>
                     </div>
@@ -37,35 +37,45 @@ export default{
             </div>
             <div v-else-if="$store.state.role==='Professional'" class="row">
                 <form @submit.prevent="EditProProfile" class="text-center" id='Profile-Form'>
-                    <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                        <label for="name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="name" name="fullname" v-model="pro_profile_data.p_name" required>
+                    <div class="row">
+                        <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="fullname" v-model="pro_profile_data.p_name" required>
+                        </div>
+                        <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <label for="name" class="form-label">Contact Number</label>
+                            <input type="tel" class="form-control" name="pro_contact_no" v-model="pro_profile_data.p_contact_no" min="10" max="10" required>
+                        </div>
+                        <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <label for="inputEmail4" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="inputEmail4" v-model="pro_profile_data.p_email" name="email" disabled>
+                        </div>
                     </div>
-                    <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                        <label for="name" class="form-label">Contact Number</label>
-                        <input type="tel" class="form-control" name="pro_contact_no" v-model="pro_profile_data.p_contact_no" min="10" max="10" required>
+                    <div class="row">
+                        <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <label for="name" class="form-label">Service Type</label>
+                            <select class="form-select" name="service_type" v-model="pro_profile_data.p_service_type">
+                                <option v-for="p in services_type_data">
+                                    {{p}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <label for="inputZip" class="form-label">Serviceable Pincode</label>
+                            <input type="text" class="form-control" id="inputZip" name="pincode" v-model="pro_profile_data.p_pincode" required>
+                        </div>
+                        
                     </div>
-                    <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                        <label for="inputEmail4" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="inputEmail4" v-model="pro_profile_data.p_email" name="email" disabled>
-                    </div>
-                    <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                        <label for="name" class="form-label">Service Type</label>
-                        <select class="form-select" name="service_type" v-model="pro_profile_data.p_service_type">
-                            <option v-for="p in services_type_data">
-                                {{p}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                        <label for="name" class="form-label">Years of Experience</label>
-                        <input type="number" class="form-control" id="exp" name="yrs_of_exp" v-model="pro_profile_data.p_exp" disabled>
-            
-                    </div>
-                    <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
-                        <label for="inputZip" class="form-label">Serviceable Pincode</label>
-                        <input type="text" class="form-control" id="inputZip" name="pincode" v-model="pro_profile_data.p_pincode" required>
-                    </div>
+                    <div class="row">
+                        <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <label for="name" class="form-label">My Average Rating</label>
+                            <input type="number" class="form-control" id="rate" name="avg_rating" v-model="pro_profile_data.p_avg_rating" disabled>
+                        </div>
+                        <div class="mb-2 col-md-3" style="text-align: center;padding:0px;margin:auto">
+                            <label for="name" class="form-label">Years of Experience</label>
+                            <input type="number" class="form-control" id="exp" name="yrs_of_exp" v-model="pro_profile_data.p_exp" disabled>
+                        </div>
+                    </div><br>
                     <div class="row">
                         <div class="col-6" style="text-align:end;padding:0px;margin:auto">
                             <button type="submit" class="btn btn-warning btn-lg p-2 col-6">Update</button>
@@ -88,8 +98,8 @@ export default{
             font-size: 20px;
             margin: auto;
             border: 10px solid #00827f;
-            height: 600px;
-            width: 1100px;
+            height: 550px;
+            width: 900px;
         }
         `
         document.head.appendChild(this.style)

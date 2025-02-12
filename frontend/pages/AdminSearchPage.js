@@ -38,6 +38,7 @@ export default{
                                     <th>Service Name</th>
                                     <th>Service Price (₹)</th>
                                     <th>Service Duration (hrs)</th>
+                                    <th>Average Rating</th>
                                     <th>Service Description</th>
                                 </tr>
                             </thead>
@@ -48,6 +49,7 @@ export default{
                                     <td>{{s.serv_name}}</td>
                                     <td>{{s.serv_price}}</td>
                                     <td>{{s.serv_duration}}</td>
+                                    <td>{{s.serv_avg_rating}}</td>
                                     <td>{{s.serv_desc}}</td>
                                 </tr>
                             </tbody>
@@ -146,6 +148,7 @@ export default{
                                     <th>Professional Expertise</th>
                                     <th>Professional Experience (yrs)</th>
                                     <th>Professional Average Rating</th>
+                                    <th>Professional Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -156,6 +159,7 @@ export default{
                                     <td>{{p.p_name}}</td>
                                     <td>{{p.p_contact_no}}</td>
                                     <td>{{p.p_pincode}}</td>
+                                    <td>{{p.p_service_type}}</td>
                                     <td>{{p.p_exp}}</td>
                                     <td>{{p.p_avg_rating}}</td>
                                     <td>

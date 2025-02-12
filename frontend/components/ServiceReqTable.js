@@ -21,12 +21,12 @@ export default{
                     </thead>
                     <tbody>
                         <tr v-for="sreq in service_reqs_data" :key="sreq.serv_req_id">
-                            <td><button type="button" class="btn btn-primary" @click="$emit('Serv_Req_Details',sreq.serv_req_id)">{{sreq.serv_req_id}}</button></td>
+                            <td><button type="button" class="btn btn-secondary" @click="$emit('Serv_Req_Details',sreq.serv_req_id)">{{sreq.serv_req_id}}</button></td>
                             <td><button type="button" class="btn btn-warning" @click="$emit('Serv_Details',sreq.serv_id)">{{sreq.serv_id}}</button></td>
                             <td>{{sreq.serv_name}}</td>
                             <td>
                                 <div v-if="sreq.pro_id">
-                                    <button type="button" class="btn btn-info" @click="$emit('Pro_Details',sreq.pro_id)">{{sreq.pro_id}}</button>
+                                    <button type="button" class="btn btn-primary" @click="$emit('Pro_Details',sreq.pro_id)">{{sreq.pro_id}}</button>
                                 </div>
                                 <div v-else>
                                     <p> Not yet assigned</p>

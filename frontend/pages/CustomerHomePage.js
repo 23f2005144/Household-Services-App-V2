@@ -10,14 +10,17 @@ export default{
         <div class="container">
             <div class="row">
                 <p class="text-end link-info link-offset-2 link-underline-opacity-100 link-underline-opacity-100-hover" style="font-size:25px; font-weight: bold;" @click="ShowProfile">View Profile</p>
-                <div v-if="show_profile">
+                <div v-show="show_profile">
                     <ProfileForm :cust_profile_data="profile_data" @HideCustProfile="HideProfile"/>
                 </div>
+                <div v-show="serv_req_close_data">
+                    <ServiceCloseForm :serv_req_close_data='serv_req_close_data' @Serv_Req_Closed='serv_req_close_form_close'/>
+                </div> 
             </div>
-            <div class="row">
+            <div class="row" v-show="!show_profile && !serv_req_close_data">
                 <ServiceBookCard/>
             </div>
-            <div class="row">
+            <div class="row" v-show="!show_profile && !serv_req_close_data">
                 <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Cust="serv_req_details_cust_show" @Serv_Req_Cancel="serv_req_cancel" @Pro_Details="pro_details_show" @Serv_Req_Close="serv_req_close_form_show"/>
             </div>
             <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
@@ -119,9 +122,6 @@ export default{
                     </div>
                 </div>
             </div>
-            <div v-if="serv_req_close_data">
-                <ServiceCloseForm :serv_req_close_data='serv_req_close_data' @Serv_Req_Closed='serv_req_close_form_close'/>
-            </div> 
         </div>  
     </div>
     
@@ -205,18 +205,17 @@ export default{
             this.show_profile=false
         },
         async serv_req_cancel(serv_req_id){
-            const serv_req_obj=this.service_reqs_data.find(s=> s.serv_req_id===serv_req_id)
             const now = new Date();
             const current_datetime = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0') + " " +
-            String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0')
+            String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":00"
             try{
                 const res = await fetch(`${location.origin}/api/service_request/${serv_req_id}`,{
-                    method: "PUT",
+                    method: "PATCH",
                     headers: {
                         'Authentication-Token': this.$store.state.auth_token,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({...serv_req_obj,'req_method':'Cancelled','serv_close_datetime':current_datetime})
+                    body: JSON.stringify({'serv_close_datetime':current_datetime})
                 })
                 if(res.ok){
                     const data = await res.json()

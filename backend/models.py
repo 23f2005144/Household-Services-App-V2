@@ -32,6 +32,22 @@ class Service(db.Model):
     serv_desc=db.Column(db.String())
     serv_req=db.relationship('ServiceRequest',backref='service',cascade='delete')
 
+    @property
+    def serv_avg_rating(self):
+        total_rating=0
+        c=0
+        for s in self.serv_req:
+            if s.serv_rating is not None:
+                total_rating+=s.serv_rating
+                c+= 1
+
+        if c > 0:
+            return round(total_rating/c, 2)
+        else:
+            return 0.0
+
+    
+
 class Customer(db.Model):
     c_id=db.Column(db.Integer,primary_key=True,nullable=False)
     user_c_id=db.Column(db.Integer, db.ForeignKey('user.user_id'),nullable=False)
@@ -57,7 +73,7 @@ class Professional(db.Model):
         total_rating=0
         c=0
         for sr in self.serv_req_pro:
-            if sr.serv_status=='Closed' and sr.pro_rating is not None:
+            if sr.pro_rating is not None:
                 total_rating+=sr.pro_rating
                 c+= 1
 
@@ -94,3 +110,5 @@ class ServiceRequest(db.Model):
         if self.serv_close_datetime:
             return self.serv_close_datetime.strftime("%d-%m-%Y %H:%M")
         return None
+    
+    
