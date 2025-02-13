@@ -218,8 +218,6 @@ export default{
                     body: JSON.stringify({'serv_close_datetime':current_datetime})
                 })
                 if(res.ok){
-                    const data = await res.json()
-                    console.log(data.Message)
                     await this.ServiceReqsDataFetch()
 
                 }else{

@@ -89,6 +89,9 @@ export default{
                 </div>
             </div>
         </div>
+        <div class="row-6 text-end" v-show="!serv_form">
+            <button class="btn btn-lg btn-dark col-2 pt-2 text-center" @click="CreateCSV">+ Get ServiceRequest Data</button>
+        </div>
         <div class="row" v-show="!serv_form">
             <ServiceReqTable :service_reqs_data="service_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
         </div>
@@ -248,8 +251,9 @@ export default{
             }
         },
 
-        serv_deleted(service_id){
+        async serv_deleted(service_id){
             this.services = this.services.filter(service => service.serv_id !== service_id)
+            await this.ServiceReqsDataFetch()
         },
         serv_details_show(service_id){
             this.service_detail_record = this.services.find(service => service.serv_id === service_id)
@@ -302,6 +306,32 @@ export default{
                 this.serv_form=false
             }else{
                 this.serv_form=true
+            }
+        },
+        async CreateCSV(){
+            try{
+                const res = await fetch(location.origin+'/create-csv',{
+                    headers:{
+                        'Authentication-Token' : this.$store.state.auth_token
+                    }
+                })
+                if(res.ok){
+                    const task_id = (await res.json()).task_id
+
+                    const interval = setInterval(async()=>{
+                        const res = await fetch(`${location.origin}/get-csv/${task_id}`)
+                        if(res.ok){
+                            console.log("CSV created successfully")
+                            window.open(`${location.origin}/get-csv/${task_id}`, '_blank')
+                            clearInterval(interval)
+                        }
+                    }, 500)
+                }else{
+                    const {Message} = await res.json()
+                    throw new Error(Message)
+                }
+            }catch(error){
+                console.log(error.message)
             }
         }
     },

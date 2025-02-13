@@ -5,6 +5,7 @@ from flask_security import auth_required,current_user
 from datetime import datetime
 from sqlalchemy import func #to make sure that pro only accepts today's service requests.
 
+cache=app.cache
 
 api=Api(prefix='/api')
 
@@ -15,7 +16,7 @@ service_fields={
     'serv_name' : fields.String,
     'serv_price' : fields.Integer,
     'serv_duration' : fields.Integer,
-    'serv_avg_rating' : fields.Float(attribute=lambda s: s.serv_avg_rating if s else None),
+    'serv_avg_rating' : fields.Float(attribute='serv_avg_rating'),
     'serv_desc' : fields.String
 }
 
@@ -61,7 +62,7 @@ pro_fields={
     'p_contact_no': fields.Integer,
     'p_service_type': fields.String,
     'p_exp' : fields.Integer,
-    'p_avg_rating' : fields.Float(attribute=lambda p: p.avg_rating if p else None),
+    'p_avg_rating' : fields.Float(attribute="avg_rating"),
     'p_pincode' : fields.Integer
 }
 
@@ -194,6 +195,8 @@ class ServiceAPI(Resource):
         try:
             db.session.delete(service_data)
             db.session.commit()
+            cache.delete("all_services")
+            cache.delete("all_service_requests") #this should work, but first verify the cascade delete bro
             return "",204
         
         except:
@@ -223,6 +226,7 @@ class ServiceAPI(Resource):
             service_data.serv_duration=serv_duration
             service_data.serv_desc=serv_desc
             db.session.commit()
+            cache.delete("all_services")
             return {"Message":"Service details updated successfully"},200
         
         except:
@@ -256,13 +260,20 @@ class ServiceListAPI(Resource):
             unique_serv_types=[s_type[0] for s_type in serv_types]
 
             return {"Service_Types": unique_serv_types},200
-         
+        
+        cached_services=cache.get("all_services")
+        if cached_services:
+            return cached_services,200
+        
         service_data_list=Service.query.all()
 
         if not service_data_list:
-            return {"Message":"Services do not exist"},404
+            return {"Message": "Service do not exist"},404
         
-        return marshal(service_data_list,service_fields),200
+        response = marshal(service_data_list,service_fields)
+        cache.set("all_services", response, timeout=180) #upto 3 mins is fine here
+        return response,200
+
 
     @auth_required('token')
     def post(self):
@@ -280,6 +291,7 @@ class ServiceListAPI(Resource):
             service=Service(serv_type=serv_type, serv_name=serv_name, serv_price=serv_price, serv_duration=serv_duration, serv_desc=serv_desc)
             db.session.add(service)
             db.session.commit()
+            cache.delete("all_services") #removing the cache since new service got created
             return {"Message":"Service data added successfully"},201
         
         except:
@@ -315,6 +327,7 @@ class ServiceRequestAPI(Resource):
             return {"Message" : "ServiceRequest not Found"},404
 
         if serv_close_dt:
+            serv_close_dt=datetime.strptime(serv_close_dt, "%Y-%m-%d %H:%M:%S")
             if serv_rating and pro_rating: #customer is closing the service with rating and review if any.
                 try:
                     serv_req_data.serv_rating=serv_rating
@@ -322,6 +335,7 @@ class ServiceRequestAPI(Resource):
                     serv_req_data.serv_remarks=serv_remarks
                     serv_req_data.serv_status='Closed'
                     db.session.commit()
+                    cache.delete("all_service_requests")
                     return "",204
                 except:
                     db.session.rollback()
@@ -331,6 +345,7 @@ class ServiceRequestAPI(Resource):
                     serv_req_data.serv_status='Cancelled'
                     serv_req_data.serv_close_datetime=serv_close_dt
                     db.session.commit()
+                    cache.delete("all_service_requests")
                     return "",204
                 
                 except:
@@ -347,6 +362,7 @@ class ServiceRequestAPI(Resource):
                 serv_req_data.pro_id=pro_id
                 serv_req_data.serv_status='Accepted'
                 db.session.commit()
+                cache.delete("all_service_requests")
                 return "",204
             except:
                     db.session.rollback()
@@ -450,12 +466,20 @@ class ServiceRequestListAPI(Resource):
                     return marshal(serv_req_data,service_request_fields),200
 
             else:
+                cached_serv_reqs=cache.get("all_service_requests")
+                if cached_serv_reqs:
+                    return cached_serv_reqs,200
+                
                 serv_req_data_list=ServiceRequest.query.all()
 
                 if not serv_req_data_list:
                     return {"Message":"ServiceRequests do not exist"},404
                 
-                return marshal(serv_req_data_list,service_request_fields),200
+                response = marshal(serv_req_data_list,service_request_fields)
+                cache.set("all_service_requests", response, timeout=180) #upto 3 mins is fine here because customer might close service/cancel in demo tho.
+                return response,200
+                
+                
     
     @auth_required('token')
     def post(self):
@@ -477,6 +501,7 @@ class ServiceRequestListAPI(Resource):
             new_serv_req=ServiceRequest(serv_id=serv_id, cust_id=cust_id,serv_request_datetime=req_datetime)
             db.session.add(new_serv_req)
             db.session.commit()
+            cache.delete("all_service_requests")
             return {"Message":"ServiceRequest details added successfully"},201
         
         except:
@@ -519,6 +544,7 @@ class CustomerAPI(Resource):
                     c_data.c_address=c_address
                     c_data.c_pincode=c_pincode
                     db.session.commit()
+                    cache.delete("all_customers")
                     return {"Message":"Customer details updated successfully"},200
                 
                 except:
@@ -542,13 +568,22 @@ class CustomerListAPI(Resource):
                 return {"Message" : "Customer data not found"},404
             
             return marshal(cust_data,customer_fields),200
+        
 
+        
+        cached_cust_data=cache.get("all_customers")
+        if cached_cust_data:
+            return cached_cust_data,200
+        
         cust_data_list=Customer.query.all()
 
         if not cust_data_list:
             return {"Message":"Customers do not exist"},404
         
-        return marshal(cust_data_list,customer_fields),200
+        response=marshal(cust_data_list,customer_fields)
+        cache.set("all_customers", response, timeout=300) #upto 5 mins is fine here 
+        return response,200
+        
     
 
 class ProfessionalAPI(Resource):
@@ -586,6 +621,7 @@ class ProfessionalAPI(Resource):
                     p_data.p_service_type=p_service_type
                     p_data.p_pincode=p_pincode
                     db.session.commit()
+                    cache.delete("all_service_pros")
                     return {"Message":"Professional details updated successfully"},200
                 
                 except:
@@ -609,12 +645,18 @@ class ProfessionalListAPI(Resource):
             
             return marshal(pro_data,pro_fields),200
 
+        cached_pro_data=cache.get("all_service_pros")
+        if cached_pro_data:
+            return cached_pro_data,200
+        
         pro_data_list=Professional.query.all()
 
         if not pro_data_list:
             return {"Message":"Professionals do not exist"},404
         
-        return marshal(pro_data_list,pro_fields),200
+        response=marshal(pro_data_list,pro_fields)
+        cache.set("all_service_pros", response, timeout=300) #upto 5 mins is fine here 
+        return response,200
 
 
 class UserAPI(Resource):
@@ -632,7 +674,6 @@ class UserAPI(Resource):
     @auth_required('token')
     def delete(self,user_id):
         user_data=User.query.filter(User.user_id==user_id).first()
-        pro_data=Professional.query.filter(Professional.user_p_id==user_id).first()
 
         if not user_data:
             return {"Message":"User does not exist"},404
@@ -642,8 +683,9 @@ class UserAPI(Resource):
         
         try:
             db.session.delete(user_data)
-            db.session.delete(pro_data)
             db.session.commit()
+            cache.delete("all_users")
+            cache.delete("all_service_pros")
             return "",204
         
         except:
@@ -669,6 +711,9 @@ class UserAPI(Resource):
             try:
                 user_data.active = True
                 db.session.commit()
+                cache.delete("all_users")
+                cache.delete("all_service_pros") #might need to add a check but its okay tho
+                cache.delete("all_customers")
                 return "",204
             
             except:
@@ -677,18 +722,21 @@ class UserAPI(Resource):
             
         else:
             if user_data.c_user:
-                c_id=user_data.c_user.c_id
+                c_id=user_data.c_user[0].c_id
                 serv_req_data=ServiceRequest.query.filter((ServiceRequest.cust_id==c_id)&(ServiceRequest.serv_status=='Requested')|(ServiceRequest.serv_status=='Accepted')).all()
                 for x in serv_req_data:
                     try:
                         x.serv_status='Cancelled'
                         db.session.commit()
+                        cache.delete("all_service_requests")
                     except:
                         db.session.rollback()
                         return {"Message" : "Error in database"},400
                 try:
                     user_data.active = False
                     db.session.commit()
+                    cache.delete("all_users")
+                    cache.delete("all_customers")
                     return "",204
             
                 except:
@@ -696,12 +744,13 @@ class UserAPI(Resource):
                     return {"Message":"Error in database"},400
 
             elif user_data.p_user:
-                p_id=user_data.p_user.p_id
+                p_id=user_data.p_user[0].p_id
                 serv_req_data=ServiceRequest.query.filter((ServiceRequest.pro_id==p_id)&(ServiceRequest.serv_status=='Accepted')).all()
                 for x in serv_req_data:
                     try:
                         x.serv_status='Cancelled'
                         db.session.commit()
+                        cache.delete("all_service_requests")
                     except:
                         db.session.rollback()
                         return {"Message" : "Error in database"},400
@@ -709,6 +758,8 @@ class UserAPI(Resource):
                 try:
                     user_data.active = False
                     db.session.commit()
+                    cache.delete("all_users")
+                    cache.delete("all_service_pros")
                     return "",204
             
                 except:
@@ -735,12 +786,19 @@ class UserListAPI(Resource):
             
             return marshal(user_data,user_fields),200
 
+        cached_user_data=cache.get("all_users")
+        if cached_user_data:
+            return cached_user_data,200
+        
         user_data=User.query.all()
 
         if not user_data:
             return {"Message" : "User data not found"},404
 
-        return marshal(user_data,user_fields),200
+        response=marshal(user_data,user_fields)
+        cache.set("all_users", response, timeout=300) #upto 5 mins is fine here 
+        return response,200
+        
 
 api.add_resource(RegisterAPI,'/register')
 api.add_resource(ServiceAPI,'/service/<int:service_id>')

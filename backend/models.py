@@ -10,8 +10,8 @@ class User(db.Model,UserMixin):
     fs_uniquifier=db.Column(db.String(), unique = True, nullable = False)
     active=db.Column(db.Boolean, default = True)
     roles=db.relationship('Role', backref = 'ur', secondary='user_roles', cascade="delete")
-    p_user=db.relationship('Professional',backref='p',cascade='delete', uselist=False)
-    c_user=db.relationship('Customer',backref='c', uselist=False)
+    p_user=db.relationship('Professional',backref='p',cascade='delete')
+    c_user=db.relationship('Customer',backref='c')
     
 class Role(db.Model,RoleMixin):
     role_id=db.Column(db.Integer, primary_key=True)
@@ -20,7 +20,7 @@ class Role(db.Model,RoleMixin):
 
 class UserRoles(db.Model):
     ur_id=db.Column(db.Integer,primary_key=True)
-    u_id=db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE'))
+    u_id=db.Column(db.Integer, db.ForeignKey('user.user_id'))
     r_id=db.Column(db.Integer, db.ForeignKey('role.role_id'))
 
 class Service(db.Model):
@@ -60,7 +60,7 @@ class Customer(db.Model):
 
 class Professional(db.Model):
     p_id=db.Column(db.Integer,primary_key=True,nullable=False)
-    user_p_id=db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete="CASCADE"), nullable=False)
+    user_p_id=db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     p_name=db.Column(db.String(), nullable=False)
     p_contact_no=db.Column(db.Integer)
     p_service_type=db.Column(db.String(), nullable=False)

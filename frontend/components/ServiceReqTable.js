@@ -117,6 +117,7 @@ export default{
                                 <th>Customer Name</th>
                                 <th>Service Location</th>
                                 <th>DateTime_of_Completion</th>
+                                <th>Service Status</th>
                                 <th>Service Remarks</th>
                                 <th>Service Rating</th>
                                 <th>My Rating</th>
@@ -129,6 +130,7 @@ export default{
                                 <td>{{sh.cust_name}}</td>
                                 <td>{{sh.cust_address}} {{sh.cust_pincode}}</td>
                                 <td>{{sh.serv_close_datetime}}</td> 
+                                <td>{{sh.serv_status}}</td>
                                 <td>{{sh.serv_remarks}}</td>
                                 <td>{{sh.serv_rating}}</td>
                                 <td>{{sh.pro_rating}}</td>

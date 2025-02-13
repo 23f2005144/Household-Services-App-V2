@@ -213,6 +213,11 @@ export default{
             this.service_table=true
             this.service_create_form=false
             this.$emit('ServiceForm')
+            this.new_service_type=null
+            this.new_service_name=null
+            this.new_service_price=null
+            this.new_service_duration=null
+            this.new_service_desc=null
 
         },
         async ServiceDelete(service_id){
@@ -281,6 +286,11 @@ export default{
                     this.service_table=true;
                     this.$emit("Service_Created")
                     this.$emit('ServiceForm')
+                    this.new_service_type=null
+                    this.new_service_name=null
+                    this.new_service_price=null
+                    this.new_service_duration=null
+                    this.new_service_desc=null
                 }else{
                     const {Message} = await res.json()
                     throw new Error(Message)

@@ -325,6 +325,7 @@ export default{
                         throw new Error(Message)
                     }
                 }catch(error){
+                    alert(error.message)
                     console.log(error.message)
                     this.$router.push(`/customer/home/${this.$store.state.user_id}`)
                 }

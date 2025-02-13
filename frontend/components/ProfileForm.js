@@ -132,7 +132,7 @@ export default{
                 })
                 if (res.ok){
                     const data = await res.json()
-                    alert(data.message)
+                    alert(data.Message)
                     console.log("Profile Updated successfully")
                     this.$emit('HideCustProfile')
                 }else{
@@ -158,7 +158,7 @@ export default{
                 })
                 if (res.ok){
                     const data = await res.json()
-                    alert(data.message)
+                    alert(data.Message)
                     console.log("Profile Updated successfully")
                     this.$emit('HideProProfile')
                 }else{

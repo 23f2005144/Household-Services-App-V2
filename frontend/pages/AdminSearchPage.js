@@ -192,12 +192,10 @@ export default{
                                 <tr v-for="u in table_data" :key="u.user_id">
                                     <td>{{u.user_id}}</td>
                                     <td>{{u.email}}</td>
-                                    <div v-if="u.active==true">
-                                        <td><p>Active</p></td>
-                                    </div>
-                                    <div v-else>
-                                        <td><p>Blocked</p></td>
-                                    </div>
+                                    <td>
+                                        <p v-if="u.active">Active</p>
+                                        <p v-else>Blocked</p>
+                                    </td>
                                     <td>{{u.roles[0].name}}</td>
                                     <td>{{u.roles[0].desc}}</td>
                                 </tr>
