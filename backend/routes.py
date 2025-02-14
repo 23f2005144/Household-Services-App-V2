@@ -27,7 +27,7 @@ def createCSV():
 def getCSV(task_id):
     result=AsyncResult(task_id)
     if result.ready():
-        return send_file(f'backend/celery/admin_downloads/{result.result}',as_attachment=True),200
+        return send_file(f'backend/celery/admin_downloads/{result.result}'),200
     else:
         return jsonify({"Message" : "Task not ready"}),405
 
