@@ -439,11 +439,8 @@ class ServiceRequestListAPI(Resource):
             if not pro_data:
                 return {"Message":"Professional does not exist"}, 404
             
-            today=datetime.today()
-            current_datetime=datetime.now()
-            start_of_day=datetime.combine(today, time(8, 0, 0))
-            end_of_day=datetime.combine(today, time(20, 0, 0))
-            new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type,ServiceRequest.serv_request_datetime.between(start_of_day, end_of_day),ServiceRequest.serv_request_datetime >= current_datetime).all()
+            current_datetime = datetime.now()
+            new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type,ServiceRequest.serv_request_datetime >= current_datetime).all()
 
             if not new_service_req_data:
                 return {"Message":'ServiceRequests do not exist'},404

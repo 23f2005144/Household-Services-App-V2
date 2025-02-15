@@ -28,6 +28,7 @@ celery_app=celery_init_app(app)
 with app.app_context():
     app.cache.clear() #remove it once done testing and all since this just clears redis again and again
 
+import backend.celery.celery_schedule
 import backend.initial_data
 import backend.routes
 excel.init_excel(app)
