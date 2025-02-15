@@ -27,6 +27,9 @@ def createCSV():
 def getCSV(task_id):
     result=AsyncResult(task_id)
     if result.ready():
+        if isinstance(result.result,dict): #returning a dict since no servicerequests found which were closed.
+            return jsonify(result.result),404
+        
         return send_file(f'backend/celery/admin_downloads/{result.result}'),200
     else:
         return jsonify({"Message" : "Task not ready"}),405

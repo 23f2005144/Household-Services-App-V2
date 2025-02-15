@@ -95,8 +95,8 @@ export default{
                                     <button type="button" class="btn btn-warning" @click="$emit('Serv_Req_Close',sreq.serv_req_id)">Close Service?</button>
                                 </div>
                                 <div v-else-if="sreq.serv_status==='Closed'">
-                                    <p>The service was rated {{sreq.serv_rating}}</p>
-                                    <p>The professional was rated{{sreq.pro_rating}}</p>
+                                    <p>The service was rated {{sreq.serv_rating}} stars</p>
+                                    <p>The professional was rated {{sreq.pro_rating}} stars</p>
                                 </div>
                                 <div v-else>
                                     <p>This service was cancelled</p>

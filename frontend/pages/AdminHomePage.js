@@ -322,10 +322,17 @@ export default{
                         const res = await fetch(`${location.origin}/get-csv/${task_id}`)
                         if(res.ok){
                             console.log("CSV created successfully")
-                            window.open(`${location.origin}/get-csv/${task_id}`, '_blank')
+                            window.open(`${location.origin}/get-csv/${task_id}`)
                             clearInterval(interval)
+                        }else if (res.status===405){
+                            console.log("Task not ready yet")
+                        }else{
+                            clearInterval(interval)
+                            const { Message } = await res.json() 
+                            console.log(Message)
+                            alert(Message)  
                         }
-                    }, 500)
+                    }, 100)
                 }else{
                     const {Message} = await res.json()
                     throw new Error(Message)

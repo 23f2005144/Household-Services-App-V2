@@ -141,6 +141,7 @@ export default{
                 }
             }catch(error){
                 console.log(error.message)
+                alert(error.message)
                 this.$emit('HideCustProfile')
             }
             
@@ -167,6 +168,7 @@ export default{
                 }
             }catch(error){
                 console.log(error.message)
+                alert(error.message)
                 this.$emit('HideProProfile')
             }
         }

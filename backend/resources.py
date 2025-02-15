@@ -2,7 +2,7 @@ from flask import current_app as app,request
 from flask_restful import Api, Resource,fields,marshal_with,marshal
 from backend.models import db,User,Customer,Professional,Service,ServiceRequest,UserRoles,Role
 from flask_security import auth_required,current_user
-from datetime import datetime
+from datetime import datetime,time,date
 from sqlalchemy import func #to make sure that pro only accepts today's service requests.
 
 cache=app.cache
@@ -334,6 +334,7 @@ class ServiceRequestAPI(Resource):
                     serv_req_data.pro_rating=pro_rating
                     serv_req_data.serv_remarks=serv_remarks
                     serv_req_data.serv_status='Closed'
+                    serv_req_data.serv_close_datetime=serv_close_dt
                     db.session.commit()
                     cache.delete("all_service_requests")
                     return "",204
@@ -439,7 +440,10 @@ class ServiceRequestListAPI(Resource):
                 return {"Message":"Professional does not exist"}, 404
             
             today=datetime.today()
-            new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type,func.date(ServiceRequest.serv_request_datetime)==today).all()
+            current_datetime=datetime.now()
+            start_of_day=datetime.combine(today, time(8, 0, 0))
+            end_of_day=datetime.combine(today, time(20, 0, 0))
+            new_service_req_data=ServiceRequest.query.join(Customer).join(Service).filter(ServiceRequest.serv_status == 'Requested',Customer.c_pincode == pro_data.p_pincode,Service.serv_type == pro_data.p_service_type,ServiceRequest.serv_request_datetime.between(start_of_day, end_of_day),ServiceRequest.serv_request_datetime >= current_datetime).all()
 
             if not new_service_req_data:
                 return {"Message":'ServiceRequests do not exist'},404

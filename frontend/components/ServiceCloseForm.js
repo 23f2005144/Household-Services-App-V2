@@ -107,8 +107,7 @@ export default{
                     body: JSON.stringify({'serv_close_datetime':current_datetime,'serv_rating':this.serv_req_close_data.serv_rating,'pro_rating':this.serv_req_close_data.pro_rating,'serv_remarks':this.serv_req_close_data.serv_remarks})
                 })
                 if(res.ok){
-                    const data = await res.json()
-                    console.log(data.Message)
+                    console.log("Service Closed successfully")
                     $emit('Serv_Req_Closed')
 
                 }else{

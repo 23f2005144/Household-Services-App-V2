@@ -221,8 +221,9 @@ export default{
                 console.log(error.message)
             }
         },
-        HideProfile(){
+        async HideProfile(){
             this.show_profile=false
+            await this.ServiceReqsProDataFetch()  
         },
         async ServiceAccept(serv_req_id){
             try{
@@ -235,8 +236,8 @@ export default{
                     body: JSON.stringify({"pro_id":this.$store.state.p_id})
                 })
                 if(res.ok){
-                    const data = await res.json()
-                    alert(data.Message)
+                    console.log("Service Accepted")
+                    alert("Service Accepted")
                     await this.ServiceReqsDataFetch()
                     await this.ServiceReqsProDataFetch()
                 }else{
