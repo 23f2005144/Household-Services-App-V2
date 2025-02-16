@@ -1,9 +1,9 @@
 from celery import shared_task
-from backend.models import ServiceRequest
+from backend.models import ServiceRequest,db
 import flask_excel
 from backend.celery.mail_service import send_email
 from backend.models import User,ServiceRequest,Customer
-from datetime import datetime
+from datetime import datetime,timedelta
 from flask import render_template_string
 from weasyprint import HTML
 from io import BytesIO
@@ -185,19 +185,62 @@ def send_monthly_reports():
     for c in customers:
         pdf_report=generate_monthly_report(c) 
         pdf_buffer=BytesIO(pdf_report).getvalue()
-        subject = f"Your Monthly Service Report - {datetime.now().strftime('%B %Y')}"
+        subject = f"📝 Your Monthly Service Report - {datetime.now().strftime('%B %Y')}"
         body = f"""
         <p>Dear {c.c_name},</p>
         <p>Attached is your monthly service report from Abode Mantra.</p>
         <p>It includes:</p>
         <ul>
-            <li>Total Services Requested & Completed</li>
+            <li>Total Services Requested & Closed</li>
             <li>Total Amount Spent</li>
             <li>Average Ratings</li>
             <li>Most Booked Services</li>
         </ul>
         <p>Thank you for using Abode Mantra!</p>
         <p>Best Regards, <br>Abode Mantra Team</p>
+        <p style="font-size: 14px;"><strong>Abode Mantra: Your A-Z Cleaning Experts</strong></p>
         """
         send_email(c.c.email, subject, body, pdf_buffer, "Monthly_Report.pdf")
+        
+    return f"Sent monthly reports to {len(customers)} customers via email"
+
+@shared_task(ignore_result=True)
+def update_expired_serv_requests():
+    now=datetime.now()
+    serv_request_data=ServiceRequest.query.filter((ServiceRequest.serv_request_datetime<now)&(ServiceRequest.serv_status=='Requested')).all()
+
+    updated_serv_requests=[]
+    if not serv_request_data:
+        print(now)
+        return "No Service Requests are expired"
+    for req in serv_request_data:
+        old_serv_request_datetime=req.serv_request_datetime
+        new_date=now.date()+timedelta(days=1)
+        req.serv_request_datetime=datetime.combine(new_date, old_serv_request_datetime.time())
+        updated_serv_requests.append((req,old_serv_request_datetime))
+
+    db.session.commit()
+
+    for (req, old_serv_request_datetime) in updated_serv_requests:
+        cust=req.customer
+        subject = "⚠️ Your Recent Service Request Has Been Rescheduled"
+        body = f"""
+        <p>Dear {cust.c_name},</p>
+        <p>We regret to inform you that no service professional was assigned to your service request for <strong>{req.service.serv_name} Service</strong> at <strong>{old_serv_request_datetime.strftime('%d-%m-%Y %H:%M')}</strong></p>
+        <p>Hence, we have rescheduled it to tomorrow at the same time: <b>{req.serv_request_datetime.strftime('%d-%m-%Y %H:%M')}</b>.</p>
+        <p>Please log in to your dashboard to review the updated service request details.</p>
+        <p style="text-align: center;">
+            <a href="http://127.0.0.1:5000/#/login" 
+                style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
+                Go to Dashboard
+            </a>
+        </p>
+        <p>For any concerns, please reach out to us.</p>
+        <p>Best Regards, <br>Abode Mantra Team</p>
+        <p style="font-size: 14px;"><strong>Abode Mantra: Your A-Z Cleaning Experts</strong></p>
+        """
+
+        send_email(cust.c.email,subject,body)
+
+    return f"Rescheduled {len(serv_request_data)} requests and sent emails."
 
