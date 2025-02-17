@@ -26,15 +26,15 @@ export default{
                     </div>
                 </div>
                 <div class="row fs-5">
-                    <div class="my-3 col-md-3">
+                    <div class="my-3 col-md-4">
                         <label for="name" class="form-label">DateTime_of_Request</label>
                         <input type="text" class="form-control" id="service_dor" name="service_dor" v-model="serv_req_close_data.serv_request_datetime" disabled>
                     </div>
-                    <div class="my-3 col-md-3">
+                    <div class="my-3 col-md-4">
                         <label for="name" class="form-label">Professional Name</label>
                         <input type="text" class="form-control" name="service_pro_name" v-model="serv_req_close_data.pro_name"  disabled>
                     </div>
-                    <div class="my-3 col-md-3">
+                    <div class="my-3 col-md-4">
                         <label for="name" class="form-label">Professional Contact No</label>
                         <input type="text" class="form-control" id="service_pro_contact_no" name="service_pro_contact_no" v-model="serv_req_close_data.pro_contact_no" disabled>
                     </div>
@@ -108,7 +108,7 @@ export default{
                 })
                 if(res.ok){
                     console.log("Service Closed successfully")
-                    $emit('Serv_Req_Closed')
+                    this.$emit('Serv_Req_Closed')
 
                 }else{
                     const {Message} = await res.json()
@@ -116,6 +116,8 @@ export default{
                 }
             }catch(error){
                 console.log(error.message)
+                alert(error.message)
+                this.$emit('Serv_Req_Closed')
             }
         },
     }

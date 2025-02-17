@@ -58,9 +58,8 @@ export default{
                 })
                 if(res.ok){
                     this.$emit('Pro_Approved',p_id)
-                    const data=await res.json()
-                    alert(data.Message)
-                    console.log("Professional Succesfully Approved")
+                    alert("Professional Approved Successfully")
+                    console.log("Professional Approved Successfully")
                     this.new_pro_obj=null
                 }else{
                     const {Message} = await res.json()
@@ -68,6 +67,7 @@ export default{
                 }
             }catch(error){
                 console.log(error.message)
+                alert(error.message)
             }
         },
         async RejectPro(p_id){

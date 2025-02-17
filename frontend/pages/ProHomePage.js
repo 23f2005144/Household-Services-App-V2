@@ -238,8 +238,10 @@ export default{
                 if(res.ok){
                     console.log("Service Accepted")
                     alert("Service Accepted")
+                    this.new_service_reqs_pro_data=null
                     await this.ServiceReqsDataFetch()
                     await this.ServiceReqsProDataFetch()
+                    
                 }else{
                     const {Message} = await res.json()
                     throw new Error(Message)

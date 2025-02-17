@@ -1,9 +1,9 @@
 from flask import current_app as app,request
 from flask_restful import Api, Resource,fields,marshal_with,marshal
-from backend.models import db,User,Customer,Professional,Service,ServiceRequest,UserRoles,Role
+from backend.models import db,User,Customer,Professional,Service,ServiceRequest
 from flask_security import auth_required,current_user
-from datetime import datetime,time,date
-from sqlalchemy import func #to make sure that pro only accepts today's service requests.
+from datetime import datetime,timedelta
+
 
 cache=app.cache
 
@@ -329,6 +329,13 @@ class ServiceRequestAPI(Resource):
         if serv_close_dt:
             serv_close_dt=datetime.strptime(serv_close_dt, "%Y-%m-%d %H:%M:%S")
             if serv_rating and pro_rating: #customer is closing the service with rating and review if any.
+                serv_request_time=serv_req_data.serv_request_datetime
+                serv_duration=serv_req_data.service.serv_duration
+                serv_closing_time=serv_request_time + timedelta(hours=serv_duration)
+                current_time = datetime.now()
+
+                if current_time < serv_closing_time:
+                    return {"Message": "Sorry, you cannot close the ServiceRequest before the scheduled time."}, 400
                 try:
                     serv_req_data.serv_rating=serv_rating
                     serv_req_data.pro_rating=pro_rating
