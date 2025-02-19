@@ -10,10 +10,10 @@ export default{
         <div class="container">
             <div class="row">
                 <p class="text-end link-info link-offset-2 link-underline-opacity-100 link-underline-opacity-100-hover" style="font-size:25px; font-weight: bold;" @click="ShowProfile">View Profile</p>
-                <div v-show="show_profile">
+                <div v-if="show_profile">
                     <ProfileForm :cust_profile_data="profile_data" @HideCustProfile="HideProfile"/>
                 </div>
-                <div v-show="serv_req_close_data">
+                <div v-if="serv_req_close_data">
                     <ServiceCloseForm :serv_req_close_data='serv_req_close_data' @Serv_Req_Closed='serv_req_close_form_close'/>
                 </div> 
             </div>
@@ -57,15 +57,57 @@ export default{
                                         <td>{{service_req_detail_record.serv_name}}</td>
                                         <td>{{service_req_detail_record.serv_price}}</td>
                                         <td>{{service_req_detail_record.serv_duration}}</td>
-                                        <td>{{service_req_detail_record.pro_name}}</td>
-                                        <td>{{service_req_detail_record.pro_contact_no}}</td>
-                                        <td>{{service_req_detail_record.pro_exp}}</td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.pro_name">
+                                                {{service_req_detail_record.pro_name}}
+                                            </div>
+                                            <div v-else>
+                                                <p>Not yet assigned</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.pro_contact_no">
+                                                {{service_req_detail_record.pro_contact_no}}
+                                            </div>
+                                            <div v-else>
+                                                <p>Not yet assigned</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.pro_exp">
+                                                {{service_req_detail_record.pro_exp}}
+                                            </div>
+                                            <div v-else>
+                                                <p>Not yet assigned</p>
+                                            </div>
+                                        </td>
                                         <td>{{service_req_detail_record.serv_request_datetime}}</td>
                                         <td>{{service_req_detail_record.serv_close_datetime}}</td>
                                         <td>{{service_req_detail_record.serv_status}}</td>
-                                        <td>{{service_req_detail_record.serv_remarks}}</td>
-                                        <td>{{service_req_detail_record.serv_rating}}</td>
-                                        <td>{{service_req_detail_record.pro_rating}}</td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.serv_remarks">
+                                                {{service_req_detail_record.serv_remarks}}
+                                            </div>
+                                            <div v-else>
+                                                <p>Null</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.serv_rating">
+                                                {{service_req_detail_record.serv_rating}}
+                                            </div>
+                                            <div v-else>
+                                                <p>Null</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.pro_rating">
+                                                {{service_req_detail_record.pro_rating}}
+                                            </div>
+                                            <div v-else>
+                                                <p>Null</p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -131,7 +173,7 @@ export default{
         this.style = document.createElement('style')
         this.style.innerHTML=`
             table{
-                font-size: 18px;
+                font-size: 16px;
             }
             body{
                 background-color: lightgoldenrodyellow;  

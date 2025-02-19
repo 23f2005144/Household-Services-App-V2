@@ -13,7 +13,7 @@ def home():
 
 
 
-@auth_required('token') #so that only admin can retrive the csv file.
+@auth_required('token')
 @app.get('/create-csv')
 def createCSV():
     if not current_user.roles[0].name=='Admin':
@@ -27,7 +27,7 @@ def createCSV():
 def getCSV(task_id):
     result=AsyncResult(task_id)
     if result.ready():
-        if isinstance(result.result,dict): #returning a dict since no servicerequests found which were closed.
+        if isinstance(result.result,dict):
             return jsonify(result.result),404
         
         return send_file(f'backend/celery/admin_downloads/{result.result}'),200

@@ -18,6 +18,7 @@ export default{
                         <input type="password" class="form-control" v-model="password" id="passwordbox" required>
                     </div>
                     <button type="submit" class="btn btn-success btn-lg p-2 col-md-3" id="btn-login">Login</button>
+                    <button type="reset" class="btn btn-lg btn-secondary p-2 col-md-3">Clear</button>
                 </form>
             </div>     
         </div>

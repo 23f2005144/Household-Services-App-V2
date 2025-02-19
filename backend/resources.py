@@ -115,11 +115,17 @@ serv_req_pro_fields={
 
 }
 
-class RegisterAPI(Resource): #have not used any @auth only checking if registering user is already registred to the user table or not:)
+class RegisterAPI(Resource):
     def post(self):
         data=request.get_json()
         email=data.get('email')
         role=data.get('role')
+        if email is None or role is None:
+            return {"Message":"Invalid Input"},400
+        
+        if '@' not in email:
+            return {"Message":"Invalid Email"},400
+        
         user_data=User.query.filter_by(email=email).first()
         if user_data:
             roles_list=user_data.roles
@@ -134,6 +140,15 @@ class RegisterAPI(Resource): #have not used any @auth only checking if registeri
                     c_address=data.get('c_address')
                     c_pincode=data.get('c_pincode')
                     user_c_id=user_data.user_id
+
+                    if c_name is None or c_contact_no is None or c_address is None or c_pincode is None:
+                        return {"Message":"Invalid Input"},400
+                    
+                    if type(c_contact_no) != int or len(str(c_contact_no))!=10:
+                        return {"Message":"Invalid Contact Number"},400
+                    
+                    if type(c_pincode)!=int or len(str(c_pincode))!=6:
+                        return {"Message":"Invalid Pincode"},400
 
                     try:
                         new_customer=Customer(user_c_id=user_c_id,c_name=c_name,c_contact_no=c_contact_no,c_address=c_address,c_pincode=c_pincode)
@@ -153,6 +168,15 @@ class RegisterAPI(Resource): #have not used any @auth only checking if registeri
                     p_pincode=data.get('p_pincode')
                     user_p_id=user_data.user_id
 
+                    if p_name is None or p_contact_no is None or p_service_type is None or p_pincode is None:
+                        return {"Message":"Invalid Input"},400
+                    
+                    if type(p_contact_no) != int or len(str(p_contact_no))!=10:
+                        return {"Message":"Invalid Contact Number"},400
+
+                    if type(p_pincode)!=int or len(str(p_pincode))!=6:
+                        return {"Message":"Invalid Pincode"},400
+                    
                     try:
                         new_pro=Professional(user_p_id=user_p_id, p_name=p_name, p_contact_no=p_contact_no, p_service_type=p_service_type, p_exp=p_exp, p_pincode=p_pincode)
                         db.session.add(new_pro)
@@ -196,7 +220,7 @@ class ServiceAPI(Resource):
             db.session.delete(service_data)
             db.session.commit()
             cache.delete("all_services")
-            cache.delete("all_service_requests") #this should work, but first verify the cascade delete bro
+            cache.delete("all_service_requests")
             return "",204
         
         except:
@@ -212,6 +236,12 @@ class ServiceAPI(Resource):
         serv_duration=data.get('serv_duration')
         serv_desc=data.get('serv_desc')
         service_data=Service.query.get(service_id)
+
+        if serv_type is None or serv_name is None or serv_price is None or serv_duration is None:
+            return {"Message":"Invalid Input"},400
+        
+        if type(serv_price)!=int or type(serv_duration)!=int:
+            return {"Message":"Invalid Price or Duration"},400
 
         if not service_data:
              return {"Message":"Service does not exist"},404
@@ -256,7 +286,7 @@ class ServiceListAPI(Resource):
             return marshal(serv_data,service_fields),200
             
         if query=='service_types':
-            serv_types=db.session.query(Service.serv_type.distinct()).all() #returns a tuple ()
+            serv_types=db.session.query(Service.serv_type.distinct()).all()
             unique_serv_types=[s_type[0] for s_type in serv_types]
 
             return {"Service_Types": unique_serv_types},200
@@ -268,10 +298,10 @@ class ServiceListAPI(Resource):
         service_data_list=Service.query.all()
 
         if not service_data_list:
-            return {"Message": "Service do not exist"},404
+            return {"Message": "Services do not exist"},404
         
         response = marshal(service_data_list,service_fields)
-        cache.set("all_services", response, timeout=180) #upto 3 mins is fine here
+        cache.set("all_services", response, timeout=180)
         return response,200
 
 
@@ -284,6 +314,12 @@ class ServiceListAPI(Resource):
         serv_duration=data.get('service_duration')
         serv_desc=data.get('service_desc')
 
+        if serv_type is None or serv_name is None or serv_price is None or serv_duration is None:
+            return {"Message":"Invalid Input"},400
+        
+        if type(serv_price)!=int or type(serv_duration)!=int:
+            return {"Message":"Invalid Price or Duration"},400
+
         if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can create new service"},403
         
@@ -291,8 +327,8 @@ class ServiceListAPI(Resource):
             service=Service(serv_type=serv_type, serv_name=serv_name, serv_price=serv_price, serv_duration=serv_duration, serv_desc=serv_desc)
             db.session.add(service)
             db.session.commit()
-            cache.delete("all_services") #removing the cache since new service got created
-            return {"Message":"Service data added successfully"},201
+            cache.delete("all_services")
+            return {"Message":"Service created successfully"},201
         
         except:
             db.session.rollback()
@@ -320,7 +356,6 @@ class ServiceRequestAPI(Resource):
         serv_remarks=data.get('serv_remarks')
         pro_id=data.get('pro_id')
 
-    
         serv_req_data=ServiceRequest.query.get(serv_req_id)
 
         if not(serv_req_data):
@@ -328,7 +363,7 @@ class ServiceRequestAPI(Resource):
 
         if serv_close_dt:
             serv_close_dt=datetime.strptime(serv_close_dt, "%Y-%m-%d %H:%M:%S")
-            if serv_rating and pro_rating: #customer is closing the service with rating and review if any.
+            if serv_rating and pro_rating:
                 serv_request_time=serv_req_data.serv_request_datetime
                 serv_duration=serv_req_data.service.serv_duration
                 serv_closing_time=serv_request_time + timedelta(hours=serv_duration)
@@ -455,7 +490,7 @@ class ServiceRequestListAPI(Resource):
             return marshal(new_service_req_data,serv_req_pro_fields),200
 
         else:
-            if query: #for admin searching in service request table
+            if query:
                 if len(query)==10 and query.count("-")==2:
                     query=datetime.strptime(query, "%d-%m-%Y").strftime("%Y-%m-%d")
                     serv_req_data=ServiceRequest.query.filter((ServiceRequest.serv_request_datetime.like(f"{query}%"))|(ServiceRequest.serv_close_datetime.like(f"{query}%"))).all()
@@ -484,7 +519,7 @@ class ServiceRequestListAPI(Resource):
                     return {"Message":"ServiceRequests do not exist"},404
                 
                 response = marshal(serv_req_data_list,service_request_fields)
-                cache.set("all_service_requests", response, timeout=180) #upto 3 mins is fine here because customer might close service/cancel in demo tho.
+                cache.set("all_service_requests", response, timeout=180)
                 return response,200
                 
                 
@@ -495,6 +530,10 @@ class ServiceRequestListAPI(Resource):
         serv_id=data.get('serv_id')
         cust_id=data.get('cust_id')
         serv_req_dt=data.get('serv_request_datetime')
+    
+        if serv_id is None or cust_id is None or serv_req_dt is None:
+            return {"Message":"Invalid Input"},400
+        
         req_datetime= datetime.strptime(serv_req_dt, '%d-%m-%Y %H:%M')
 
         if current_user.roles[0].name!='Customer':
@@ -534,6 +573,9 @@ class CustomerAPI(Resource):
     def put(self,c_id):
         data=request.get_json()
         user_c_id=data.get('user_c_id')
+        if user_c_id is None:
+            return {"Message":"Invalid Input"},400
+            
         c_data=Customer.query.get(c_id)
         c_user_data=User.query.get(user_c_id)
         if c_data and c_user_data:
@@ -542,6 +584,16 @@ class CustomerAPI(Resource):
                 c_contact_no=data.get('c_contact_no')
                 c_address=data.get('c_address')
                 c_pincode=data.get('c_pincode')
+
+                if c_name is None or c_contact_no is None or c_address is None or c_pincode is None:
+                    return {"Message":"Invalid Input"},400
+                
+                if type(c_contact_no)!=int or len(str(c_contact_no))!=10:
+                    return {"Message":"Invalid Contact Number"},400
+                
+                if type(c_pincode)!=int or len(str(c_pincode))!=6:
+                    return {"Message":"Invalid Pincode"},400
+                
                 serv_reqs=ServiceRequest.query.filter((ServiceRequest.cust_id==c_id)&(ServiceRequest.serv_status=='Accepted')).all()
                 if serv_reqs:
                     return {"Message" : "ServiceRequests in progress, cannot update profile right now"},409
@@ -569,7 +621,7 @@ class CustomerListAPI(Resource):
     def get(self):
         query=request.args.get("q","").strip()
 
-        if query: #Admin is searching in customer table
+        if query:
             cust_data=Customer.query.join(User).filter((Customer.c_pincode==query)|(Customer.c_name==query)|(User.active==query)).all()
 
             if not cust_data:
@@ -589,7 +641,7 @@ class CustomerListAPI(Resource):
             return {"Message":"Customers do not exist"},404
         
         response=marshal(cust_data_list,customer_fields)
-        cache.set("all_customers", response, timeout=300) #upto 5 mins is fine here 
+        cache.set("all_customers", response, timeout=300) 
         return response,200
         
     
@@ -610,6 +662,10 @@ class ProfessionalAPI(Resource):
     def put(self,p_id):
         data=request.get_json()
         user_p_id=data.get('user_p_id')
+
+        if user_p_id is None:
+            return {"Message":"Invalid Input"},400
+        
         p_data=Professional.query.get(p_id)
         p_user_data=User.query.get(user_p_id)
         if p_data and p_user_data:
@@ -618,6 +674,15 @@ class ProfessionalAPI(Resource):
                 p_contact_no=data.get('p_contact_no')
                 p_service_type=data.get('p_service_type')
                 p_pincode=data.get('p_pincode')
+
+                if p_name is None or p_contact_no is None or p_service_type is None or p_pincode is None:
+                    return {"Message":"Invalid Input"},400
+                
+                if type(p_contact_no)!=int or len(str(p_contact_no))!=10:
+                    return {"Message":"Invalid Contact Number"},400
+
+                if type(p_pincode)!=int or len(str(p_pincode))!=6:
+                    return {"Message":"Invalid Pincode"},400
 
                 serv_reqs=ServiceRequest.query.filter((ServiceRequest.pro_id==p_id)&(ServiceRequest.serv_status=='Accepted')).all()
                 if serv_reqs:
@@ -645,7 +710,7 @@ class ProfessionalListAPI(Resource):
     def get(self):
         query=request.args.get("q","").strip()
 
-        if query: #Admin is searching in Pro table
+        if query:
             pro_data=Professional.query.join(User).filter((Professional.p_name==query)|(Professional.p_service_type==query)|(Professional.p_exp==query)|(Professional.p_pincode==query)|(User.active==query)).all()
 
             if not pro_data:
@@ -663,7 +728,7 @@ class ProfessionalListAPI(Resource):
             return {"Message":"Professionals do not exist"},404
         
         response=marshal(pro_data_list,pro_fields)
-        cache.set("all_service_pros", response, timeout=300) #upto 5 mins is fine here 
+        cache.set("all_service_pros", response, timeout=300)
         return response,200
 
 
@@ -720,7 +785,7 @@ class UserAPI(Resource):
                 user_data.active = True
                 db.session.commit()
                 cache.delete("all_users")
-                cache.delete("all_service_pros") #might need to add a check but its okay tho
+                cache.delete("all_service_pros")
                 cache.delete("all_customers")
                 return "",204
             
@@ -786,7 +851,7 @@ class UserListAPI(Resource):
         if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can access user details"},403
 
-        if query: #Admin is searching in customer table
+        if query:
             user_data=User.query.filter((User.email==query)|(User.roles[0].name==query)|(User.active==query)).all()
 
             if not user_data:
@@ -804,7 +869,7 @@ class UserListAPI(Resource):
             return {"Message" : "User data not found"},404
 
         response=marshal(user_data,user_fields)
-        cache.set("all_users", response, timeout=300) #upto 5 mins is fine here 
+        cache.set("all_users", response, timeout=300)
         return response,200
         
 

@@ -2,7 +2,7 @@ export default{
     template:`
     <div>
         <nav class="navbar navbar-expand-lg col-md-12" style="background-color: lightcyan; font-size: 25px; padding: 15px;">
-            <div class="container-fluid d-flex justify-content-center">
+            <div class="container-fluid">
                 <div class="navbar-nav text-center">
                     <router-link v-if="!$store.state.LoggedIn" to='/' class="nav-link  mx-2">Home</router-link>
                     <router-link v-if="!$store.state.LoggedIn" to='/login' class="nav-link  mx-2">Login</router-link>

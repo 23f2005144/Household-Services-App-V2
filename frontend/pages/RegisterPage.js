@@ -51,7 +51,7 @@ export default{
         <div v-else-if="role==='Professional'">
             <div>
                 <h1 class="Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</h1>
-                <hr style="border:9px dashed lightseagreen;">
+                <hr style="border:6px dashed lightseagreen;">
                 <p class="Subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p>
             </div>
             <div class="container" id="Register-Pro">

@@ -52,7 +52,7 @@ export default{
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header" >
-                        <h1 class="modal-title fs-5">New Professional Details</h1>
+                        <h1 class="modal-title fs-5">Professional Details</h1>
                         <button type="button" class="btn-close" @click="pro_details_close" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -133,12 +133,19 @@ export default{
                                             {{service_req_detail_record.pro_id}}
                                         </div>
                                         <div v-else>
-                                            <p>Null</p>
+                                            <p>Not yet assigned</p>
                                         </div>
                                     </td>
                                     <td>{{service_req_detail_record.serv_request_datetime}}</td>
                                     <td>{{service_req_detail_record.serv_close_datetime}}</td>
-                                    <td>{{service_req_detail_record.serv_remarks}}</td>
+                                    <td>
+                                        <div v-if="service_req_detail_record.serv_remarks">
+                                            {{service_req_detail_record.serv_remarks}}
+                                        </div>
+                                        <div v-else>
+                                            <p>Null</p>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div v-if="service_req_detail_record.serv_rating">
                                             {{service_req_detail_record.serv_rating}}
@@ -251,8 +258,8 @@ export default{
             }
         },
 
-        async serv_deleted(service_id){
-            this.services = this.services.filter(service => service.serv_id !== service_id)
+        async serv_deleted(){
+            await this.ServiceDataFetch()
             await this.ServiceReqsDataFetch()
         },
         serv_details_show(service_id){
@@ -261,17 +268,14 @@ export default{
         serv_details_close(){
             this.service_detail_record=null
         },
-        serv_update(service_update_obj){
-            const index = this.services.findIndex(service => service.serv_id === service_update_obj.serv_id);
-            if (index !== -1) {
-                this.$set(this.services, index, service_update_obj);
-            }
+        async serv_update(){
+            await this.ServiceDataFetch()
         },
-        pro_approved(p_id){
-            this.new_pro_data=this.new_pro_data.filter(pro => pro.p_id !== p_id)
+        async pro_approved(){
+            await this.NewProDataFetch()
         },
-        pro_rejected(p_id){
-            this.new_pro_data=this.new_pro_data.filter(pro => pro.p_id !== p_id)
+        async pro_rejected(){
+            await this.NewProDataFetch()
         },
         async pro_details_show(p_id){
             try{

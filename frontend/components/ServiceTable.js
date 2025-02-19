@@ -229,7 +229,7 @@ export default{
                     }
                 })
                 if (res.ok){
-                    this.$emit('Service_Deleted',service_id)
+                    this.$emit('Service_Deleted')
                     console.log("Service Deleted Successfully")
                     alert("Service Deleted Successfully")
                 }else{
@@ -256,7 +256,7 @@ export default{
                     console.log("Service updated successfully")
                     this.service_update_form=false
                     this.service_table=true
-                    this.$emit('Service_Updated',this.service_update_obj)
+                    this.$emit('Service_Updated')
                     this.$emit('ServiceForm')
                 }else{
                     const {Message} = await res.json()

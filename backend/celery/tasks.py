@@ -172,11 +172,13 @@ def send_service_reminders():
                     <hr style="border: 0.5px solid #ddd; margin: 20px 0;">
 
                     <p style="text-align: center; font-size: 14px; color: #777;">
-                        You are receiving this email because you are a service professional at <strong>Abode Mantra</strong>. <br>
+                        You are receiving this email because you are a service professional at <strong>Abode Mantra</strong>.
+                        For any queries or concerns kindly contact support at support@abodemantra.in <br>
                     </p>
                     <p style="text-align: center; font-size: 14px;><strong>Abode Mantra: Your A-Z Cleaning Experts</strong></p>
                 </div>
             """)
+        return f"Sent Service Reminders to {len(service_pros)} Service Professionals via email"
 
 
 @shared_task(ignore_result=True)
@@ -197,7 +199,8 @@ def send_monthly_reports():
             <li>Most Booked Services</li>
         </ul>
         <p>Thank you for using Abode Mantra!</p>
-        <p>Best Regards, <br>Abode Mantra Team</p>
+        <p>Best Regards, <br>Abode Mantra Team
+        For any queries or concerns kindly contact support at support@abodemantra.in</p>
         <p style="font-size: 14px;"><strong>Abode Mantra: Your A-Z Cleaning Experts</strong></p>
         """
         send_email(c.c.email, subject, body, pdf_buffer, "Monthly_Report.pdf")
@@ -236,7 +239,8 @@ def update_expired_serv_requests():
             </a>
         </p>
         <p>For any concerns, please reach out to us.</p>
-        <p>Best Regards, <br>Abode Mantra Team</p>
+        <p>Best Regards, <br>Abode Mantra Team
+        For any queries or concerns kindly contact support at support@abodemantra.in</p>
         <p style="font-size: 14px;"><strong>Abode Mantra: Your A-Z Cleaning Experts</strong></p>
         """
 

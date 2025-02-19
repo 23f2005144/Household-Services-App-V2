@@ -54,9 +54,6 @@ export default{
         }
         this.style = document.createElement('style')
         this.style.innerHTML=`
-            table{
-                font-size: 18px;
-            }
             body{
                 background-color: lightgoldenrodyellow;  
             }`

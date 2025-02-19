@@ -129,7 +129,7 @@ export default{
         this.style = document.createElement('style')
         this.style.innerHTML=`
             table{
-                font-size: 18px;
+                font-size: 16px;
             }
             body{
                 background-color: lightgoldenrodyellow;  

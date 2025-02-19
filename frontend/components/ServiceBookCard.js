@@ -17,7 +17,7 @@ export default{
         this.style = document.createElement('style')
         this.style.innerHTML=`
             table{
-                font-size: 18px;
+                font-size: 16px;
             }
             body{
                 background-color: lightgoldenrodyellow;  
@@ -51,7 +51,7 @@ export default{
                 const res = await fetch(`${location.origin}/api/service?${QueryParams}`)
                 if(res.ok){
                     const data = await res.json()
-                    this.service_data=data.Service_Types //since it is a list
+                    this.service_data=data.Service_Types
                 }else{
                     const {Message} = await res.json()
                     throw new Error(Message)

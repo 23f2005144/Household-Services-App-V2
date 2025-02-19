@@ -57,7 +57,7 @@ export default{
                     body:JSON.stringify({"user_status":this.new_pro_obj.p_status})
                 })
                 if(res.ok){
-                    this.$emit('Pro_Approved',p_id)
+                    this.$emit('Pro_Approved')
                     alert("Professional Approved Successfully")
                     console.log("Professional Approved Successfully")
                     this.new_pro_obj=null
@@ -80,7 +80,7 @@ export default{
                     }
                 })
                 if (res.ok){
-                    this.$emit('Pro_Rejected',p_id)
+                    this.$emit('Pro_Rejected')
                     console.log('Professional Rejected Successfully')
                     alert("Professional Rejected Successfully")
                     this.new_pro_obj=null
