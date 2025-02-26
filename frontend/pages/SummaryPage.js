@@ -53,7 +53,7 @@ export default{
             await this.ProSummaryDataFetch()
         }
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             body{
                 background-color: lightgoldenrodyellow;  
             }`
@@ -104,9 +104,9 @@ export default{
                     for (let i = 0; i < data.length; i++) {
                         const sr=data[i]
 
-                        if (sr.serv_status === "Accepted") accepted++
-                        else if (sr.serv_status === "Closed") closed++
-                        else if (sr.serv_status === "Cancelled") cancelled++
+                        if (sr.serv_status ==="Accepted") accepted++
+                        else if (sr.serv_status ==="Closed") closed++
+                        else if (sr.serv_status ==="Cancelled") cancelled++
 
                         if (sr.pro_rating === 1) rating1++;
                         else if (sr.pro_rating === 2) rating2++
@@ -193,10 +193,10 @@ export default{
                     for (let i = 0; i < data.length; i++) {
                         const sr=data[i]
 
-                        if (sr.serv_status === "Requested") requested++
-                        else if (sr.serv_status === "Accepted") accepted++
-                        else if (sr.serv_status === "Closed") closed++
-                        else if (sr.serv_status === "Cancelled") cancelled++
+                        if (sr.serv_status ==="Requested") requested++
+                        else if (sr.serv_status ==="Accepted") accepted++
+                        else if (sr.serv_status ==="Closed") closed++
+                        else if (sr.serv_status ==="Cancelled") cancelled++
 
                         if (sr.serv_rating === 1) rating1++;
                         else if (sr.serv_rating === 2) rating2++

@@ -2,7 +2,7 @@ from celery import shared_task
 from backend.models import ServiceRequest,db
 import flask_excel
 from backend.celery.mail_service import send_email
-from backend.models import User,ServiceRequest,Customer
+from backend.models import User,ServiceRequest,Customer,Professional
 from datetime import datetime,timedelta
 from flask import render_template_string
 from weasyprint import HTML
@@ -109,7 +109,7 @@ def generate_monthly_report(customer):
     pdf_report=HTML(string=html_content).write_pdf()
     return pdf_report
 
-@shared_task(bind=True, ignore_result=False) #will store the filename instead
+@shared_task(bind=True, ignore_result=False)
 def create_csv(self):
     resource=ServiceRequest.query.filter(ServiceRequest.serv_status=='Closed').all()
     if not resource:
@@ -128,20 +128,20 @@ def create_csv(self):
 
 @shared_task(ignore_result=True)
 def email_reminder(to,subject,content):
-    send_email(to,subject,content) #simply calls it
+    send_email(to,subject,content)
 
 
 @shared_task(ignore_result=True)
 def send_service_reminders():
     now = datetime.now()
-    service_requests=ServiceRequest.query.filter((ServiceRequest.serv_status=='Requested')&(ServiceRequest.serv_request_datetime>now)).all()
+    service_requests=ServiceRequest.query.filter((ServiceRequest.serv_status=='Requested')&(ServiceRequest.serv_request_datetime>=now)).all()
 
     for req in service_requests:
         serv_pincode=req.customer.c_pincode
         serv_type=req.service.serv_type
         serv_name=req.service.serv_name
         serv_price=req.service.serv_price
-        service_pros=User.query.filter(User.roles.any(name="Professional"),User.active == True,User.p_user.any(p_service_type=serv_type, p_pincode=serv_pincode)).all()
+        service_pros= Professional.query.join(User).filter((Professional.p_service_type==serv_type)&(Professional.p_pincode==serv_pincode) &(User.active==True)&~ServiceRequest.query.filter((ServiceRequest.pro_id == Professional.p_id)&(ServiceRequest.serv_status=="Accepted")).exists()).all()
         for pro in service_pros:
             email_reminder.delay(
                 pro.email,
@@ -157,7 +157,7 @@ def send_service_reminders():
                         <p><strong>🔹 Service Type:</strong> {serv_type}</p>
                         <p><strong>🔹 Service Name:</strong> {serv_name}</p>
                         <p><strong>📍 Location:</strong> {serv_pincode}</p>
-                        <p><strong>⏰ Scheduled Time:</strong> {req.serv_request_datetime}</p>
+                        <p><strong>⏰ Scheduled Date & Time:</strong> {req.serv_request_datetime}</p>
                         <p><strong>💰 Price:</strong> ₹{serv_price}</p>
                     </div>
 
@@ -173,7 +173,7 @@ def send_service_reminders():
 
                     <p style="text-align: center; font-size: 14px; color: #777;">
                         You are receiving this email because you are a service professional at <strong>Abode Mantra</strong>.
-                        For any queries or concerns kindly contact support at support@abodemantra.in <br>
+                        For any queries or concerns kindly contact support at support@abodemantra.in<br>
                     </p>
                     <p style="text-align: center; font-size: 14px;><strong>Abode Mantra: Your A-Z Cleaning Experts</strong></p>
                 </div>

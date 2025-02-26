@@ -12,7 +12,7 @@ export default{
                     <ProfileForm :pro_profile_data="profile_data" @HideProProfile="HideProfile"/>
                 </div>
             </div>
-            <div class="row" v-if="service_req_acc_data">           
+            <div class="row" v-if="service_req_acc_data && !show_profile">           
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Accepted Service</p>
                 <table class="table table-hover table-bordered border-primary">
                     <thead>
@@ -37,7 +37,7 @@ export default{
                     </tbody>
                 </table>
             </div>
-            <div class="row" v-if="new_service_reqs_pro_data">
+            <div class="row" v-show="new_service_reqs_pro_data && !show_profile">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service Requests</p>
                 <table class="table table-hover table-bordered border-primary">
                     <thead>
@@ -47,7 +47,7 @@ export default{
                             <th>Service Price</th>
                             <th>Customer Name</th>
                             <th>Service Location</th>
-                            <th>DateTime_of_Request</th>
+                            <th>Request Date & Time</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -68,7 +68,7 @@ export default{
                     </tbody>
                 </table>
             </div>
-            <div class="row">
+            <div class="row" v-show="!show_profile">
                 <ServiceReqTable :service_reqs_data='service_reqs_data' @Serv_Req_Details_Pro="serv_req_details_pro_show"/>
             </div>
             <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
@@ -89,8 +89,8 @@ export default{
                                     <th>Customer Name</th>
                                     <th>Customer Contact Number</th>
                                     <th>Service Location</th>
-                                    <th>DateTime_of_Request</th>
-                                    <th>DateTime_of_Completion</th>
+                                    <th>Request Date & Time</th>
+                                    <th>Completion Date & Time</th>
                                     <th>Service Status</th>
                                     <th>Service Remarks</th>
                                     <th>Service Rating</th>
@@ -127,7 +127,7 @@ export default{
         await this.ServiceReqsDataFetch()
         await this.ServiceReqsProDataFetch()
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             table{
                 font-size: 16px;
             }
@@ -150,8 +150,6 @@ export default{
             new_service_reqs_pro_data:[],
             service_req_detail_record:null,
             profile_data:[]
-
-
         }
     },
     methods:{

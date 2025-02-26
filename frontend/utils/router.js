@@ -17,7 +17,7 @@ const routes=[
     {path:'/register/:role', component:RegisterPage },
     {path:'/admin/home', component:AdminHomePage, meta:{RequiresLogin:true, role:'Admin'}},
     {path:'/admin/search', component:AdminSearchPage, meta:{RequiresLogin:true, role:'Admin'}, props:route=>({query:route.query.q || "", table: route.query.table || "" })},
-    {path:'/admin/summary', component:SummaryPage, meta:{RequiresLogin:true, role:'Admin'}},//using same summary pages across three roles
+    {path:'/admin/summary', component:SummaryPage, meta:{RequiresLogin:true, role:'Admin'}},
     {path:'/customer/home/:user_id', name:'CustomerHome', component:CustomerHomePage, meta:{RequiresLogin:true, role:'Customer'}},
     {path:'/customer/:user_id/search', name:'CustomerSearch', component:CustomerSearchPage, meta:{RequiresLogin:true, role:'Customer'}, props:route=>({query:route.query.q || "", table: route.query.table || "" })},
     {path:'/customer/summary/:user_id', name:'CustomerSummary', component:SummaryPage, meta:{RequiresLogin:true, role:'Customer'}},
@@ -32,13 +32,15 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next)=>{
-    if(to.matched.some((record)=> record.meta.RequiresLogin)){//array of objects of routes check it once later
+    if(to.matched.some((record)=> record.meta.RequiresLogin)){
         if(!store.state.LoggedIn){
             next({path:"/login"})
         } else if(to.meta.role && to.meta.role!=store.state.role && store.state.role==="Customer"){
             next({path:`/customer/home/${store.state.user_id}`})
         }else if(to.meta.role && to.meta.role!=store.state.role && store.state.role==="Professional"){
             next({path:`/pro/home/${store.state.user_id}`})
+        }else if(to.meta.role && to.meta.role!=store.state.role && store.state.role==="Admin"){
+            next({path:`/admin/home`})
         }else{
             next();
         }

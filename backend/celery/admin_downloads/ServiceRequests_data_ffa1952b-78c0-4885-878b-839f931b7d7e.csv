@@ -1,2 +1,0 @@
-serv_req_id,serv_id,cust_id,pro_id,serv_request_datetime,serv_close_datetime,serv_status,serv_remarks,serv_rating,pro_rating
-4,1,1,1,2025-02-15T18:00:00,,Closed,"Awesome job, on time",4,4

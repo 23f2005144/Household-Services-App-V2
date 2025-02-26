@@ -65,12 +65,12 @@ export default{
                                     <th>ID</th>
                                     <th>Service Type</th>
                                     <th>Service Name</th>
-                                    <th>Service Price (₹)</th>
-                                    <th>Customer Name (Location)</th>
-                                    <th>Professional Name (Contact Number)</th>
-                                    <th>Professional Experience (yrs) (Average Rating)</th>
-                                    <th>DateTime_of_Request</th>
-                                    <th>DateTime_of_Completion</th>
+                                    <th>Service Price(₹)</th>
+                                    <th>Customer Name | Location</th>
+                                    <th>Professional Name | Professional Experience(yrs)</th>
+                                    <th>Professional Average Rating</th>
+                                    <th>Request Date & Time</th>
+                                    <th>Completion Date & Time</th>
                                     <th>Service Status</th>
                                     <th>Service Remarks</th>
                                     <th>Service Rating</th>
@@ -83,15 +83,50 @@ export default{
                                     <td>{{sr.serv_type}}</td>
                                     <td>{{sr.serv_name}}</td>
                                     <td>{{sr.serv_price}}</td>
-                                    <td>{{sr.cust_name}}  ({{sr.cust_pincode}})</td>
-                                    <td>{{sr.pro_name}}  ({{sr.pro_contact_no}})</td>
-                                    <td>{{sr.pro_exp}}  ({{sr.pro_avg_rating}})</td>
+                                    <td>{{sr.cust_name}} | {{sr.cust_pincode}}</td>
+                                    <td>
+                                        <div v-if="sr.pro_name">
+                                            {{sr.pro_name}} | {{sr.pro_exp}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A | N/A</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="sr.pro_avg_rating">
+                                            {{sr.pro_avg_rating}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A</p>
+                                        </div>
+                                    </td>
                                     <td>{{sr.serv_request_datetime}}</td> 
                                     <td>{{sr.serv_close_datetime}}</td> 
                                     <td>{{sr.serv_status}}</td>
-                                    <td>{{sr.serv_remarks}}</td>
-                                    <td>{{sr.serv_rating}}</td>
-                                    <td>{{sr.pro_rating}}</td>
+                                    <td>
+                                        <div v-if="sr.serv_remarks">
+                                            {{sr.serv_remarks}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="sr.serv_rating">
+                                            {{sr.serv_rating}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="sr.pro_rating">
+                                            {{sr.pro_rating}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A</p>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -210,7 +245,7 @@ export default{
     `,
     async mounted(){
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             table{
                 font-size: 16px;
             }
@@ -236,11 +271,11 @@ export default{
     watch:{
         search_table(newVal,oldVal) {
             if (newVal!==oldVal) {
-                this.table_data = null //helps so that service table data is not shown during selecting servicereq table and vis-a-vis
+                this.table_data = null
             }
         }
     },
-    methods:{//still need to check this.
+    methods:{
         async AdminSearchData(){
             try{
                 this.table_data=null
@@ -293,7 +328,7 @@ export default{
                 })
                 this.$router.push({ query:{ t:this.search_table, q:this.search_query || undefined }}).catch(err => {
                     if (err.name !== 'NavigationDuplicated') {
-                        throw err;
+                        throw err
                     }
                 })
                 

@@ -27,7 +27,7 @@ export default{
                 </div>
                 <div class="row fs-5">
                     <div class="my-3 col-md-4">
-                        <label for="name" class="form-label">DateTime_of_Request</label>
+                        <label for="name" class="form-label">Request Date & Time</label>
                         <input type="text" class="form-control" id="service_dor" name="service_dor" v-model="serv_req_close_data.serv_request_datetime" disabled>
                     </div>
                     <div class="my-3 col-md-4">
@@ -63,8 +63,8 @@ export default{
                     <div class="fs-4 text-center col-md-6" style="margin: auto;">
                         <label for="service_desc" class="form-label">Service Review (if any)</label>
                         <input type="text" class="form-control p-4" id="service_rev" name="service_rev" v-model="serv_req_close_data.serv_remarks"><br>
-                        <button type="submit" class="btn btn-lg btn-success p-3 col-md-4" id="btn-submit">Close Service</button>
-                        <button type="button" class="btn btn-lg btn-danger p-3 col-md-4" @click="$emit('Serv_Req_Closed')">Go back</button>
+                        <button type="submit" class="btn btn-lg btn-success p-2 col-md-4" id="btn-submit">Close Service</button>
+                        <button type="button" class="btn btn-lg btn-danger p-2 col-md-4" @click="$emit('Serv_Req_Closed')">Go back</button>
                     </div>
                 </div><br>
             </form>
@@ -73,7 +73,7 @@ export default{
     `,
     async mounted(){
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             #remark-form{
                 border: 10px solid lightseagreen;
             }

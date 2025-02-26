@@ -33,8 +33,8 @@ export default{
                             <th>Service Name</th>
                             <th>Service Price (₹)</th>
                             <th>Service Duration (hrs)</th>
-                            <th>DateTime_of_Request</th>
-                            <th>DateTime_of_Completion</th>
+                            <th>Request Date & Time</th>
+                            <th>Completion Date & Time</th>
                             <th>Service Status</th>
                             <th>Service Remarks</th>
                             <th>Service Rating</th>
@@ -64,7 +64,7 @@ export default{
     `,
     async mounted(){
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             table{
                 font-size: 16px;
             }

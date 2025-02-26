@@ -5,14 +5,14 @@ export default{
     template:`
     <div>
         <div class="container">
-            <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">New Professionals</p>
-            <table class="table table-bordered">
+            <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">New Service Professionals</p>
+            <table class="table table-hover table-bordered border-primary">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Experience(Yrs)</th>
+                        <th>Experience(yrs)</th>
                         <th>Service Type</th>
                         <th>Action</th>
                     </tr>

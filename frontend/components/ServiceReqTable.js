@@ -7,21 +7,21 @@ export default{
         <div class="container">
             <div v-if="$store.state.role==='Admin'">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Service Requests</p>
-                <table class="table table-bordered">
+                <table class="table table-hover table-bordered border-primary">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Service ID </th>
                             <th>Service Name</th>
-                            <th>Pro ID</th>
-                            <th>Pro Name</th>
-                            <th>DateTime_of_Request</th>
-                            <th>Status</th>
+                            <th>Professional ID</th>
+                            <th>Professional Name</th>
+                            <th>Request Date & Time</th>
+                            <th>Service Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="sreq in service_reqs_data" :key="sreq.serv_req_id">
-                            <td><button type="button" class="btn btn-secondary" @click="$emit('Serv_Req_Details',sreq.serv_req_id)">{{sreq.serv_req_id}}</button></td>
+                            <td><button type="button" class="btn btn-dark" @click="$emit('Serv_Req_Details',sreq.serv_req_id)">{{sreq.serv_req_id}}</button></td>
                             <td><button type="button" class="btn btn-warning" @click="$emit('Serv_Details',sreq.serv_id)">{{sreq.serv_id}}</button></td>
                             <td>{{sreq.serv_name}}</td>
                             <td>
@@ -53,12 +53,12 @@ export default{
                         <tr>
                             <th>ID</th>
                             <th>Service Name</th>
-                            <th>Service Price ₹</th>
+                            <th>Service Price (₹)</th>
                             <th>Service Duration (hrs)</th>
                             <th>Assigned Professional</th>
                             <th>Contact Number</th>
-                            <th>DateTime_of_Request</th>
-                            <th>Status</th>
+                            <th>Request Date & Time</th>
+                            <th>Service Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -73,7 +73,7 @@ export default{
                                     <button type="button" class="btn btn-info" @click="$emit('Pro_Details',sreq.pro_id)">{{sreq.pro_name}}</button>
                                 </div>
                                 <div v-else>
-                                    <p> Not yet assigned</p>
+                                    <p>N/A</p>
                                 </div>
                             </td>
                             <td>
@@ -81,7 +81,7 @@ export default{
                                     {{sreq.pro_contact_no}}
                                 </div>
                                 <div v-else>
-                                    <p> Not yet assigned</p>
+                                    <p>N/A</p>
                                 </div>
                             </td>
                             <td>{{sreq.serv_request_datetime}}</td>
@@ -116,7 +116,7 @@ export default{
                                 <th>Service Name</th>
                                 <th>Customer Name</th>
                                 <th>Service Location</th>
-                                <th>DateTime_of_Completion</th>
+                                <th>Completion Date & Time</th>
                                 <th>Service Status</th>
                                 <th>Service Remarks</th>
                                 <th>Service Rating</th>

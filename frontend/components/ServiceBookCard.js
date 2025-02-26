@@ -15,7 +15,7 @@ export default{
     async mounted(){
         await this.ServiceDataFetch()
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             table{
                 font-size: 16px;
             }

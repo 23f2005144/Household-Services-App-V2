@@ -7,7 +7,7 @@ export default{
         <div class="container">
             <div v-if="service_table">
                 <p class="mb-0" style="color:teal; font-size:35px; font-weight:bold;">Services</p>
-                <table class="table table-bordered">
+                <table class="table table-hover table-bordered border-primary">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -137,7 +137,7 @@ export default{
     `,
     mounted(){
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             #ServiceCreateForm {
                 text-align: center;
                 background-color: lightgoldenrodyellow;
@@ -253,7 +253,7 @@ export default{
                 if(res.ok){
                     const data=await res.json()
                     alert(data.Message)
-                    console.log("Service updated successfully")
+                    console.log("Service Updated successfully")
                     this.service_update_form=false
                     this.service_table=true
                     this.$emit('Service_Updated')
@@ -263,7 +263,13 @@ export default{
                     throw new Error(Message)
                 }
             }catch(error){
+                alert(error.message)
                 console.log(error.message)
+                this.service_update_form=false
+                this.service_table=true
+                this.service_update_id=null
+                this.service_update_obj=null
+                this.$emit('Service_Updated')
                 this.$emit('ServiceForm')
             }
 
@@ -282,22 +288,33 @@ export default{
                     const data= await res.json()
                     alert(data.Message)
                     console.log("Service Created Successfully")
-                    this.service_create_form=false;
-                    this.service_table=true;
-                    this.$emit("Service_Created")
-                    this.$emit('ServiceForm')
+                    this.service_create_form=false
+                    this.service_table=true
                     this.new_service_type=null
                     this.new_service_name=null
                     this.new_service_price=null
                     this.new_service_duration=null
                     this.new_service_desc=null
+                    this.$emit("Service_Created")
+                    this.$emit('ServiceForm')
+                    
                 }else{
                     const {Message} = await res.json()
                     throw new Error(Message)
                 }
             }catch(error){
+                alert(error.message)
                 console.log(error.message)
+                this.service_create_form=false
+                this.service_table=true
+                this.new_service_type=null
+                this.new_service_name=null
+                this.new_service_price=null
+                this.new_service_duration=null
+                this.new_service_desc=null
                 this.$emit('ServiceForm')
+                this.$emit("Service_Created")
+                
             }
         }
         

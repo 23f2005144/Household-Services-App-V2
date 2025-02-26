@@ -17,7 +17,7 @@ def create_app():
     app.security=Security(app,datastore,register_blueprint=False)
     app.app_context().push()
 
-    from backend.resources import api #so that api can now use cache
+    from backend.resources import api
     api.init_app(app)
 
     return app
@@ -32,8 +32,6 @@ import backend.celery.celery_schedule
 import backend.initial_data
 import backend.routes
 excel.init_excel(app)
-
-
 
 if __name__=="__main__":
     app.run()

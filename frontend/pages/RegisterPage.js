@@ -6,6 +6,8 @@ export default{
                 <p class="Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</p>
                 <hr style="border:6px dashed lightseagreen;">
                 <p class="Subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p>
+                <img class="img-fluid rounded float-end" style="height: 440px; width: 440px;" src="/static/bucket-303265_640-copywritefreefromPixabay.png">
+                <img class="img-fluid rounded float-start" style="height: 440px; width: 440px;" src="/static/cleaning-up-294085_1920-copywritefreefromPixabay.png">
             </div>
             <div class="container" id="Register-Cust">
                 <form @submit.prevent="RegisterCustomer">
@@ -36,13 +38,14 @@ export default{
                             <input type="text" class="form-control" name="address" v-model="c_address" required>
                         </div>
                         <div class="mb-4 col-md-4">
-                            <label for="inputZip" class="form-label">Pincode</label>
+                            <label for="inputZip" class="form-label">Pin Code</label>
                             <input type="text" class="form-control" name="pincode" v-model="c_pincode" required>
                         </div>
                     </div>
                     <div class="row-6">
                         <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-lg p-2 col-md-2">Register</button> 
+                            <button type="submit" class="btn btn-success btn-lg p-2 col-md-2">Register</button>
+                            <button type="reset" class="btn btn-lg btn-danger p-2 col-md-2">Clear</button>
                         </div>
                     </div>
                 </form>
@@ -53,6 +56,8 @@ export default{
                 <h1 class="Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</h1>
                 <hr style="border:6px dashed lightseagreen;">
                 <p class="Subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p>
+                <img class="img-fluid rounded float-end" style="height: 440px; width: 440px;" src="/static/bucket-303265_640-copywritefreefromPixabay.png">
+                <img class="img-fluid rounded float-start" style="height: 440px; width: 440px;" src="/static/cleaning-up-294085_1920-copywritefreefromPixabay.png">
             </div>
             <div class="container" id="Register-Pro">
                 <form @submit.prevent="RegisterPro">
@@ -97,13 +102,14 @@ export default{
                             <input class="form-control" type="text" id="File" v-model="pro_resume" name="File">
                         </div>
                         <div class="mb-3 col-md-3">
-                            <label for="inputZip" class="form-label">Serviceable Pincode</label>
+                            <label for="inputZip" class="form-label">Serviceable Pin Code</label>
                             <input type="text" class="form-control" id="inputZip" v-model="pro_pincode" name="pincode" required>  
                         </div>
                     </div>
                     <div class="row-6">
                         <div class="text-center">
                             <button type="submit" class="btn btn-warning btn-lg p-2 col-md-2">Register</button>
+                            <button type="reset" class="btn btn-lg btn-danger p-2 col-md-2">Clear</button>
                         </div>
                     </div>
                 </form>
@@ -114,7 +120,7 @@ export default{
     `,
     mounted(){
         this.style=document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             .Title{
                 background-color:lightgoldenrodyellow;
                 font-style: italic;
@@ -205,9 +211,12 @@ export default{
                     body: JSON.stringify({'email': this.c_email,'password': this.c_password,'role':this.role})
                 })
                 if (c_res.ok){
-                    console.log('Successfully registered Customer')
                     const data = await c_res.json()
-                    console.log(data)
+                    console.log('Successfully registered Customer',"User ID is",data.user_id)
+                }
+                else{
+                    const {Message} = await c_res.json()
+                    throw new Error(Message)
                 }
                 const c_response = await fetch(location.origin+'/api/register',
                     {
@@ -222,10 +231,11 @@ export default{
                     this.$router.push('/login')
                     alert("Registered Successfully, Login now!")
                 }else{
-                    const {Message} = await res.json()
+                    const {Message} = await c_response.json()
                     throw new Error(Message)
                 }
             }catch(error){
+                alert(error.message)
                 console.log(error.message)
             }
         },
@@ -239,9 +249,13 @@ export default{
                     body: JSON.stringify({'email': this.pro_email,'password': this.pro_password,'role':this.role})
                 })
                 if (p_res.ok){
-                    console.log('Successfully Registered Professional')
                     const data = await p_res.json()
-                    console.log(data)
+                    console.log('Successfully registered Professional',"User ID is",data.user_id)
+                }
+                else{
+                    const {Message} = await p_res.json()
+                    throw new Error(Message)
+                    
                 }
                 const p_response = await fetch(location.origin+'/api/register',
                     {
@@ -256,10 +270,11 @@ export default{
                     this.$router.push('/login')
                     alert("Registered Successfully, Login once approved by Admin")
                 }else{
-                    const {Message} = await res.json()
+                    const {Message} = await p_response.json()
                     throw new Error(Message)
                 }
             }catch(error){
+                alert(error.message)
                 console.log(error.message)
             }
         }

@@ -39,15 +39,14 @@ export default{
                                         <th>Service Name</th>
                                         <th>Service Price ₹</th>
                                         <th>Service Duration (hrs)</th>
-                                        <th>Assigned Professional</th>
-                                        <th>Contact Number</th>
-                                        <th>Experience (yrs)</th>
-                                        <th>DateTime_of_Request</th>
-                                        <th>DateTime_of_Completion</th>
+                                        <th>Assigned Professional | Contact Number</th>
+                                        <th>Professional Experience (yrs)</th>
+                                        <th>Request Date & Time</th>
+                                        <th>Completion Date & Time</th>
                                         <th>Service Status</th>
                                         <th>Service Remarks</th>
                                         <th>Service Rating</th>
-                                        <th>Pro Rating</th>
+                                        <th>Professional Rating</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -59,18 +58,10 @@ export default{
                                         <td>{{service_req_detail_record.serv_duration}}</td>
                                         <td>
                                             <div v-if="service_req_detail_record.pro_name">
-                                                {{service_req_detail_record.pro_name}}
+                                                {{service_req_detail_record.pro_name}} | {{service_req_detail_record.pro_contact_no}}
                                             </div>
                                             <div v-else>
-                                                <p>Not yet assigned</p>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div v-if="service_req_detail_record.pro_contact_no">
-                                                {{service_req_detail_record.pro_contact_no}}
-                                            </div>
-                                            <div v-else>
-                                                <p>Not yet assigned</p>
+                                                <p>N/A | N/A</p>
                                             </div>
                                         </td>
                                         <td>
@@ -78,7 +69,7 @@ export default{
                                                 {{service_req_detail_record.pro_exp}}
                                             </div>
                                             <div v-else>
-                                                <p>Not yet assigned</p>
+                                                <p>N/A</p>
                                             </div>
                                         </td>
                                         <td>{{service_req_detail_record.serv_request_datetime}}</td>
@@ -89,7 +80,7 @@ export default{
                                                 {{service_req_detail_record.serv_remarks}}
                                             </div>
                                             <div v-else>
-                                                <p>Null</p>
+                                                <p>N/A</p>
                                             </div>
                                         </td>
                                         <td>
@@ -97,7 +88,7 @@ export default{
                                                 {{service_req_detail_record.serv_rating}}
                                             </div>
                                             <div v-else>
-                                                <p>Null</p>
+                                                <p>N/A</p>
                                             </div>
                                         </td>
                                         <td>
@@ -105,7 +96,7 @@ export default{
                                                 {{service_req_detail_record.pro_rating}}
                                             </div>
                                             <div v-else>
-                                                <p>Null</p>
+                                                <p>N/A</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -117,7 +108,7 @@ export default{
                 </div>
             </div>
             <div v-if="pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
-                <div class="modal-dialog modal-xl">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h1 class="modal-title fs-5">Service Professional Profile</h1>
@@ -125,7 +116,7 @@ export default{
                         </div>
                         <div class="modal-body text-center">
                             <div class="mb-3">
-                                <i class="bi bi-person-circle" style="font-size: 120px; color: gray;"></i>
+                                <i class="bi bi-person-circle" style="font-size: 100px; color: gray;"></i>
                             </div>
                             <table class="table table-striped">
                                 <tbody>
@@ -146,7 +137,7 @@ export default{
                                         <td>{{pro_detail_record.p_pincode}}</td>
                                     </tr>
                                     <tr>
-                                        <th><i class="bi bi-tools"></i> Service Type:</th>
+                                        <th><i class="bi bi-tools"></i> Service Expertise:</th>
                                         <td>{{pro_detail_record.p_service_type}}</td>
                                     </tr>
                                     <tr>
@@ -154,7 +145,7 @@ export default{
                                         <td>{{pro_detail_record.p_exp}} Years</td>
                                     </tr>
                                     <tr>
-                                        <th><i class="bi bi-star"></i> Avg. Rating:</th>
+                                        <th><i class="bi bi-star"></i> Average Rating:</th>
                                         <td>{{pro_detail_record.p_avg_rating}}</td>
                                     </tr>
                                 </tbody>
@@ -171,7 +162,7 @@ export default{
     async mounted(){
         await this.ServiceReqsDataFetch()
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             table{
                 font-size: 16px;
             }

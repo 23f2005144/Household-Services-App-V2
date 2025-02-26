@@ -5,6 +5,8 @@ export default{
                 <h1 class="Title display-1 text-center">Abode Mantra:Your A-Z Cleaning Experts</h1>
                 <hr style="border:9px dashed lightseagreen;">
                 <p class="Subtitle text-center">Experience the Comfort and Satisfaction of a Perfectly Maintained Home</p><br>
+                <img class="img-fluid rounded float-end" style="height: 440px; width: 440px;" src="/static/bucket-303265_640-copywritefreefromPixabay.png">
+                <img class="img-fluid rounded float-start" style="height: 440px; width: 440px;" src="/static/cleaning-up-294085_1920-copywritefreefromPixabay.png">
             </div>
             <div class="container" id="login-form">
                 <form @submit.prevent="LoginSubmit">
@@ -18,14 +20,14 @@ export default{
                         <input type="password" class="form-control" v-model="password" id="passwordbox" required>
                     </div>
                     <button type="submit" class="btn btn-success btn-lg p-2 col-md-3" id="btn-login">Login</button>
-                    <button type="reset" class="btn btn-lg btn-secondary p-2 col-md-3">Clear</button>
+                    <button type="reset" class="btn btn-lg btn-danger p-2 col-md-3">Clear</button>
                 </form>
             </div>     
         </div>
     `,
     mounted() {
         this.style=document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             #emailbox{
                 border: 2px solid ;
                 height: 35px;

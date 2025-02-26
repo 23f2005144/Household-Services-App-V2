@@ -4,10 +4,10 @@ import ServiceReqTable from "../components/ServiceReqTable.js"
 export default{
     template:`
     <div>
-        <p class="mb-0 text-center fs-1" style="color:teal;font-weight:bold;">Welcome to Admin Dashboard</p>
+        <p class="mb-0 text-center fs-1" style="color:teal;font-weight:bold;">Welcome to Admin Dashboard</p><br>
         <div class="row">
-            <ServiceTable :services="services" @Service_Deleted="serv_deleted" @Service_Details="serv_details_show" @Service_Updated="serv_update" @Service_Created="ServiceDataFetch" @ServiceForm="ServiceFormVisible"/><br>
-        </div>
+            <ServiceTable :services="services" @Service_Deleted="serv_deleted" @Service_Details="serv_details_show" @Service_Updated="ServiceDataFetch" @Service_Created="ServiceDataFetch" @ServiceForm="ServiceFormVisible"/><br>
+        </div><br>
         <div v-if="service_detail_record" class="modal fade show" id="ServiceModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -47,12 +47,12 @@ export default{
         </div>
         <div class="row" v-show="!serv_form">
             <ProTable :new_pro_data="new_pro_data" @Pro_Approved="pro_approved" @Pro_Details="pro_details_show" @Pro_Rejected="pro_rejected"/>
-        </div>
+        </div><br>
         <div v-if="new_pro_detail_record" class="modal fade show" id="ProModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header" >
-                        <h1 class="modal-title fs-5">Professional Details</h1>
+                        <h1 class="modal-title fs-5">New Service Professional Details</h1>
                         <button type="button" class="btn-close" @click="pro_details_close" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -63,10 +63,10 @@ export default{
                                     <th>UserID</th>
                                     <th>Email</th>
                                     <th>Name</th>
-                                    <th>Contact_No</th>
-                                    <th>Service_Type</th>
+                                    <th>Contact Number</th>
+                                    <th>Service Type</th>
                                     <th>Experience(yrs)</th>
-                                    <th>Serviceable_Pincode</th>
+                                    <th>Serviceable Pincode</th>
                                     <th>Average Rating</th>
                                 </tr>
                             </thead>
@@ -89,11 +89,13 @@ export default{
                 </div>
             </div>
         </div>
-        <div class="row-6 text-end" v-show="!serv_form">
-            <button class="btn btn-lg btn-dark col-2 pt-2 text-center" @click="CreateCSV">+ Get ServiceRequest Data</button>
-        </div>
         <div class="row" v-show="!serv_form">
             <ServiceReqTable :service_reqs_data="service_reqs_data" @Serv_Req_Details="serv_req_details_show" @Serv_Details="serv_details_show" @Pro_Details="pro_details_show" />
+        </div>
+        <div class="container" v-show="!serv_form">
+            <div class="row-6 text-end">
+                <button class="btn btn-lg btn-info col-3 pt-2 text-center" @click="CreateCSV">+ Get ServiceRequest Data</button>
+            </div>
         </div>
         <div v-if="service_req_detail_record" class="modal fade show" id="ServReqModal" style="display: block; background-color: rgba(0, 0, 0, 0.5);" role="dialog">
             <div class="modal-dialog modal-xl" style="max-width: 90%;">
@@ -109,15 +111,14 @@ export default{
                                     <th>ID</th>
                                     <th>Service ID</th>
                                     <th>Customer ID</th>
-                                    <th>Customer Name</th>
-                                    <th>Customer Pincode</th>
+                                    <th>Customer Name | Location</th>
                                     <th>Service Status</th>
-                                    <th>Pro ID</th>
-                                    <th>DateTime_of_Request</th>
-                                    <th>DateTime_of_Completion</th>
+                                    <th>Professional ID</th>
+                                    <th>Request Date & Time</th>
+                                    <th>Completion Date & Time</th>
                                     <th>Service Remarks</th>
                                     <th>Service Rating</th>
-                                    <th>Pro Rating</th>
+                                    <th>Professional Rating</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -125,15 +126,14 @@ export default{
                                     <td>{{service_req_detail_record.serv_req_id}}</td>
                                     <td>{{service_req_detail_record.serv_id}}</td>
                                     <td>{{service_req_detail_record.cust_id}}</td>
-                                    <td>{{service_req_detail_record.cust_name}}</td>
-                                    <td>{{service_req_detail_record.cust_pincode}}</td>
+                                    <td>{{service_req_detail_record.cust_name}} | {{service_req_detail_record.cust_pincode}}</td>
                                     <td>{{service_req_detail_record.serv_status}}</td>
                                     <td>
                                         <div v-if="service_req_detail_record.pro_id">
                                             {{service_req_detail_record.pro_id}}
                                         </div>
                                         <div v-else>
-                                            <p>Not yet assigned</p>
+                                            <p>N/A</p>
                                         </div>
                                     </td>
                                     <td>{{service_req_detail_record.serv_request_datetime}}</td>
@@ -143,7 +143,7 @@ export default{
                                             {{service_req_detail_record.serv_remarks}}
                                         </div>
                                         <div v-else>
-                                            <p>Null</p>
+                                            <p>N/A</p>
                                         </div>
                                     </td>
                                     <td>
@@ -151,7 +151,7 @@ export default{
                                             {{service_req_detail_record.serv_rating}}
                                         </div>
                                         <div v-else>
-                                            <p>Null</p>
+                                            <p>N/A</p>
                                         </div>
                                     </td>
                                     <td>
@@ -159,7 +159,7 @@ export default{
                                             {{service_req_detail_record.pro_rating}}
                                         </div>
                                         <div v-else>
-                                            <p>Null</p>
+                                            <p>N/A</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -177,7 +177,7 @@ export default{
         await this.NewProDataFetch()
         await this.ServiceReqsDataFetch()
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             table{
                 font-size: 18px;
             }
@@ -259,6 +259,7 @@ export default{
         },
 
         async serv_deleted(){
+            this.services=null
             await this.ServiceDataFetch()
             await this.ServiceReqsDataFetch()
         },
@@ -267,9 +268,6 @@ export default{
         },
         serv_details_close(){
             this.service_detail_record=null
-        },
-        async serv_update(){
-            await this.ServiceDataFetch()
         },
         async pro_approved(){
             await this.NewProDataFetch()
@@ -323,18 +321,24 @@ export default{
                     const task_id = (await res.json()).task_id
 
                     const interval = setInterval(async()=>{
+                        try{
                         const res = await fetch(`${location.origin}/get-csv/${task_id}`)
-                        if(res.ok){
-                            console.log("CSV created successfully")
-                            window.open(`${location.origin}/get-csv/${task_id}`)
+                            if(res.ok){
+                                console.log("CSV created successfully")
+                                window.open(`${location.origin}/get-csv/${task_id}`)
+                                clearInterval(interval)
+                            }else if (res.status===405){
+                                console.log("Task not ready yet")
+                            }else{
+                                const { Message } = await res.json()
+                                console.log(Message)
+                                alert(Message)
+                                clearInterval(interval)
+                            }
+                        }catch (error){
+                            console.log(error.message)
+                            alert(error.message)
                             clearInterval(interval)
-                        }else if (res.status===405){
-                            console.log("Task not ready yet")
-                        }else{
-                            clearInterval(interval)
-                            const { Message } = await res.json() 
-                            console.log(Message)
-                            alert(Message)  
                         }
                     }, 100)
                 }else{
@@ -342,6 +346,7 @@ export default{
                     throw new Error(Message)
                 }
             }catch(error){
+                alert(error.message)
                 console.log(error.message)
             }
         }

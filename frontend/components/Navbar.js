@@ -1,9 +1,9 @@
 export default{
     template:`
     <div>
-        <nav class="navbar navbar-expand-lg col-md-12" style="background-color: lightcyan; font-size: 25px; padding: 15px;">
+        <nav class="navbar navbar-expand-lg col-md-12" style="background-color: lightcyan; font-size: 25px; padding: 15px;font-weight: bold;">
             <div class="container-fluid">
-                <div class="navbar-nav text-center">
+                <div class="navbar-nav">
                     <router-link v-if="!$store.state.LoggedIn" to='/' class="nav-link  mx-2">Home</router-link>
                     <router-link v-if="!$store.state.LoggedIn" to='/login' class="nav-link  mx-2">Login</router-link>
                     <router-link v-if="!$store.state.LoggedIn" to='/register/Customer' class="nav-link  mx-2">New Customer? Register Now!</router-link>

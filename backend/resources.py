@@ -5,6 +5,7 @@ from flask_security import auth_required,current_user
 from datetime import datetime,timedelta
 
 
+
 cache=app.cache
 
 api=Api(prefix='/api')
@@ -31,6 +32,7 @@ service_request_fields={
     'cust_pincode': fields.Integer(attribute="customer.c_pincode"),
     'pro_id' : fields.Integer,
     'pro_name' : fields.String(attribute="professional.p_name"),
+    'pro_contact_no': fields.Integer(attribute="professional.p_contact_no"),
     'pro_exp' : fields.Integer(attribute="professional.p_exp"),
     'pro_avg_rating' :  fields.Float(attribute="pro_avg_rating"),
     'serv_request_datetime' : fields.String(attribute='format_serv_request_datetime'),
@@ -142,22 +144,40 @@ class RegisterAPI(Resource):
                     user_c_id=user_data.user_id
 
                     if c_name is None or c_contact_no is None or c_address is None or c_pincode is None:
+                        self.rollback_user(user_data)
                         return {"Message":"Invalid Input"},400
                     
-                    if type(c_contact_no) != int or len(str(c_contact_no))!=10:
-                        return {"Message":"Invalid Contact Number"},400
-                    
-                    if type(c_pincode)!=int or len(str(c_pincode))!=6:
-                        return {"Message":"Invalid Pincode"},400
+                    for char in c_name:
+                        if not (char.isalpha() or char == " "):
+                            self.rollback_user(user_data)
+                            return {"Message" : "Invalid Name"},400
+
+                    try:
+                        c_contact_no=int(c_contact_no)
+                        c_pincode=int(c_pincode)
+                    except ValueError:
+                        self.rollback_user(user_data)
+                        return {"Message": "Invalid Contact Number or Pincode"},400
+
+                    if len(str(c_contact_no))!=10:
+                        self.rollback_user(user_data)
+                        return {"Message": "Invalid Contact Number"},400
+
+                    if len(str(c_pincode))!=6:
+                        self.rollback_user(user_data)
+                        return {"Message": "Invalid Pincode"},400
 
                     try:
                         new_customer=Customer(user_c_id=user_c_id,c_name=c_name,c_contact_no=c_contact_no,c_address=c_address,c_pincode=c_pincode)
                         db.session.add(new_customer)
                         db.session.commit()
+                        cache.delete("all_customers")
+                        cache.delete("all_users")
                         return {'Message':'Customer details successfully added'},201
                     
                     except:
                         db.session.rollback()
+                        self.rollback_user(user_data)
                         return {"Message":"Error in database"},400
 
                 elif role=='Professional':
@@ -169,30 +189,58 @@ class RegisterAPI(Resource):
                     user_p_id=user_data.user_id
 
                     if p_name is None or p_contact_no is None or p_service_type is None or p_pincode is None:
+                        self.rollback_user(user_data)
                         return {"Message":"Invalid Input"},400
                     
-                    if type(p_contact_no) != int or len(str(p_contact_no))!=10:
-                        return {"Message":"Invalid Contact Number"},400
+                    for char in p_name:
+                        if not (char.isalpha() or char == " "):
+                            self.rollback_user(user_data)
+                            return {"Message" : "Invalid Name"},400
+                    try:
+                        p_contact_no=int(p_contact_no)
+                        p_pincode=int(p_pincode)
+                    except ValueError:
+                        self.rollback_user(user_data)
+                        return {"Message": "Invalid Contact Number or Pincode"},400
 
-                    if type(p_pincode)!=int or len(str(p_pincode))!=6:
-                        return {"Message":"Invalid Pincode"},400
+                    if len(str(p_contact_no))!=10:
+                        self.rollback_user(user_data)
+                        return {"Message": "Invalid Contact Number"},400
+
+                    if len(str(p_pincode))!=6:
+                        self.rollback_user(user_data)
+                        return {"Message": "Invalid Pincode"},400
                     
                     try:
                         new_pro=Professional(user_p_id=user_p_id, p_name=p_name, p_contact_no=p_contact_no, p_service_type=p_service_type, p_exp=p_exp, p_pincode=p_pincode)
                         db.session.add(new_pro)
                         db.session.commit()
+                        cache.delete("all_service_pros")
+                        cache.delete("all_users")
                         return {'Message':'Professional details successfully added'},201
                     
                     except:
                         db.session.rollback()
+                        self.rollback_user(user_data)
                         return {"Message":"Error in database"},400
                     
                 else:
+                    self.rollback_user(user_data)
                     return {"Message":"Invalid Role"},404
             else:
+                self.rollback_user(user_data)
                 return {"Message":"Role does not exist"},404
         else:
             return {"Message":"User does not exist"},404
+    
+    def rollback_user(self,user):
+        datastore=app.security.datastore
+        try:
+            datastore.delete_user(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Failed to rollback user details:{str(e)}")
 
 class ServiceAPI(Resource):
 
@@ -240,9 +288,13 @@ class ServiceAPI(Resource):
         if serv_type is None or serv_name is None or serv_price is None or serv_duration is None:
             return {"Message":"Invalid Input"},400
         
-        if type(serv_price)!=int or type(serv_duration)!=int:
-            return {"Message":"Invalid Price or Duration"},400
-
+        try:
+            serv_price=int(serv_price)
+            serv_duration=int(serv_duration)
+        except ValueError:
+            return {"Message": "Invalid Price or Duration"},400
+        
+        
         if not service_data:
              return {"Message":"Service does not exist"},404
         
@@ -257,7 +309,7 @@ class ServiceAPI(Resource):
             service_data.serv_desc=serv_desc
             db.session.commit()
             cache.delete("all_services")
-            return {"Message":"Service details updated successfully"},200
+            return {"Message":"Service details Updated successfully"},200
         
         except:
             db.session.rollback()
@@ -317,8 +369,11 @@ class ServiceListAPI(Resource):
         if serv_type is None or serv_name is None or serv_price is None or serv_duration is None:
             return {"Message":"Invalid Input"},400
         
-        if type(serv_price)!=int or type(serv_duration)!=int:
-            return {"Message":"Invalid Price or Duration"},400
+        try:
+            serv_price=int(serv_price)
+            serv_duration=int(serv_duration)
+        except ValueError:
+            return {"Message": "Invalid Price or Duration"},400
 
         if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can create new service"},403
@@ -501,7 +556,7 @@ class ServiceRequestListAPI(Resource):
                     return marshal(serv_req_data,service_request_fields),200
                 
                 else:
-                    serv_req_data=ServiceRequest.query.join(Customer).filter((Customer.c_pincode==query)|(ServiceRequest.serv_status==query)).all()
+                    serv_req_data=ServiceRequest.query.join(Customer).join(Service).filter((Customer.c_pincode==query)|(ServiceRequest.serv_status==query)|(Service.serv_type==query)|((Service.serv_price==query))).all()
                     
                     if not serv_req_data:
                         return {"Message":"ServiceRequest not found"},404
@@ -588,11 +643,21 @@ class CustomerAPI(Resource):
                 if c_name is None or c_contact_no is None or c_address is None or c_pincode is None:
                     return {"Message":"Invalid Input"},400
                 
-                if type(c_contact_no)!=int or len(str(c_contact_no))!=10:
-                    return {"Message":"Invalid Contact Number"},400
+                for char in c_name:
+                    if not (char.isalpha() or char == " "):
+                        return {"Message" : "Invalid Name"},400
                 
-                if type(c_pincode)!=int or len(str(c_pincode))!=6:
-                    return {"Message":"Invalid Pincode"},400
+                try:
+                    c_contact_no=int(c_contact_no)
+                    c_pincode=int(c_pincode)
+                except ValueError:
+                    return {"Message": "Invalid Contact Number or Pincode"},400
+
+                if len(str(c_contact_no))!=10:
+                    return {"Message": "Invalid Contact Number"},400
+
+                if len(str(c_pincode))!=6:
+                    return {"Message": "Invalid Pincode"},400
                 
                 serv_reqs=ServiceRequest.query.filter((ServiceRequest.cust_id==c_id)&(ServiceRequest.serv_status=='Accepted')).all()
                 if serv_reqs:
@@ -678,11 +743,21 @@ class ProfessionalAPI(Resource):
                 if p_name is None or p_contact_no is None or p_service_type is None or p_pincode is None:
                     return {"Message":"Invalid Input"},400
                 
-                if type(p_contact_no)!=int or len(str(p_contact_no))!=10:
-                    return {"Message":"Invalid Contact Number"},400
+                for char in p_name:
+                    if not (char.isalpha() or char == " "):
+                        return {"Message" : "Invalid Name"},400
 
-                if type(p_pincode)!=int or len(str(p_pincode))!=6:
-                    return {"Message":"Invalid Pincode"},400
+                try:
+                    p_contact_no=int(p_contact_no)
+                    p_pincode=int(p_pincode)
+                except ValueError:
+                    return {"Message": "Invalid Contact Number or Pincode"},400
+
+                if len(str(p_contact_no))!=10:
+                    return {"Message": "Invalid Contact Number"},400
+
+                if len(str(p_pincode))!=6:
+                    return {"Message": "Invalid Pincode"},400
 
                 serv_reqs=ServiceRequest.query.filter((ServiceRequest.pro_id==p_id)&(ServiceRequest.serv_status=='Accepted')).all()
                 if serv_reqs:
@@ -769,6 +844,7 @@ class UserAPI(Resource):
     def patch(self,user_id):
         data=request.get_json()
         status = data["user_status"]
+        current_datetime=datetime.now()
 
         if "user_status" not in data:
             return {"Message" : "Status missing"},400
@@ -800,6 +876,7 @@ class UserAPI(Resource):
                 for x in serv_req_data:
                     try:
                         x.serv_status='Cancelled'
+                        x.serv_close_datetime=current_datetime
                         db.session.commit()
                         cache.delete("all_service_requests")
                     except:
@@ -822,6 +899,7 @@ class UserAPI(Resource):
                 for x in serv_req_data:
                     try:
                         x.serv_status='Cancelled'
+                        x.serv_close_datetime=current_datetime
                         db.session.commit()
                         cache.delete("all_service_requests")
                     except:
@@ -884,5 +962,3 @@ api.add_resource(ProfessionalAPI,'/professional/<int:p_id>')
 api.add_resource(ProfessionalListAPI,'/professional')
 api.add_resource(UserAPI,'/user/<int:user_id>')
 api.add_resource(UserListAPI,'/user')
-
-

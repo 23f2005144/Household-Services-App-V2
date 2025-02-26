@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
-import datetime
 db=SQLAlchemy()
 
 class User(db.Model,UserMixin):
@@ -9,7 +8,7 @@ class User(db.Model,UserMixin):
     password=db.Column(db.String(), nullable=False)
     fs_uniquifier=db.Column(db.String(), unique = True, nullable = False)
     active=db.Column(db.Boolean, default = True)
-    roles=db.relationship('Role', backref = 'ur', secondary='user_roles', cascade="delete")
+    roles=db.relationship('Role', backref = 'ur', secondary='user_roles')
     p_user=db.relationship('Professional',backref='p',cascade='delete')
     c_user=db.relationship('Customer',backref='c')
     
@@ -20,8 +19,8 @@ class Role(db.Model,RoleMixin):
 
 class UserRoles(db.Model):
     ur_id=db.Column(db.Integer,primary_key=True)
-    u_id=db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    r_id=db.Column(db.Integer, db.ForeignKey('role.role_id'))
+    u_id=db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete="CASCADE"))
+    r_id=db.Column(db.Integer, db.ForeignKey('role.role_id', ondelete="CASCADE"))
 
 class Service(db.Model):
     serv_id=db.Column(db.Integer, primary_key=True)

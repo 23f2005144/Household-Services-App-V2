@@ -16,6 +16,10 @@ def home():
 @auth_required('token')
 @app.get('/create-csv')
 def createCSV():
+    workers = app.extensions['celery'].control.ping(timeout=1)
+    if not workers:
+        return jsonify({"Message": "Celery worker is not running"}),400
+    
     if not current_user.roles[0].name=='Admin':
         return jsonify({"Message" : "Only Admin can get CSV files"}),403
     
@@ -76,9 +80,9 @@ def register_user():
         if user:
             return jsonify({"Message":"User already exists"}),409
         try:
-            datastore.create_user(email=email, password=hash_password(password), roles=[role_obj])
+            new_user=datastore.create_user(email=email, password=hash_password(password), roles=[role_obj])
             db.session.commit()
-            return jsonify({"Message":"User created successfully"}),201
+            return jsonify({"Message":"User created successfully","user_id":new_user.user_id}),201
         except:
             db.session.rollback()
             return jsonify({"Message":"Error creating user in database"}),400
@@ -88,9 +92,9 @@ def register_user():
         if user:
             return jsonify({"Message":"User already exists"}),409
         try:
-            datastore.create_user(email=email, password=hash_password(password), roles=[role_obj],active=False) #since pro first has to be approved by admin
+            new_user=datastore.create_user(email=email, password=hash_password(password), roles=[role_obj],active=False)
             db.session.commit()
-            return jsonify({"Message":"User created successfully"}),201
+            return jsonify({"Message":"User created successfully","user_id":new_user.user_id}),201
         except:
             db.session.rollback()
             return jsonify({"Message":"Error creating user in database"}),400

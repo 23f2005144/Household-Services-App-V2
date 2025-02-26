@@ -10,12 +10,12 @@ export default{
                 <table class="table table-hover table-bordered border-primary">
                     <thead>
                         <tr>
-                            <th>Service Type</th>
-                            <th>Service Name</th>
-                            <th>Service Price ₹</th>
-                            <th>Service Duration</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Price ₹</th>
+                            <th>Duration</th>
                             <th>Average Rating</th>
-                            <th>Service Description</th>
+                            <th>Description</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -101,15 +101,14 @@ export default{
                                         <th>Service Name</th>
                                         <th>Service Price ₹</th>
                                         <th>Service Duration (hrs)</th>
-                                        <th>Assigned Professional</th>
-                                        <th>Contact Number</th>
-                                        <th>Experience (yrs)</th>
-                                        <th>DateTime_of_Request</th>
-                                        <th>DateTime_of_Completion</th>
+                                        <th>Assigned Professional | Contact Number</th>
+                                        <th>Professional Experience (yrs)</th>
+                                        <th>Request Date & Time</th>
+                                        <th>Completion Date & Time</th>
                                         <th>Service Status</th>
                                         <th>Service Remarks</th>
                                         <th>Service Rating</th>
-                                        <th>Pro Rating</th>
+                                        <th>Professional Rating</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -119,15 +118,49 @@ export default{
                                         <td>{{service_req_detail_record.serv_name}}</td>
                                         <td>{{service_req_detail_record.serv_price}}</td>
                                         <td>{{service_req_detail_record.serv_duration}}</td>
-                                        <td>{{service_req_detail_record.pro_name}}</td>
-                                        <td>{{service_req_detail_record.pro_contact_no}}</td>
-                                        <td>{{service_req_detail_record.pro_exp}}</td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.pro_name">
+                                                {{service_req_detail_record.pro_name}} | {{service_req_detail_record.pro_contact_no}}
+                                            </div>
+                                            <div v-else>
+                                                <p>N/A | N/A</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.pro_exp">
+                                                {{service_req_detail_record.pro_exp}}
+                                            </div>
+                                            <div v-else>
+                                                <p>N/A</p>
+                                            </div>
+                                        </td>
                                         <td>{{service_req_detail_record.serv_request_datetime}}</td>
                                         <td>{{service_req_detail_record.serv_close_datetime}}</td>
                                         <td>{{service_req_detail_record.serv_status}}</td>
-                                        <td>{{service_req_detail_record.serv_remarks}}</td>
-                                        <td>{{service_req_detail_record.serv_rating}}</td>
-                                        <td>{{service_req_detail_record.pro_rating}}</td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.serv_remarks">
+                                                {{service_req_detail_record.serv_remarks}}
+                                            </div>
+                                            <div v-else>
+                                                <p>N/A</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.serv_rating">
+                                                {{service_req_detail_record.serv_rating}}
+                                            </div>
+                                            <div v-else>
+                                                <p>N/A</p>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div v-if="service_req_detail_record.pro_rating">
+                                                {{service_req_detail_record.pro_rating}}
+                                            </div>
+                                            <div v-else>
+                                                <p>N/A</p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -166,7 +199,7 @@ export default{
                                         <td>{{pro_detail_record.p_pincode}}</td>
                                     </tr>
                                     <tr>
-                                        <th><i class="bi bi-tools"></i> Service Type:</th>
+                                        <th><i class="bi bi-tools"></i> Service Expertise:</th>
                                         <td>{{pro_detail_record.p_service_type}}</td>
                                     </tr>
                                     <tr>
@@ -174,7 +207,7 @@ export default{
                                         <td>{{pro_detail_record.p_exp}} Years</td>
                                     </tr>
                                     <tr>
-                                        <th><i class="bi bi-star"></i> Avg. Rating:</th>
+                                        <th><i class="bi bi-star"></i> Average Rating:</th>
                                         <td>{{pro_detail_record.p_avg_rating}}</td>
                                     </tr>
                                 </tbody>
@@ -194,7 +227,7 @@ export default{
         await this.ServiceDataTypeFetch()
         await this.ServiceReqsDataFetch()
         this.style = document.createElement('style')
-        this.style.innerHTML=`
+        this.style.textContent=`
             table{
                 font-size: 16px;
             }
