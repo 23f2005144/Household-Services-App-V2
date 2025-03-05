@@ -54,7 +54,7 @@ export default{
                         'Authentication-Token':this.$store.state.auth_token,
                         'Content-Type':'application/json'
                     },
-                    body:JSON.stringify({"user_status":this.new_pro_obj.p_status})
+                    body:JSON.stringify({"user_status":this.new_pro_obj.p_active})
                 })
                 if(res.ok){
                     this.$emit('Pro_Approved')

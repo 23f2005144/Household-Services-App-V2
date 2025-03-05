@@ -198,11 +198,11 @@ export default{
                                     <td>{{p.p_exp}}</td>
                                     <td>{{p.p_avg_rating}}</td>
                                     <td>
-                                        <p v-if="p.p_status===true">Active</p>
-                                        <p v-else>Blocked</p>
+                                        <p v-if="p.p_active===true && p.p_status==='Active'">{{p.p_status}}</p>
+                                        <p v-else>{{p.p_status}}</p>
                                     </td>
                                     <td>
-                                        <button v-if="p.p_status===true" class="btn btn-lg btn-danger" @click="BlockUser(p.user_p_id,'professional')">Block</button>
+                                        <button v-if="p.p_active===true && p.p_status==='Active'" class="btn btn-lg btn-danger" @click="BlockUser(p.user_p_id,'professional')">Block</button>
                                         <button v-else class="btn btn-lg btn-warning" @click="UnblockUser(p.user_p_id,'professional')">Unblock</button>   
                                     </td>
                                 </tr>
@@ -229,6 +229,7 @@ export default{
                                     <td>{{u.email}}</td>
                                     <td>
                                         <p v-if="u.active">Active</p>
+                                        <p v-else-if="u.roles[0].name==='Professional'">Blocked/Not Approved</p>
                                         <p v-else>Blocked</p>
                                     </td>
                                     <td>{{u.roles[0].name}}</td>
@@ -254,9 +255,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){
@@ -317,7 +318,12 @@ export default{
                     }
                 } else if (this.search_table==="User") {
                     endp="user"
-                    if (this.search_query){
+                    if (this.search_query==='Active'){
+                        QueryParams=new URLSearchParams({q:1}).toString()
+                    }
+                    else if (this.search_query==='Blocked'){
+                        QueryParams=new URLSearchParams({q:0}).toString()
+                    }else{
                         QueryParams=new URLSearchParams({q:this.search_query}).toString()
                     }
                 }
@@ -333,7 +339,10 @@ export default{
                 })
                 
                 if (res.ok){
-                    const data = await res.json()
+                    let data = await res.json()
+                    if (this.search_table==="Professional"){
+                        data=data.filter(pro => pro.p_status!=="Pending")
+                    }
                     this.table_data=data
                 }else{
                     const {Message} = await res.json()
@@ -343,7 +352,6 @@ export default{
                 console.log(error.message)
                 this.table_data=null
             }
-
         },
         async BlockUser(user_id,role){
             try{
@@ -355,7 +363,7 @@ export default{
 
                 }else if (role==='professional'){
                     user_data=this.table_data.find(user => user.user_p_id===user_id)
-                    user_status=user_data.p_status
+                    user_status=user_data.p_active
                 }
                 const res = await fetch(`${location.origin}/api/user/${user_id}`,{
                     method:"PATCH",
@@ -391,7 +399,7 @@ export default{
 
                 }else if (role==='professional'){
                     user_data=this.table_data.find(user => user.user_p_id===user_id)
-                    user_status=user_data.p_status
+                    user_status=user_data.p_active
                 }
                 const res = await fetch(`${location.origin}/api/user/${user_id}`,{
                     method:"PATCH",

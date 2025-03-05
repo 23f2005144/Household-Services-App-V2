@@ -171,9 +171,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){

@@ -150,9 +150,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){
@@ -168,9 +168,8 @@ export default{
     watch:{
         search_table(newVal,oldVal) {
             if (newVal!==oldVal) {
-                this.table_data = null //helps so that service table data is not shown during selecting servicereq table and vis-a-vis
-            }
-        }
+                this.table_data = null
+        }   }
     },
     methods:{
         async CustomerSearchData(){
@@ -187,7 +186,7 @@ export default{
                     }
                 }else{
                     if(this.search_table==='ServiceRequest'){
-                        QueryParams=new URLSearchParams({c_id:this.$store.state.c_id}).toString() //needed to retrieve only customer service req data
+                        QueryParams=new URLSearchParams({c_id:this.$store.state.c_id}).toString()
                     }
                 }
                 const res = await fetch(`${location.origin}/api/${endp}${QueryParams ? "?"+QueryParams : ""}`,{
@@ -211,8 +210,6 @@ export default{
                 console.log(error.message)
                 this.table_data=null
             }
-
         }
     }
-
 }

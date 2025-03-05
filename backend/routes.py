@@ -11,8 +11,6 @@ datastore=app.security.datastore
 def home():
     return render_template('index.html')
 
-
-
 @auth_required('token')
 @app.get('/create-csv')
 def createCSV():

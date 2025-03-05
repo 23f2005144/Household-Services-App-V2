@@ -95,8 +95,8 @@ export default{
                                     <button type="button" class="btn btn-warning" @click="$emit('Serv_Req_Close',sreq.serv_req_id)">Close Service?</button>
                                 </div>
                                 <div v-else-if="sreq.serv_status==='Closed'">
-                                    <p>The service was rated {{sreq.serv_rating}} stars</p>
-                                    <p>The professional was rated {{sreq.pro_rating}} stars</p>
+                                    <p>The service was rated <strong>{{sreq.serv_rating}} stars</strong></p>
+                                    <p>The professional was rated <strong>{{sreq.pro_rating}} stars</strong></p>
                                 </div>
                                 <div v-else>
                                     <p>This service was cancelled</p>
@@ -131,9 +131,30 @@ export default{
                                 <td>{{sh.cust_address}} {{sh.cust_pincode}}</td>
                                 <td>{{sh.serv_close_datetime}}</td> 
                                 <td>{{sh.serv_status}}</td>
-                                <td>{{sh.serv_remarks}}</td>
-                                <td>{{sh.serv_rating}}</td>
-                                <td>{{sh.pro_rating}}</td>
+                                <td>
+                                    <div v-if="sh.serv_remarks">
+                                        {{sh.serv_remarks}}
+                                    </div>
+                                    <div v-else>
+                                        <p>N/A</p>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div v-if="sh.serv_rating">
+                                        {{sh.serv_rating}}
+                                    </div>
+                                    <div v-else>
+                                        <p>N/A</p>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div v-if="sh.pro_rating">
+                                        {{sh.pro_rating}}
+                                    </div>
+                                    <div v-else>
+                                        <p>N/A</p>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

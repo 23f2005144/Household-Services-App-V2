@@ -186,9 +186,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){
@@ -228,7 +228,7 @@ export default{
                 })
                 if(res.ok){
                     const new_pro_data_all= await res.json()
-                    this.new_pro_data=new_pro_data_all.filter(pro=> pro.p_status===false)
+                    this.new_pro_data=new_pro_data_all.filter(pro=> pro.p_status==='Pending')
                     
                 }else{
                     const {Message} = await res.json()

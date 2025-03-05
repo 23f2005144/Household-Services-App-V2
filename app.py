@@ -26,7 +26,7 @@ app=create_app()
 celery_app=celery_init_app(app)
 
 with app.app_context():
-    app.cache.clear() #remove it once done testing and all since this just clears redis again and again
+    app.cache.clear()
 
 import backend.celery.celery_schedule
 import backend.initial_data

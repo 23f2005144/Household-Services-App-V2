@@ -110,9 +110,30 @@ export default{
                                     <td>{{service_req_detail_record.serv_request_datetime}}</td>
                                     <td>{{service_req_detail_record.serv_close_datetime}}</td>
                                     <td>{{service_req_detail_record.serv_status}}</td>
-                                    <td>{{service_req_detail_record.serv_remarks}}</td>
-                                    <td>{{service_req_detail_record.serv_rating}}</td>
-                                    <td>{{service_req_detail_record.pro_rating}}</td>
+                                    <td>
+                                        <div v-if="service_req_detail_record.serv_remarks">
+                                            {{service_req_detail_record.serv_remarks}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="service_req_detail_record.serv_rating">
+                                            {{service_req_detail_record.serv_rating}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A</p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div v-if="service_req_detail_record.pro_rating">
+                                            {{service_req_detail_record.pro_rating}}
+                                        </div>
+                                        <div v-else>
+                                            <p>N/A</p>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -136,9 +157,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){
@@ -245,6 +266,7 @@ export default{
                     throw new Error(Message)
                 }
             }catch(error){
+                alert("You are not free to accept this ServiceRequest")
                 console.log(error.message)
             }
         }

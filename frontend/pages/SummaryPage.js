@@ -59,9 +59,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){
@@ -281,7 +281,7 @@ export default{
                         plugins: {
                             title: {
                                 display: true,
-                                text: "Overall Service Statuses",
+                                text: "Overall Service Request Statuses",
                                 font: { weight: "bold", size: 40 }
                             },
                             legend: { position: "bottom" }
@@ -352,7 +352,7 @@ export default{
                         plugins: {
                             title: {
                                 display: true,
-                                text: "Overall Service Statuses",
+                                text: "Overall Service Request Statuses",
                                 font: { weight: "bold", size: 40 }
                             },
                             legend: { position: "bottom" }
@@ -419,7 +419,7 @@ export default{
                         plugins: {
                             title: {
                                 display: true,
-                                text: "Overall Service Statuses",
+                                text: "Overall Service Request Statuses",
                                 font: { weight: "bold", size: 40 }
                             },
                             legend: { position: "bottom" }

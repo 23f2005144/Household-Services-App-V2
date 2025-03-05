@@ -1,10 +1,8 @@
 from flask import current_app as app,request
 from flask_restful import Api, Resource,fields,marshal_with,marshal
-from backend.models import db,User,Customer,Professional,Service,ServiceRequest
+from backend.models import db,User,Customer,Professional,Service,ServiceRequest,Role
 from flask_security import auth_required,current_user
-from datetime import datetime,timedelta
-
-
+from datetime import datetime
 
 cache=app.cache
 
@@ -59,9 +57,10 @@ pro_fields={
     'p_id' : fields.Integer,
     'user_p_id' : fields.Integer,
     'p_email' : fields.String(attribute="p.email"),
-    'p_status' : fields.Boolean(attribute="p.active"),
+    'p_active' : fields.Boolean(attribute="p.active"),
     'p_name' : fields.String,
     'p_contact_no': fields.Integer,
+    'p_status' : fields.String,
     'p_service_type': fields.String,
     'p_exp' : fields.Integer,
     'p_avg_rating' : fields.Float(attribute="avg_rating"),
@@ -378,6 +377,12 @@ class ServiceListAPI(Resource):
         if current_user.roles[0].name!='Admin':
             return {"Message":"Forbidden: only Admin can create new service"},403
         
+        service_data=Service.query.filter((Service.serv_type==serv_type)&(Service.serv_name==serv_name)).all()
+
+        if service_data:
+            return {"Message":"Service already exists"},409
+
+        
         try:
             service=Service(serv_type=serv_type, serv_name=serv_name, serv_price=serv_price, serv_duration=serv_duration, serv_desc=serv_desc)
             db.session.add(service)
@@ -388,7 +393,6 @@ class ServiceListAPI(Resource):
         except:
             db.session.rollback()
             return {"Message":"Error in database"},400
-
 
 class ServiceRequestAPI(Resource):
 
@@ -420,11 +424,9 @@ class ServiceRequestAPI(Resource):
             serv_close_dt=datetime.strptime(serv_close_dt, "%Y-%m-%d %H:%M:%S")
             if serv_rating and pro_rating:
                 serv_request_time=serv_req_data.serv_request_datetime
-                serv_duration=serv_req_data.service.serv_duration
-                serv_closing_time=serv_request_time + timedelta(hours=serv_duration)
                 current_time = datetime.now()
 
-                if current_time < serv_closing_time:
+                if current_time < serv_request_time:
                     return {"Message": "Sorry, you cannot close the ServiceRequest before the scheduled time."}, 400
                 try:
                     serv_req_data.serv_rating=serv_rating
@@ -463,8 +465,8 @@ class ServiceRequestAPI(Resource):
                 cache.delete("all_service_requests")
                 return "",204
             except:
-                    db.session.rollback()
-                    return{"Message" : "Error in database"},400
+                db.session.rollback()
+                return{"Message" : "Error in database"},400
             
         return {"Message" : "Request body missing"},400
 
@@ -597,7 +599,7 @@ class ServiceRequestListAPI(Resource):
         serv_req_data=db.session.query(ServiceRequest).filter((ServiceRequest.cust_id==cust_id)&(ServiceRequest.serv_id==serv_id)&((ServiceRequest.serv_status=='Requested')|(ServiceRequest.serv_status=='Accepted'))).all()
         
         if serv_req_data:
-            return {"Message":"Service already booked"},400
+            return {"Message":"Service Request already booked"},409
         
         try:
             new_serv_req=ServiceRequest(serv_id=serv_id, cust_id=cust_id,serv_request_datetime=req_datetime)
@@ -609,8 +611,6 @@ class ServiceRequestListAPI(Resource):
         except:
             db.session.rollback()
             return {"Message":"Error in database"},400
-    
-
 
 class CustomerAPI(Resource):
 
@@ -677,8 +677,6 @@ class CustomerAPI(Resource):
                     return {"Message":"Error in database"},400
         else:
             return {"Message" : "Customer not found"},404
-                
-
 
 class CustomerListAPI(Resource):
 
@@ -694,8 +692,6 @@ class CustomerListAPI(Resource):
             
             return marshal(cust_data,customer_fields),200
         
-
-        
         cached_cust_data=cache.get("all_customers")
         if cached_cust_data:
             return cached_cust_data,200
@@ -709,8 +705,6 @@ class CustomerListAPI(Resource):
         cache.set("all_customers", response, timeout=300) 
         return response,200
         
-    
-
 class ProfessionalAPI(Resource):
     
     @marshal_with(pro_fields)
@@ -778,7 +772,6 @@ class ProfessionalAPI(Resource):
         else:
             return {"Message":"Professional not found"},404
                 
-
 class ProfessionalListAPI(Resource):
 
     @auth_required('token')
@@ -805,7 +798,6 @@ class ProfessionalListAPI(Resource):
         response=marshal(pro_data_list,pro_fields)
         cache.set("all_service_pros", response, timeout=300)
         return response,200
-
 
 class UserAPI(Resource):
 
@@ -857,17 +849,29 @@ class UserAPI(Resource):
         if not user_data:
             return {"Message" : "User not found"},404
         if status==False:
-            try:
-                user_data.active = True
-                db.session.commit()
-                cache.delete("all_users")
-                cache.delete("all_service_pros")
-                cache.delete("all_customers")
-                return "",204
-            
-            except:
-                db.session.rollback()
-                return {"Message":"Error in database"},400
+            if user_data.roles[0].name=='Customer':
+                try:
+                    user_data.active=True
+                    db.session.commit()
+                    cache.delete("all_users")
+                    cache.delete("all_customers")
+                    return "",204
+                except:
+                    db.session.rollback()
+                    return {"Message":"Error in database"},400
+                
+            elif user_data.roles[0].name=='Professional':
+                try:
+                    user_data.active=True
+                    user_data.p_user[0].p_status='Active'
+                    db.session.commit()
+                    cache.delete("all_users")
+                    cache.delete("all_service_pros")
+                    return "",204
+                
+                except:
+                    db.session.rollback()
+                    return {"Message":"Error in database"},400
             
         else:
             if user_data.c_user:
@@ -907,7 +911,8 @@ class UserAPI(Resource):
                         return {"Message" : "Error in database"},400
                 
                 try:
-                    user_data.active = False
+                    user_data.active=False
+                    user_data.p_user[0].p_status='Blocked'
                     db.session.commit()
                     cache.delete("all_users")
                     cache.delete("all_service_pros")
@@ -919,7 +924,6 @@ class UserAPI(Resource):
             else:
                 return {"User not found"},404
 
-
 class UserListAPI(Resource):
     
     @auth_required('token')
@@ -930,7 +934,7 @@ class UserListAPI(Resource):
             return {"Message":"Forbidden: only Admin can access user details"},403
 
         if query:
-            user_data=User.query.filter((User.email==query)|(User.roles[0].name==query)|(User.active==query)).all()
+            user_data=User.query.filter((User.email==query)|(User.roles.any(Role.name==query))|(User.active==(query=='1'))).all()
 
             if not user_data:
                 return {"Message" : "User data not found"},404

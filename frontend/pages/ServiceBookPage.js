@@ -40,7 +40,7 @@ export default{
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header" >
-                            <h1 class="modal-title fs-2">Service Details</h1>
+                            <h1 class="modal-title fs-3">Service Details</h1>
                             <button type="button" class="btn-close" @click="booking_modal_close" aria-label="Close"></button>
                         </div>
                         <div class="modal-body fs-5">
@@ -65,9 +65,9 @@ export default{
                                         <td>{{serv_book_record.serv_desc}}</td>
                                     </tr>
                                 </tbody>
-                            </table>
+                            </table><br>
                             <div class="row">
-                                <label for="datetimePicker" class="form-label" style="font-size:18px;font-weight:bold;">Choose your Date and Time for Service</label>
+                                <label for="datetimePicker" class="form-label fs-5" style="font-weight:bold;">Choose your Date and Time for Booking</label>
                                 <input id="datetimePicker" class="form-control" v-model="service_slot" placeholder="Choose your slot" required>
                             </div><br>
                             <div class="row">
@@ -236,9 +236,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){
@@ -298,43 +298,49 @@ export default{
         initializeFlatpickr() {
             const now = new Date()
             const hour = now.getHours()
-            let minDate = new Date(now)  
+            const minute = now.getMinutes()
+            let minDate = new Date(now)
             let maxDate = new Date(now)
             maxDate.setDate(now.getDate() + 3)
-            if (hour >= 20 || hour < 8) {
-                minDate = new Date(now)
-                minDate.setHours(8, 0, 0, 0)
-                if (hour>=20) {
-                    minDate.setDate(now.getDate() + 1)
-                }else if(hour>=8){
-                    let nextMin= now.getMinutes() < 30 ? "30" : "00"
-                    let nextHour= now.getMinutes() < 30 ? hour : hour + 1
-                    if(nextHour>= 20){
-                        minDate.setDate(now.getDate() + 1)
-                    } 
-                    if(nextHour>= 20) {
-                        minDate.setDate(now.getDate() + 1)
-                        minTime = "08:00"
-                    }else {
-                        minTime = String(nextHour).padStart(2, '0') + ":" + String(nextMin).padStart(2, '0')
-                    }
-                }
+        
+            let nextHour = hour;
+            let nextMin = 30;
+        
+            if (minute >= 30) {
+                nextHour += 1
+                nextMin = 0
             }
+        
+            if (nextHour >= 20) {
+                minDate.setDate(now.getDate() + 1)
+                nextHour = 8
+                nextMin = 0
+            }
+        
+            minDate.setHours(nextHour, nextMin, 0, 0)
+            
             const dt = document.getElementById("datetimePicker")
             flatpickr(dt, {
-              enableTime: true,               // time selection
-              dateFormat: "d-m-Y H:i",        // Date and time format
-              minDate,                        // Start from today
-              maxDate,                        // Up to 3 days from today
-              minTime: "08:00",               // Start time
-              maxTime: "20:00",               // End time
-              time_24hr: true,               // 12-hour clock
-              minuteIncrement: 30,
-              onChange: (selectedDates) => {
-                this.service_slot = selectedDates[0] // Update selected date
-              },
+                enableTime: true,
+                dateFormat: "d-m-Y H:i",
+                minDate,
+                maxDate,
+                time_24hr: true,
+                minuteIncrement: 30,
+                onChange: (selectedDates, dateStr, instance) => {
+                    if (selectedDates.length > 0) {
+                        const selectedDate = selectedDates[0]
+                        if (selectedDate.getDate() === now.getDate()) {
+                            instance.set("minTime", minDate.getHours() + ":" + (minDate.getMinutes() < 10 ? "0" : "") + minDate.getMinutes())
+                        } else {
+                            instance.set("minTime", "08:00")
+                        }
+                        instance.set("maxTime", "20:00")
+                    }
+                    this.service_slot = selectedDates[0]
+                },
             })
-        },
+        },    
         async ServBookSubmit(){
             if(this.service_slot!==null){
                 try{

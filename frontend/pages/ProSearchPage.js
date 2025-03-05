@@ -51,9 +51,30 @@ export default{
                             <td>{{sr.serv_request_datetime}}</td> 
                             <td>{{sr.serv_close_datetime}}</td> 
                             <td>{{sr.serv_status}}</td>
-                            <td>{{sr.serv_remarks}}</td>
-                            <td>{{sr.serv_rating}}</td>
-                            <td>{{sr.pro_rating}}</td>
+                            <td>
+                                <div v-if="sr.serv_remarks">
+                                    {{sr.serv_remarks}}
+                                </div>
+                                <div v-else>
+                                    <p>N/A</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div v-if="sr.serv_rating">
+                                    {{sr.serv_rating}}
+                                </div>
+                                <div v-else>
+                                    <p>N/A</p>
+                                </div>
+                            </td>
+                            <td>
+                                <div v-if="sr.pro_rating">
+                                    {{sr.pro_rating}}
+                                </div>
+                                <div v-else>
+                                    <p>N/A</p>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -73,9 +94,9 @@ export default{
             }`
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){

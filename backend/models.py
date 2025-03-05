@@ -45,7 +45,6 @@ class Service(db.Model):
         else:
             return 0.0
 
-    
 
 class Customer(db.Model):
     c_id=db.Column(db.Integer,primary_key=True,nullable=False)
@@ -62,6 +61,7 @@ class Professional(db.Model):
     user_p_id=db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
     p_name=db.Column(db.String(), nullable=False)
     p_contact_no=db.Column(db.Integer)
+    p_status=db.Column(db.String(), nullable=False, default='Pending')
     p_service_type=db.Column(db.String(), nullable=False)
     p_exp=db.Column(db.Integer, nullable=False)
     p_pincode=db.Column(db.Integer, nullable=False)

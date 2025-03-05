@@ -161,13 +161,14 @@ export default{
         `
         document.head.appendChild(this.style)    
     },
-    unmounted() {
+    beforeDestroy(){
         if (this.style) {
-            document.head.removeChild(this.style);
+            document.head.removeChild(this.style)
         }
     },
     data(){
         return{
+            style:null,
             service_table:true,
             service_update_form:false,
             service_create_form:false,
