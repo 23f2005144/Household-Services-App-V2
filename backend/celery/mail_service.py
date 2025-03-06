@@ -15,14 +15,14 @@ def send_email(to,subject,content, pdf_data=None,pdf_filename=None):
     msg["Subject"]=subject
     msg["From"]=SENDER_EMAIL
 
-    msg.attach(MIMEText(content,'html')) #creates a tree like stucture we can add more html for html text
+    msg.attach(MIMEText(content,'html'))
 
     if pdf_data and pdf_filename:
         pdf_attachment = MIMEApplication(pdf_data, _subtype="pdf")
         pdf_attachment.add_header('Content-Disposition', f'attachment; filename="{pdf_filename}"')
         msg.attach(pdf_attachment)
 
-    with smtplib.SMTP(host=SMTP_SERVER,port=SMTP_PORT) as client: #creates the message and sends it
+    with smtplib.SMTP(host=SMTP_SERVER,port=SMTP_PORT) as client:
         client.send_message(msg)
         client.quit()
 

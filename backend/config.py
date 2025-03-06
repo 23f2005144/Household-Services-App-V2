@@ -3,7 +3,7 @@ class Config():
     SQLALCHEMY_TRACK_MODIFICATIONS=False
 
 class LocalDevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI="sqlite:///household_serv_database_testing.sqlite3"
+    SQLALCHEMY_DATABASE_URI="sqlite:///household_serv_database.sqlite3"
     DEBUG=True
     SECURITY_PASSWORD_HASH='bcrypt'
     SECURITY_PASSWORD_SALT='secretsaltforhashing'

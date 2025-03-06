@@ -25,9 +25,6 @@ def create_app():
 app=create_app()
 celery_app=celery_init_app(app)
 
-with app.app_context():
-    app.cache.clear()
-
 import backend.celery.celery_schedule
 import backend.initial_data
 import backend.routes

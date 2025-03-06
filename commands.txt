@@ -1,0 +1,10 @@
+This is a commands file for all the necessary commands required to run this project.
+
+1) To create virtual environment: python3 -m venv .venv
+2) To activate virtual environment: source .venv/bin/activate
+3) To install all requirements: pip install -r requirements.txt
+4) To start Redis Server: sudo service redis-server start
+5) To start Flask App: python3 app.py
+6) To start MailHog in a new shell: ~/go/bin/MailHog
+7) To start Celery Worker in a new shell: celery -A app:celery_app worker -l INFO
+8) To start Celery Beat in a new shell: celery -A app:celery_app beat -l INFO
