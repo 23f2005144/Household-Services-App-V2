@@ -40,14 +40,14 @@ This project is a multi-user application designed for **Admin**, **Customers**, 
 4. **Controllers Development**: Handled different user roles using Flask and Flask-SQLAlchemy, with API endpoints for seamless integration.
 5. **Testing**: Utilized dummy data to verify the backend and frontend functionality.
 
-This version (V2) builds upon the initial Household Services App by enhancing the frontend and backend integration, adding advanced features such as background job scheduling, automated reminders, and monthly reporting. The application follows a Multi-Page Application (MPA) architecture, where each major section is loaded as a separate page, ensuring clear separation of concerns and straightforward navigation.
+This version (V2) builds upon the initial Household Services App by enhancing the frontend and backend integration, adding advanced features such as background job scheduling, automated reminders, and monthly reporting. The application upgrades from **Multi-Page Application to Single-Page Application** architecture using Vue.js, enabling seamless page transitions, faster navigation without full page reloads, and dynamic UI updates through Vue-Router and Vuex state management.
 
 ---
 
 ## 🌟 Core Functionalities:
 
 ### 👨‍💼 Admin:
-1. Manage services (Create, Edit, Delete) 🛠️
+1. Manage services (CRUD) 🛠️
 2. Cascade delete service-related records upon service deletion 🗑️
 3. Approve/Reject new professionals ✅❌
 4. Monitor all service requests 👀
