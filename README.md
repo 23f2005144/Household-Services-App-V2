@@ -106,7 +106,7 @@ This version (V2) builds upon the initial Household Services App by enhancing th
 ---
 
 ## 🔌 API Endpoints
-The backend provides 11 RESTful API endpoints using Flask-RESTful for managing users, services, and service requests. These endpoints support operations such as user registration, service management, request handling, and user administration. For detailed API documentation, refer to the project report: [Project Report.pdf](Project%20Report.pdf).
+The backend provides 11 RESTful API endpoints using Flask-RESTful for managing users, services, and service requests. These endpoints support operations such as user registration, service management, request handling, and user administration. For detailed API documentation, refer to the project report: [Project Report](https://github.com/23f2005144/Household-Services-App-V2/blob/82e95f875839b6966ff790b1ad1e607198b57b17/Project%20Report.pdf).
 
 ---
 
