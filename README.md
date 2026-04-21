@@ -13,7 +13,11 @@
 
 ---
 
-## 🎥 Project Demo Video: [https://drive.google.com/file/d/1oMztdSLeSnzmO9rJTHkRclWp1T8CHu-y/view?usp=sharing](https://drive.google.com/file/d/1oMztdSLeSnzmO9rJTHkRclWp1T8CHu-y/view?usp=sharing)
+## 🎥 [Project Demo Video:](https://drive.google.com/file/d/1NBXspFo0VMFpsDZIC6ltZF2eQs0PyPXt/view?usp=sharing)
+
+---
+### 🏠 Home Page
+![Homepage](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-HomePage.jpeg)
 
 ---
 
@@ -80,6 +84,8 @@ This version (V2) builds upon the initial Household Services App by enhancing th
 6. Summarize service ratings and statuses 📊
 7. Export CSV reports of service requests 📂
 
+![Admin Dashboard](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-AdminDashboard.jpeg)
+
 ### 🧍 Customer:
 1. Book, close, or cancel services by pin code 📞
 2. Book different service types simultaneously 🔄
@@ -94,6 +100,8 @@ This version (V2) builds upon the initial Household Services App by enhancing th
 3. View past/current requests and edit profile 📝
 4. Summarize customer ratings and request statuses 📊
 5. Receive hourly reminders for pending requests ⏰
+
+![Summary Page](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-SummaryPage.jpeg)
 
 ---
 
