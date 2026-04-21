@@ -40,6 +40,21 @@
 - **Bootstrap**: 5.3.3 🎨
 
 ---
+## 🛠️ Setup & Installation
+
+1. **Create virtual environment** — `python3 -m venv .venv`
+2. **Activate it** — `source .venv/bin/activate`
+3. **Install dependencies** — `pip install -r requirements.txt`
+4. **Start Redis** — `sudo service redis-server start`
+5. **Run Flask app** — `python3 app.py`
+
+Open separate terminals for:
+
+6. **MailHog** (local email testing) — `~/go/bin/MailHog`
+7. **Celery Worker** — `celery -A app:celery_app worker -l INFO`
+8. **Celery Beat** (scheduled jobs) — `celery -A app:celery_app beat -l INFO`
+
+---
 
 ## 📝 Abstract:
 This project is a multi-user application designed for **Admin**, **Customers**, and **Professionals**, providing comprehensive home servicing and solutions. The development was structured in phases:
