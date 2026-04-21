@@ -2,6 +2,16 @@
 
 ## 🚀 Project Title: 
 **Abode Mantra: Your A-Z Cleaning Experts V2**
+---
+
+![Project](https://img.shields.io/badge/Project-Full%20Stack%20App-blue)
+![Type](https://img.shields.io/badge/Type-SPA%20%2B%20Backend%20System-yellow)
+![Stack](https://img.shields.io/badge/Stack-Vue%20%2B%20Flask-violet)
+![Architecture](https://img.shields.io/badge/Architecture-REST%20%2B%20Async%20Tasks-red)
+![Features](https://img.shields.io/badge/Features-RBAC%2C%20Caching%2C%20Reports-teal)
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
+
+---
 
 ## 🎥 Project Demo Video: [https://drive.google.com/file/d/1oMztdSLeSnzmO9rJTHkRclWp1T8CHu-y/view?usp=sharing](https://drive.google.com/file/d/1oMztdSLeSnzmO9rJTHkRclWp1T8CHu-y/view?usp=sharing)
 
