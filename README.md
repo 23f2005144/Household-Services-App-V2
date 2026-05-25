@@ -139,7 +139,7 @@ python3 app.py
 
 ## 🔮 Future Improvements
 
-While this version successfully implements a production-style SPA and async job queues, the following upgrades are planned for the next iteration:
+While this version successfully implements a production-style SPA and async job queues, the following upgrades can be implemented in the future:
 
 1. **Independent Deployment:** Fully decoupling the deployment architecture by hosting the Vue.js frontend on a CDN (e.g., Vercel/Netlify) and the Flask/Celery backend on a cloud provider (e.g., AWS/Render).
 2. **Automated Testing Suite:** Implementing robust unit and integration tests for the API endpoints and background tasks using `pytest` to ensure application stability as new features are added.
