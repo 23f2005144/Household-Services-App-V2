@@ -1,8 +1,11 @@
 # 🏠 Household-Services-App-V2
 
-## 🚀 Project Title: 
+## 🚀 Project Title:
+
 **Abode Mantra: Your A-Z Cleaning Experts V2**
----
+
+> **A Full-Stack Single-Page Application (SPA) providing an end-to-end multi-user platform for household service management, scheduling, and analytics.**
+
 
 ![Project](https://img.shields.io/badge/Project-Full%20Stack%20App-blue)
 ![Type](https://img.shields.io/badge/Type-SPA%20%2B%20Backend%20System-yellow)
@@ -13,104 +16,131 @@
 
 ---
 
-## 🎥 [Project Demo Video:](https://drive.google.com/file/d/1NBXspFo0VMFpsDZIC6ltZF2eQs0PyPXt/view?usp=sharing)
+## 🎥 Quick Links & Visuals
 
+* **[Project Demo Video](https://drive.google.com/file/d/1NBXspFo0VMFpsDZIC6ltZF2eQs0PyPXt/view?usp=sharing)**
+
+### 🖼️ App Interfaces
+| Home Page | Admin Dashboard | Professional Summary Page |
+| :---: | :---: | :---: |
+| ![Homepage](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-HomePage.jpeg) | ![Admin Dashboard](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-AdminDashboard.jpeg) | ![Summary Page](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-SummaryPage.jpeg) |
 ---
-### 🏠 Home Page
-![Homepage](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-HomePage.jpeg)
 
----
+## 🧠 Problem Framing & Architecture
 
-## 📚 Frameworks and Libraries Used:
-- **Python**: 3.12.3 🐍
-- **SQLite**: 3.49.1 💾
-- **Flask**: 3.1.0 🌐
-- **Flask-SQLAlchemy**: 3.1.1 🛠️
-- **Flask-Security-Too**: 5.5.2 🔒
-- **Flask-RESTful**: 0.3.10 🔗
-- **Flask-Caching**: 2.3.0 ⚡
-- **Flask-Excel**: 0.0.7 📂
-- **Celery**: 5.4.0 🔄
-- **Redis**: 5.2.1 🧠
-- **pyexcel**: 0.7.1 📊
-- **WeasyPrint**: 64.0 🖨️
-- **datetime and smtplib**: Python’s Inbuilt Library ⏰✉️
-- **JavaScript ES6**: For frontend logic 🖼️
-- **Vue**: 2.7.16 🌐
-- **Vue-Router**: 3.0.0 🧭
-- **Vuex**: 3.0.0 🗄️
-- **Flatpickr.js**: 4.0.0 📅
-- **Chart.js**: 4.4.8 📊
-- **Bootstrap**: 5.3.3 🎨
+This project is a comprehensive multi-user application designed for **Admin, Customers, and Professionals**. It serves as a centralized platform for booking, fulfilling, and managing household services.
 
----
-## 🛠️ Setup & Installation
-
-1. **Create virtual environment** — `python3 -m venv .venv`
-2. **Activate it** — `source .venv/bin/activate`
-3. **Install dependencies** — `pip install -r requirements.txt`
-4. **Start Redis** — `sudo service redis-server start`
-5. **Run Flask app** — `python3 app.py`
-
-Open separate terminals for:
-
-6. **MailHog** (local email testing) — `~/go/bin/MailHog`
-7. **Celery Worker** — `celery -A app:celery_app worker -l INFO`
-8. **Celery Beat** (scheduled jobs) — `celery -A app:celery_app beat -l INFO`
+**Architectural Upgrade (The "Why"):**
+This iteration transitions from a traditional Multi-Page Application (MPA) to a **Single-Page Application (SPA)** framework. By cleanly separating the backend (Flask REST API) from the frontend (Vue.js, Vue-Router, Vuex), the app ensures seamless page transitions, completely eliminating full page reloads. The backend focuses strictly on business logic, asynchronous task management, and data integrity, while the frontend dynamically updates the UI via state management.
 
 ---
 
-## 📝 Abstract:
-This project is a multi-user application designed for **Admin**, **Customers**, and **Professionals**, providing comprehensive home servicing and solutions. The development was structured in phases:
+## 🏗️ System Design & Database Decisions
 
-1. **Database Initialization**: Created tables for users, services, and requests with SQLite3, incorporating password hashing and role-based access control.
-2. **Coding Environment Setup**: Modularized code and implemented Bootstrap for UI and Vue for dynamic frontend.
-3. **Frontend Development**: Leveraged HTML, CSS, JavaScript, Vue, Vue-Router, and Vuex to create an intuitive and responsive user interface.
-4. **Controllers Development**: Handled different user roles using Flask and Flask-SQLAlchemy, with API endpoints for seamless integration.
-5. **Testing**: Utilized dummy data to verify the backend and frontend functionality.
+The foundation of the application relies on SQLite3 integrated with SQLAlchemy. Key engineering decisions include:
 
-This version (V2) builds upon the initial Household Services App by enhancing the frontend and backend integration, adding advanced features such as background job scheduling, automated reminders, and monthly reporting. The application upgrades from **Multi-Page Application to Single-Page Application** architecture using Vue.js, enabling seamless page transitions, faster navigation without full page reloads, and dynamic UI updates through Vue-Router and Vuex state management.
+* **Relational Integrity:** Implemented `ON DELETE CASCADE` rules. If an Admin deletes a specific service, all associated service requests are automatically removed to prevent orphaned records in the database.
+* **Dynamic Data Attributes:** Utilized `@property` decorators in `models.py` to dynamically calculate the average ratings of professionals and services on the fly, as well as format service request timestamps for enhanced readability on the frontend.
+* **Role-Based Access Control (RBAC):** Leveraged Flask-Security-Too to implement Token-based authentication, ensuring strict boundaries between Admin, Customer, and Professional privileges.
 
----
-
-## 🌟 Core Functionalities:
-
-### 👨‍💼 Admin:
-1. Manage services (CRUD) 🛠️
-2. Cascade delete service-related records upon service deletion 🗑️
-3. Approve/Reject new professionals ✅❌
-4. Monitor all service requests 👀
-5. Search and block/unblock users with restricted access post-blocking 🔍🔒
-6. Summarize service ratings and statuses 📊
-7. Export CSV reports of service requests 📂
-
-![Admin Dashboard](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-AdminDashboard.jpeg)
-
-### 🧍 Customer:
-1. Book, close, or cancel services by pin code 📞
-2. Book different service types simultaneously 🔄
-3. View and rate services/professionals ⭐
-4. Edit profile and search past/current requests 🖊️🔍
-5. Summarize ratings for services and professionals 📈
-6. Receive monthly service summary reports 📧
-
-### 🛠️ Professional:
-1. Accept requests based on pin code and service type 📲
-2. Handle one request at a time, allowing subsequent requests post-completion ⏳
-3. View past/current requests and edit profile 📝
-4. Summarize customer ratings and request statuses 📊
-5. Receive hourly reminders for pending requests ⏰
-
-![Summary Page](https://github.com/23f2005144/Household-Services-App-V2/blob/bc54c2ea22d38b84ee7499af0f38c57a51f5f8a6/Household-Services-App-SummaryPage.jpeg)
-
----
-
-## 🔌 API Endpoints
-The backend provides 11 RESTful API endpoints using Flask-RESTful for managing users, services, and service requests. These endpoints support operations such as user registration, service management, request handling, and user administration. For detailed API documentation, refer to the project report: [Project Report](https://github.com/23f2005144/Household-Services-App-V2/blob/82e95f875839b6966ff790b1ad1e607198b57b17/Project%20Report.pdf).
-
----
-
-## 📌 ER Diagram:
+### 📌 ER Diagram
 ![ER Diagram](ER%20Diagram%20for%20MAD-II%20Project%20HouseholdServices%20-Kavish-23f2005144.png)
+---
+
+## ⚡ Core Features & Edge Case Handling
+
+Beyond standard CRUD operations, this application handles complex asynchronous background tasks and real-world edge cases using **Celery** and **Redis**.
+
+### 🔄 Background Jobs & Automation
+
+* **Hourly Reminders:** The system scans for unassigned service requests and sends automated hourly emails (via `smtplib` and `MailHog`) to all available professionals whose pin code and expertise match the pending request.
+* **Automated Monthly Reports:** A Celery Beat scheduler generates a monthly PDF summary of all service interactions for each customer using `WeasyPrint` and emails it out automatically.
+* **Data Export:** Admins can export bulk CSV files of closed service requests, handled dynamically by `Flask-Excel`.
+
+### 🛡️ Edge Case Management (Failure Handling)
+
+* **The "Missed Booking" Protocol:** What happens if a customer books a service but no professional accepts it in time? The system runs a background Celery check every 2 hours to identify unaccepted requests that have surpassed their scheduled time. The backend automatically reschedules the service for the following day and dispatches an email notification to the customer informing them of the delay.
 
 ---
+
+## 🔌 API Design & Performance Tuning
+
+The backend exposes **11 RESTful API endpoints** utilizing `Flask-RESTful` for seamless frontend-backend communication.
+
+### Performance & Caching Strategy
+
+To reduce database load and improve fetch times for frequently accessed, read-heavy data, API responses (such as `ServiceListAPI`, `CustomerListAPI`, and `UserListAPI`) are cached using `Flask-Caching` and stored directly in **Redis**.
+
+| Endpoint | Methods | Access Level | Purpose |
+| --- | --- | --- | --- |
+| `/api/register` | `POST` | Public | Registers new Customers/Professionals. |
+| `/api/service/<id>` | `GET`, `PUT`, `DELETE` | Admin (PUT/DEL) | Manages specific service details. |
+| `/api/service` | `GET`, `POST` | Admin (POST) | Retrieves all services (Cached) / Creates new. |
+| `/api/service_request/<id>` | `GET`, `PATCH` | Auth Token Req. | Customers cancel/close; Pros accept requests. |
+| `/api/user/<id>` | `GET`, `PATCH`, `DELETE` | Admin (PATCH/DEL) | Block/Unblock users or Reject professionals. |
+
+---
+
+## 🛠️ Tech Stack & Libraries
+
+**Backend & Infrastructure**
+
+* **Language:** Python 3.12.3
+* **Web Framework:** Flask 3.1.0, Flask-RESTful 0.3.10
+* **Database:** SQLite 3.49.1, Flask-SQLAlchemy 3.1.1
+* **Authentication:** Flask-Security-Too 5.5.2
+* **Async/Jobs:** Celery 5.4.0, Redis 5.2.1
+* **Document Generation:** WeasyPrint 64.0 (PDFs), Flask-Excel/pyexcel (CSV)
+
+**Frontend & UI**
+
+* **Framework:** JavaScript (ES6+), Vue 2.7.16
+* **State & Routing:** Vuex 3.0.0, Vue-Router 3.0.0
+* **Styling & Data Vis:** Bootstrap 5.3.3, Chart.js 4.4.8
+* **Utilities:** Flatpickr.js 4.0.0 (Time/Date booking)
+
+---
+
+## 💻 Setup & Reproducibility (Local Installation)
+
+Follow these exact steps to spin up the distributed architecture locally:
+
+**1. Environment Setup**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+```
+
+**2. Start the Backend Infrastructure**
+*(Open separate terminals for each of the following)*
+
+```bash
+# Terminal 1: Start Redis Server for Caching & Task Queues
+sudo service redis-server start
+
+# Terminal 2: Run MailHog for Local Email Interception/Testing
+~/go/bin/MailHog
+
+# Terminal 3: Start the Celery Worker (Processes async tasks)
+celery -A app:celery_app worker -l INFO
+
+# Terminal 4: Start Celery Beat (Triggers scheduled jobs)
+celery -A app:celery_app beat -l INFO
+
+# Terminal 5: Start the Flask Application
+python3 app.py
+
+```
+
+---
+
+## 🔮 Future Improvements
+
+While this version successfully implements a production-style SPA and async job queues, the following upgrades are planned for the next iteration:
+
+1. **Independent Deployment:** Fully decoupling the deployment architecture by hosting the Vue.js frontend on a CDN (e.g., Vercel/Netlify) and the Flask/Celery backend on a cloud provider (e.g., AWS/Render).
+2. **Automated Testing Suite:** Implementing robust unit and integration tests for the API endpoints and background tasks using `pytest` to ensure application stability as new features are added.
+3. **UI/UX Enhancements:** Iterating on the user interface to improve accessibility, mobile responsiveness, and overall user flow based on user feedback.
