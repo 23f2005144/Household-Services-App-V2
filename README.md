@@ -18,7 +18,7 @@
 
 ## 🎥 Quick Links & Visuals
 
-* **[Project Demo Video](https://drive.google.com/file/d/1NBXspFo0VMFpsDZIC6ltZF2eQs0PyPXt/view?usp=sharing)**
+* **[Project Demo Video](https://drive.google.com/file/d/1amiCoBBHGFdcbr37UxTTJCsshItAc79c/view?usp=sharing)**
 
 ### 🖼️ App Interfaces
 | Home Page | Admin Dashboard | Professional Summary Page |
